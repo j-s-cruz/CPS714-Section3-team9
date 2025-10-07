@@ -10,6 +10,6 @@
 1. Ensure that you have Python installed
 2. cd to the backend folder
 3. Create a virtual environment by running the command "python -m venv .venv"
-4. Activate the virtual environment by running the command ".venv/Scripts/activate.ps1" or using other files in the .venv/Scripts folder
-5. Run "pip install fastapi[standard]"
+4. Activate the virtual environment by running the command ".venv/Scripts/activate" or using other files in the .venv/Scripts folder
+5. Run "pip install -r requirements.txt"
 6. Run "fastapi dev main.py" to start the backend
