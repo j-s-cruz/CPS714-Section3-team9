@@ -7,5 +7,5 @@ async def data_get():
     return [{"This": "Is"}, {"Some": "Data"}]
 
 @data_router.get("/data/test", tags=["data"])
-async def data_get():
+async def data_get_test():
     return [{"test": "test"}]
