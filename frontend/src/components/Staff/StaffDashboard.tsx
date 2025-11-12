@@ -37,20 +37,20 @@ export const StaffDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gray-900 text-yellow-500 space-y-6 p-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-slate-900">Staff Dashboard</h2>
+        <h2 className="text-2xl font-bold text-slate-100">Staff Dashboard</h2>
         <div className="flex gap-2">
           <button
             onClick={() => setShowAddClass(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Class
           </button>
           <button
             onClick={() => setShowAnnouncement(true)}
-            className="px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
             <Bell className="w-4 h-4" />
             Announce
@@ -59,36 +59,36 @@ export const StaffDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-white">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-600">Total Members</span>
-            <Users className="w-5 h-5 text-blue-600" />
+            <span className="text-white">Total Members</span>
+            <Users className="w-5 h-5 text-orange" />
           </div>
-          <p className="text-3xl font-bold text-slate-900">{stats.totalMembers}</p>
+          <p className="text-3xl font-bold text-white">{stats.totalMembers}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-white">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-600">Active Subscriptions</span>
+            <span className="text-white">Active Subscriptions</span>
             <TrendingUp className="w-5 h-5 text-green-600" />
           </div>
-          <p className="text-3xl font-bold text-slate-900">{stats.activeMembers}</p>
+          <p className="text-3xl font-bold text-white">{stats.activeMembers}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-white">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-600">Total Classes</span>
-            <Calendar className="w-5 h-5 text-cyan-600" />
+            <span className="text-white">Total Classes</span>
+            <Calendar className="w-5 h-5 text-blue-500" />
           </div>
-          <p className="text-3xl font-bold text-slate-900">{stats.totalClasses}</p>
+          <p className="text-3xl font-bold text-white">{stats.totalClasses}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-white">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-600">Today's Bookings</span>
+            <span className="text-white">Today's Bookings</span>
             <BarChart3 className="w-5 h-5 text-amber-600" />
           </div>
-          <p className="text-3xl font-bold text-slate-900">{stats.todayBookings}</p>
+          <p className="text-3xl font-bold text-white">{stats.todayBookings}</p>
         </div>
       </div>
 
@@ -121,8 +121,8 @@ const RecentMembers = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-      <h3 className="text-lg font-bold text-slate-900 mb-4">Recent Members</h3>
+    <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-white">
+      <h3 className="text-white font-bold text-slate-900 mb-4">Recent Members</h3>
       <div className="space-y-3">
         {members.map((member) => (
           <div key={member.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
@@ -166,8 +166,8 @@ const PopularClasses = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-      <h3 className="text-lg font-bold text-slate-900 mb-4">Popular Classes</h3>
+    <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-slate-200">
+      <h3 className="text-white font-bold text-slate-900 mb-4">Popular Classes</h3>
       <div className="space-y-3">
         {classes.map((cls, index) => (
           <div key={cls.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
@@ -332,7 +332,7 @@ const AnnouncementModal = ({ onClose }: { onClose: () => void }) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
               required
             />
           </div>
@@ -342,7 +342,7 @@ const AnnouncementModal = ({ onClose }: { onClose: () => void }) => {
             <textarea
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
               rows={4}
               required
             />
@@ -353,7 +353,7 @@ const AnnouncementModal = ({ onClose }: { onClose: () => void }) => {
             <select
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
             >
               <option value="low">Low</option>
               <option value="normal">Normal</option>
