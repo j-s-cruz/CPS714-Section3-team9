@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+//import { supabase } from '../../lib/supabase';
 import { Users, Calendar, TrendingUp, DollarSign, Plus, Bell, BarChart3 } from 'lucide-react';
+import DumbbellIcon from '../../assets/dumbbell.png';
+
 
 export const StaffDashboard = () => {
   const [stats, setStats] = useState({
@@ -39,7 +41,9 @@ export const StaffDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-slate-500 space-y-6 p-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-slate-100">Staff Dashboard</h2>
+        <h2 className="text-2xl font-bold text-slate-100 flex items-center gap-2">Staff Dashboard
+          <img src={DumbbellIcon} alt="Dashboard DumbbellIcon Icon" className='w-10 h-9 relative -top-0.5'/>
+        </h2>
         <div className="flex gap-2">
           <button
             onClick={() => setShowAddClass(true)}
@@ -294,11 +298,11 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full m-4">
-        <h3 className="text-xl font-bold text-slate-900 mb-4">Schedule New Class</h3>
+      <div className="bg-slate-200 rounded-xl border-8 border-slate-700 p-6 max-w-md w-full m-4">
+        <h3 className="text-xl font-bold text-slate-800 mb-4">Schedule New Class</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Class</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Class</label>
             <select
               value={formData.classId}
               onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
@@ -315,7 +319,7 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Assign Instructor</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Assign Instructor</label>
             <input
               type="text"
               value={formData.instructor_full_name}
@@ -327,7 +331,7 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Set Class Capacity</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Set Class Capacity</label>
             <input
               type="number"
               min="0"
@@ -340,7 +344,7 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Date</label>
             <input
               type="date"
               value={formData.date}
@@ -351,7 +355,7 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Start Time</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Start Time</label>
             <input
               type="time"
               value={formData.time}
@@ -371,7 +375,7 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+              className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-blue-700"
             >
               Schedule
             </button>
