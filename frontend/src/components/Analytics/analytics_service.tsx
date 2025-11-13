@@ -1,5 +1,9 @@
+import axios from "axios";
+import { MembershipChartData } from "./analytics_models";
+
+const api = 'http://localhost:8000'
+
 export const getData = async () => {
-  // Simulate fetching data (e.g., from an API or database)
 
   return new Promise((resolve) => {
     resolve(
@@ -12,15 +16,20 @@ export const getData = async () => {
         [20, 70],
     ]);
   });
-  
-//   return new Promise((resolve) => {
-//       resolve([
-//         ['Month', 'Active Members'],
-//         ['Jan', 120],
-//         ['Feb', 150],
-//         ['Mar', 170],
-//         ['Apr', 160],
-//         ['May', 200],
-//       ]);
-//   });
 };
+
+export const getMembershipData = async () => {
+    try {
+        const apiData = await axios.get<any[]>(api + '/data/membership_data');
+        return apiData.data;
+    }
+    catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.log(error.message);
+            return error.message;
+        } 
+        else {
+            console.log("Unexpected Error");
+        }
+    }
+}

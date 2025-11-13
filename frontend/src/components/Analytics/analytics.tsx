@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from "react-google-charts";
 import { getData } from './analytics_service';
+import MembershipChart from './membership_chart';
 
 // https://www.react-google-charts.com/examples/
 // https://developers.google.com/chart/interactive/docs
@@ -147,6 +148,8 @@ export const Analytics: React.FC = () => {
 
     return (
         <div>
+            <MembershipChart />
+            <br></br><br></br><br></br>
             <Chart 
                 chartType="LineChart"
                 data={newSignupsData}
