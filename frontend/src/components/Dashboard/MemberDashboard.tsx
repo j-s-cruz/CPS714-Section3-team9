@@ -2,262 +2,367 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import {
-  Calendar,
-  CreditCard,
   User,
   TrendingUp,
-  Users,
-  Award,
-  Activity,
   Settings,
   Bell,
-  LogOut,
-  Dumbbell,
   Clock,
+  LogOut,
 } from 'lucide-react';
-import { ClassBooking } from '../Classes/ClassBooking';
+import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe } from 'react-icons/gi';
+import { FaDumbbell } from 'react-icons/fa';
 import { ProfileEditor } from '../Profile/ProfileEditor';
-import { SocialFeed } from '../Social/SocialFeed';
-import { CommunityChallenges } from '../Social/CommunityChallenges';
-import { FacilityTracker } from '../Facility/FacilityTracker';
 import { StaffDashboard } from '../Staff/StaffDashboard';
+import { ClassCalendar } from './ClassCalendar';
 
-type TabType = 'dashboard' | 'classes' | 'social' | 'challenges' | 'facility' | 'profile' | 'staff';
+type TabType = 'dashboard' | 'profile' | 'staff';
+
+function startOfWeek(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + 1;
+  return new Date(d.setDate(diff));
+}
 
 export const MemberDashboard = () => {
   const { user, profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [upcomingBookings, setUpcomingBookings] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [stats, setStats] = useState({ totalClasses: 0, thisMonth: 0, streak: 0 });
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      fetchUpcomingBookings();
-      fetchNotifications();
-      fetchStats();
-    }
-  }, [user]);
+    fetchUpcomingBookings();
+    fetchNotifications();
+  }, []);
 
   const fetchUpcomingBookings = async () => {
-    const today = new Date().toISOString().split('T')[0];
-    const { data } = await supabase
-      .from('class_bookings')
-      .select('*, class_schedules(*, fitness_classes(*))')
-      .eq('user_id', user?.id)
-      .eq('status', 'confirmed')
-      .gte('class_schedules.scheduled_date', today)
-      .order('class_schedules.scheduled_date', { ascending: true })
-      .limit(5);
+    /* Place holder for fetching upcoming bookings from team 3 */
+    await supabase
+      .from('ph')
+      .select('ph');
 
-    setUpcomingBookings(data || []);
+
+    /* Dummy data. Once we get the database we can ignore this*/
+    const dummyEvents: any[] = [
+      {
+        id: '1',
+        title: 'Morning Yoga',
+        start_time: '9:00 AM',
+        end_time: '3:00 PM',
+        date: '2025-11-15',
+        instructor: 'Instructor'
+      },
+      {
+        id: '2',
+        title: 'HIIT Training',
+        start_time: '6:00 PM',
+        end_time: '7:00 PM',
+        date: '2025-11-16',
+        instructor: 'Instructor'
+      },
+      {
+        id: '3',
+        title: 'Spin Class',
+        start_time: '10:00 AM',
+        end_time: '11:00 AM',
+        date: '2025-11-18',
+        instructor: 'Instructor'
+      },
+      {
+        id: '4',
+        title: 'CrossFit',
+        start_time: '7:00 AM',
+        end_time: '8:00 AM',
+        date: '2025-11-19',
+        instructor: 'Instructor'
+      },
+      {
+        id: '5',
+        title: 'Pilates',
+        start_time: '5:30 PM',
+        end_time: '6:30 PM',
+        date: '2025-11-20',
+        instructor: 'Instructor'
+      },
+      {
+        id: '6',
+        title: 'Boxing',
+        start_time: '8:00 AM',
+        end_time: '9:00 AM',
+        date: '2025-11-21',
+        instructor: 'Instructor'
+      },
+      {
+        id: '7',
+        title: 'Zumba',
+        start_time: '12:00 PM',
+        end_time: '1:00 PM',
+        date: '2025-11-22',
+        instructor: 'Instructor'
+      },
+      {
+        id: '8',
+        title: 'Power Lifting',
+        start_time: '4:00 PM',
+        end_time: '5:00 PM',
+        date: '2025-11-23',
+        instructor: 'Instructor'
+      },
+      {
+        id: '9',
+        title: 'Power Lifting',
+        start_time: '4:00 PM',
+        end_time: '5:00 PM',
+        date: '2025-11-13',
+        instructor: 'Instructor'
+      },
+      {
+        id: '1',
+        title: 'lmao?',
+        start_time: '9:00 AM',
+        end_time: '3:00 PM',
+        date: '2025-11-11',
+        instructor: 'Instructor'
+      }
+    ];
+
+    // Get this week's start (Monday) and end (Sunday)
+    const now = new Date();
+    const weekStart = startOfWeek(now);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    /* Limit the upcoming events to this week and filter out past events */
+    const thisWeekEvents = dummyEvents
+      .filter(event => {
+        /* Parse date string as local date (avoid timezone issues) */
+        const [year, month, day] = event.date.split('-').map(Number);
+        const eventDate = new Date(year, month - 1, day);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        /* Keep event only if its today or on a future day within this week */
+        return eventDate >= weekStart && eventDate <= weekEnd && eventDate >= today;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(`${a.date} ${a.start_time}`);
+        const dateB = new Date(`${b.date} ${b.start_time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
+
+    setUpcomingBookings(thisWeekEvents);
+    console.log('Bookings set');
   };
 
   const fetchNotifications = async () => {
+    /* Placeholder for notifications database */
     const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user?.id)
-      .eq('is_read', false)
-      .order('created_at', { ascending: false })
-      .limit(5);
+      .from('ph')
+      .select('ph');
 
     setNotifications(data || []);
-  };
-
-  const fetchStats = async () => {
-    const { data } = await supabase
-      .from('class_bookings')
-      .select('*')
-      .eq('user_id', user?.id)
-      .eq('status', 'attended');
-
-    const total = data?.length || 0;
-    const thisMonth = data?.filter((b: any) => {
-      const bookedDate = new Date(b.booked_at);
-      const now = new Date();
-      return bookedDate.getMonth() === now.getMonth() && bookedDate.getFullYear() === now.getFullYear();
-    }).length || 0;
-
-    setStats({ totalClasses: total, thisMonth, streak: Math.min(total, 7) });
   };
 
   const subscription = profile?.membership_subscriptions?.[0];
   const tier = subscription?.membership_tiers;
 
-  const tabs = [
-    { id: 'dashboard' as TabType, label: 'Dashboard', icon: TrendingUp },
-    { id: 'classes' as TabType, label: 'Classes', icon: Calendar },
-    { id: 'social' as TabType, label: 'Social', icon: Users },
-    { id: 'challenges' as TabType, label: 'Challenges', icon: Award },
-    { id: 'facility' as TabType, label: 'Facility', icon: Dumbbell },
-    { id: 'profile' as TabType, label: 'Profile', icon: User },
-    ...(profile?.is_staff ? [{ id: 'staff' as TabType, label: 'Staff Panel', icon: Settings }] : []),
-  ];
+  const initials = (profile?.full_name || 'U').split(' ').map((p: string) => p[0]).slice(0, 2).join('');
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+    <div className="flex flex-col h-screen bg-gray-900 overflow-hidden">
+      {/* Banner */}
+      <header className="bg-gray-800/95 border-b border-gray-700/50 backdrop-blur-md shadow-lg">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-2 rounded-lg">
-                <Dumbbell className="w-6 h-6 text-white" />
+              <div className="bg-gold-500/90 p-2 rounded-lg shadow-md hover:shadow-gold-500/30 transition-all duration-300 hover:scale-105">
+                <FaDumbbell className="w-6 h-6 text-gray-900" />
               </div>
-              <span className="text-xl font-bold text-slate-900">FitHub Elite</span>
+              <span className="text-xl font-bold text-gold-400 tracking-tight">FitHub</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <button className="relative p-2 text-slate-600 hover:text-slate-900 transition">
+            <div className="flex items-center gap-3">
+              {/* Notifications */}
+              <button className="relative p-2 text-gray-400 hover:text-gold-400 transition-all duration-200 hover:bg-gray-700/50 rounded-lg">
                 <Bell className="w-5 h-5" />
                 {notifications.length > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-gold-500 rounded-full animate-pulse-gold shadow-lg shadow-gold-500/50"></span>
                 )}
               </button>
-              <button
-                onClick={signOut}
-                className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 transition"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Sign Out</span>
-              </button>
+
+              {/* Section for dashboard and profile buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'dashboard'
+                      ? 'bg-gold-500/90 text-gray-900 shadow-lg'
+                      : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
+                    }`}
+                >
+                  <TrendingUp className="w-4 h-4 inline mr-1" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => setActiveTab('profile')}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'profile'
+                      ? 'bg-gold-500/90 text-gray-900 shadow-lg'
+                      : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
+                    }`}
+                >
+                  <User className="w-4 h-4 inline mr-1" />
+                  Profile
+                </button>
+                {profile?.is_staff && (
+                  <button
+                    onClick={() => setActiveTab('staff')}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'staff'
+                        ? 'bg-gold-500/90 text-gray-900 shadow-lg'
+                        : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
+                      }`}
+                  >
+                    <Settings className="w-4 h-4 inline mr-1" />
+                    Staff Panel
+                  </button>
+                )}
+              </div>
+
+              {/* Sign out section */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="w-10 h-10 bg-gold-500/90 rounded-full flex items-center justify-center text-gray-900 font-bold text-sm shadow-md hover:shadow-gold-500/30 transition-all duration-300 hover:scale-105"
+                >
+                  {initials}
+                </button>
+
+                {showProfileMenu && (
+                  <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="p-4 border-b border-gray-700">
+                      <div className="text-sm font-bold text-gray-100 truncate">{profile?.full_name || 'User'}</div>
+                      <div className="text-xs text-gray-400 truncate">{user?.email}</div>
+                    </div>
+                    <div className="p-2">
+                      <button
+                        onClick={signOut}
+                        className="w-full flex items-center gap-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700/50 hover:text-red-400 transition-all duration-300"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm font-semibold">Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <aside className="lg:w-64 space-y-2">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{tab.label}</span>
-                </button>
-              );
-            })}
-          </aside>
-
-          <main className="flex-1">
-            {activeTab === 'dashboard' && (
-              <div className="space-y-6">
-                <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-6 text-white">
-                  <h1 className="text-2xl font-bold mb-2">Welcome back, {profile?.full_name}!</h1>
-                  <p className="text-blue-100">
-                    {tier?.name} Member • {stats.thisMonth} classes this month
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-600">Total Classes</span>
-                      <Activity className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <p className="text-3xl font-bold text-slate-900">{stats.totalClasses}</p>
-                  </div>
-
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-600">This Month</span>
-                      <Calendar className="w-5 h-5 text-cyan-600" />
-                    </div>
-                    <p className="text-3xl font-bold text-slate-900">{stats.thisMonth}</p>
-                  </div>
-
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-600">Day Streak</span>
-                      <Award className="w-5 h-5 text-amber-600" />
-                    </div>
-                    <p className="text-3xl font-bold text-slate-900">{stats.streak}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-blue-600" />
+      {/* Main Page */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-gray-800/90 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-1">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
+                      <GiRunningShoe className="w-6 h-6 text-gold-400" />
                       Upcoming Classes
                     </h3>
+                  </div>
+
+                  <div className="mb-2 max-h-64 overflow-y-auto">
+                    {console.log('Rendering bookings, length:', upcomingBookings.length, 'bookings:', upcomingBookings)}
                     {upcomingBookings.length === 0 ? (
-                      <p className="text-slate-500">No upcoming bookings</p>
+                      <div className="text-center py-16 bg-gray-700/30 rounded-xl border border-dashed border-gray-600">
+                        <p className="text-gray-400 mb-4">No upcoming classes booked</p>
+                      </div>
                     ) : (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {upcomingBookings.map((booking: any) => (
                           <div
                             key={booking.id}
-                            className="flex items-start justify-between p-3 bg-slate-50 rounded-lg"
+                            className="flex items-start justify-between p-5 bg-gray-700/30 rounded-xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-200 hover:shadow-md hover:bg-gray-700/50"
                           >
-                            <div>
-                              <p className="font-semibold text-slate-900">
-                                {booking.class_schedules.fitness_classes.name}
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-100 text-lg">
+                                {booking.title}
                               </p>
-                              <p className="text-sm text-slate-600 flex items-center gap-1 mt-1">
-                                <Clock className="w-4 h-4" />
-                                {new Date(booking.class_schedules.scheduled_date).toLocaleDateString()} at{' '}
-                                {booking.class_schedules.start_time}
+                              <p className="text-sm text-gray-300 flex items-center gap-1 mt-2">
+                                <Clock className="w-4 h-4 text-gold-400" />
+                                {new Date(booking.date).toLocaleDateString()} at{' '}
+                                {booking.start_time}
                               </p>
                             </div>
+                            <span className="badge-status text-xs">Confirmed</span>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
 
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-cyan-600" />
-                      Membership Status
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Plan</span>
-                        <span className="font-semibold text-slate-900">{tier?.name}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Status</span>
-                        <span className="px-2 py-1 bg-green-100 text-green-700 text-sm font-medium rounded">
-                          {subscription?.status}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Renewal</span>
-                        <span className="font-semibold text-slate-900">
-                          {subscription?.renewal_date
-                            ? new Date(subscription.renewal_date).toLocaleDateString()
-                            : 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Monthly Price</span>
-                        <span className="font-semibold text-slate-900">${tier?.price_monthly}</span>
-                      </div>
+                  {/* View calendar button */}
+                  <button
+                    onClick={() => {
+                      const scheduleElement = document.getElementById('class-calendar');
+                      scheduleElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="group w-full mt-2 px-6 py-4 bg-gold-500/90 hover:bg-gold-500 text-gray-900 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-gold-500/30 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <GiWeightLiftingUp className="w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
+                    <span>View Schedule</span>
+                  </button>
+                </div>
+
+                <div className="bg-gray-800/60 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-2">
+                  <h3 className="text-xl font-bold text-gray-100 mb-5 flex items-center gap-2">
+                    <GiMuscleUp className="w-7 h-7 text-gold-400" />
+                    Membership Status
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-700/50">
+                      <span className="text-gray-400 font-medium">Plan</span>
+                      <span className="font-bold text-gray-100 text-lg">{tier?.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b border-gray-700/50">
+                      <span className="text-gray-400 font-medium">Status</span>
+                      <span className="badge-status">
+                        {subscription?.status}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b border-gray-700/50">
+                      <span className="text-gray-400 font-medium">Renewal</span>
+                      <span className="font-semibold text-gray-100">
+                        {subscription?.renewal_date
+                          ? new Date(subscription.renewal_date).toLocaleDateString()
+                          : 'N/A'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-3">
+                      <span className="text-gray-400 font-medium">Monthly Price</span>
+                      <span className="font-bold text-gold-400 text-xl">${tier?.price_monthly}</span>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
 
-            {activeTab === 'classes' && <ClassBooking />}
-            {activeTab === 'social' && <SocialFeed />}
-            {activeTab === 'challenges' && <CommunityChallenges />}
-            {activeTab === 'facility' && <FacilityTracker />}
-            {activeTab === 'profile' && <ProfileEditor />}
-            {activeTab === 'staff' && profile?.is_staff && <StaffDashboard />}
-          </main>
+              {/* class calendar section */}
+              <div id="class-calendar" className="stagger-2">
+                <ClassCalendar userId={user?.id} />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'profile' && <ProfileEditor />}
+          {activeTab === 'staff' && profile?.is_staff && <StaffDashboard />}
         </div>
-      </div>
+      </main>
     </div>
   );
 };
