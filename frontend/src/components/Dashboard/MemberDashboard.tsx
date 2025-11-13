@@ -170,7 +170,6 @@ export const MemberDashboard = () => {
 
   const subscription = profile?.membership_subscriptions?.[0];
   const tier = subscription?.membership_tiers;
-
   const initials = (profile?.full_name || 'U').split(' ').map((p: string) => p[0]).slice(0, 2).join('');
 
   return (
@@ -200,8 +199,8 @@ export const MemberDashboard = () => {
                 <button
                   onClick={() => setActiveTab('dashboard')}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'dashboard'
-                      ? 'bg-gold-500/90 text-gray-900 shadow-lg'
-                      : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
+                    ? 'bg-gold-500/90 text-gray-900 shadow-lg'
+                    : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
                     }`}
                 >
                   <TrendingUp className="w-4 h-4 inline mr-1" />
@@ -210,8 +209,8 @@ export const MemberDashboard = () => {
                 <button
                   onClick={() => setActiveTab('profile')}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'profile'
-                      ? 'bg-gold-500/90 text-gray-900 shadow-lg'
-                      : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
+                    ? 'bg-gold-500/90 text-gray-900 shadow-lg'
+                    : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
                     }`}
                 >
                   <User className="w-4 h-4 inline mr-1" />
@@ -221,8 +220,8 @@ export const MemberDashboard = () => {
                   <button
                     onClick={() => setActiveTab('staff')}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'staff'
-                        ? 'bg-gold-500/90 text-gray-900 shadow-lg'
-                        : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
+                      ? 'bg-gold-500/90 text-gray-900 shadow-lg'
+                      : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
                       }`}
                   >
                     <Settings className="w-4 h-4 inline mr-1" />
@@ -268,6 +267,48 @@ export const MemberDashboard = () => {
         <div className="max-w-7xl mx-auto px-6 py-8">
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
+              {/* Membership Status Widget */}
+              <div className="relative rounded-2xl border border-gold-500/30 p-6 overflow-hidden">
+                {/* Background Image */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: "url('https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=1200&q=80')",
+                  }}
+                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-gold-500/60 to-gold-600/60" />
+
+                {/* Content */}
+                <div className="relative z-10 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-gold-500/90 p-3 rounded-xl shadow-lg">
+                      <GiMuscleUp className="w-8 h-8 text-gray-900" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-white drop-shadow-lg">{tier?.name || 'No Active Plan'}</h2>
+                      <p className="text-gray-100 text-sm mt-1 drop-shadow">
+                        {subscription?.status ? (
+                          <span className="inline-flex items-center gap-2">
+                            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg"></span>
+                            {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                          </span>
+                        ) : (
+                          'Inactive'
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-100 text-lg font-semibold drop-shadow">
+                      {subscription?.renewal_date
+                        ? `Renews ${new Date(subscription.renewal_date).toLocaleDateString()}`
+                        : 'No renewal date'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-gray-800/90 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-1">
                   <div className="flex items-center justify-between mb-6">
@@ -323,30 +364,13 @@ export const MemberDashboard = () => {
                 <div className="bg-gray-800/60 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-2">
                   <h3 className="text-xl font-bold text-gray-100 mb-5 flex items-center gap-2">
                     <GiMuscleUp className="w-7 h-7 text-gold-400" />
-                    Membership Status
+                    Gym Achievements Feed
                   </h3>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center py-3 border-b border-gray-700/50">
-                      <span className="text-gray-400 font-medium">Plan</span>
-                      <span className="font-bold text-gray-100 text-lg">{tier?.name}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 border-b border-gray-700/50">
-                      <span className="text-gray-400 font-medium">Status</span>
-                      <span className="badge-status">
-                        {subscription?.status}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-3 border-b border-gray-700/50">
-                      <span className="text-gray-400 font-medium">Renewal</span>
-                      <span className="font-semibold text-gray-100">
-                        {subscription?.renewal_date
-                          ? new Date(subscription.renewal_date).toLocaleDateString()
-                          : 'N/A'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-3">
-                      <span className="text-gray-400 font-medium">Monthly Price</span>
-                      <span className="font-bold text-gold-400 text-xl">${tier?.price_monthly}</span>
+                    {/* TODO: Add acheivement information here once we figure out what it is */}
+                    <div className="text-center py-8 text-gray-400">
+                      {/* TODO: Need to change this */}
+                      <p>I genuinely have no idea what would go here :/</p>
                     </div>
                   </div>
                 </div>
