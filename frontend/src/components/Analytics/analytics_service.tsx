@@ -1,5 +1,4 @@
 import axios from "axios";
-import { MembershipChartData } from "./analytics_models";
 
 const api = 'http://localhost:8000'
 
