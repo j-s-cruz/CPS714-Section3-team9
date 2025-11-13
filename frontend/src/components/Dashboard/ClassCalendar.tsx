@@ -243,107 +243,119 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
   const weekDays = daysOfWeek(currentWeekStart);
 
   return (
-    <div className="bg-gray-800/60 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-3">
-            <Calendar className="w-6 h-6 text-gold-400" />
-            <h3 className="text-2xl font-bold text-gray-100">{monthYearDisplay(currentWeekStart)}</h3>
+    <div className="relative bg-gray-800/60 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 overflow-hidden">
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-10"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1728486145245-d4cb0c9c3470?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-6 h-6 text-gold-400" />
+              <h1 className="text-2xl font-bold text-gray-100">Fitness Schedule</h1>
+            </div>
+            <h2 className="ml-9 text-xs font-bold text-gray-100">{monthYearDisplay(currentWeekStart)}</h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goToToday}
+              className="px-4 py-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg font-medium transition-all duration-200 text-sm"
+            >
+              Today
+            </button>
+            <button
+              onClick={() => navigateWeek('prev')}
+              className="p-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg transition-all duration-200"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => navigateWeek('next')}
+              className="p-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg transition-all duration-200"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={goToToday}
-            className="px-4 py-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg font-medium transition-all duration-200 text-sm"
-          >
-            Today
-          </button>
-          <button
-            onClick={() => navigateWeek('prev')}
-            className="p-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg transition-all duration-200"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => navigateWeek('next')}
-            className="p-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg transition-all duration-200"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <div className="min-w-[1000px]">
-          {/* Grid */}
-          <div className="grid grid-cols-8 gap-px bg-gray-700/30 rounded-xl border border-gray-700/50">
-            {/* Time column header */}
-            <div className="bg-gray-800/80 p-3">
-              <div className="text-sm font-semibold text-gray-400">Time</div>
-            </div>
-
-            {/* Day header */}
-            {weekDays.map((day, index) => (
-              <div
-                key={index}
-                className={`bg-gray-800/80 p-3 text-center ${isToday(day) ? 'bg-gold-500/10 border-b-2 border-gold-500' : ''
-                  }`}
-              >
-                <div className={`text-sm font-bold ${isToday(day) ? 'text-gold-400' : 'text-gray-100'}`}>
-                  {formatDayHeader(day)}
-                </div>
+        <div className="overflow-x-auto">
+          <div className="min-w-[1000px]">
+            {/* Grid */}
+            <div className="grid grid-cols-8 gap-px bg-gray-700/30 rounded-xl border border-gray-700/50">
+              {/* Time column header */}
+              <div className="bg-gray-800/80 p-3">
+                <div className="text-sm font-semibold text-gray-400">Time</div>
               </div>
-            ))}
 
-            {/* Time slots and events */}
-            {timeSlots.map((time, timeIndex) => (
-              <>
-                {/* Time */}
-                <div key={`time-${timeIndex}`} className="bg-gray-800/50 p-3 text-right border-t border-gray-700/30">
-                  <div className="text-xs text-gray-400 font-medium">{time}</div>
+              {/* Day header */}
+              {weekDays.map((day, index) => (
+                <div
+                  key={index}
+                  className={`bg-gray-800/80 p-3 text-center ${isToday(day) ? 'bg-gold-500/10 border-b-2 border-gold-500' : ''
+                    }`}
+                >
+                  <div className={`text-sm font-bold ${isToday(day) ? 'text-gold-400' : 'text-gray-100'}`}>
+                    {formatDayHeader(day)}
+                  </div>
                 </div>
+              ))}
 
-                {/* Cells */}
-                {weekDays.map((day, dayIndex) => {
-                  const dayEvents = eventsForDay(day);
-                  const cellEvents = dayEvents.filter(event => {
-                    const eventStartMinutes = eventPosition(event.start_time);
-                    const cellStartMinutes = timeIndex * 60;
-                    return eventStartMinutes >= cellStartMinutes && eventStartMinutes < cellStartMinutes + 60;
-                  });
+              {/* Time slots and events */}
+              {timeSlots.map((time, timeIndex) => (
+                <>
+                  {/* Time */}
+                  <div key={`time-${timeIndex}`} className="bg-gray-800/50 p-3 text-right border-t border-gray-700/30">
+                    <div className="text-xs text-gray-400 font-medium">{time}</div>
+                  </div>
 
-                  return (
-                    <div
-                      key={`cell-${timeIndex}-${dayIndex}`}
-                      className={`bg-gray-900/30 p-1 min-h-[60px] border-t border-gray-700/30 relative overflow-visible ${isToday(day) ? 'bg-gold-500/5' : ''
-                        }`}
-                    >
-                      {cellEvents.map((event, eventIndex) => {
-                        const IconComponent = getRandomIcon(event.id);
-                        return (
-                          <div
-                            key={`event-${event.id}-${eventIndex}`}
-                            className="absolute left-1 right-1 rounded-lg p-2 text-xs cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-gold-500/90 text-gray-900 border border-gold-400 z-10"
-                            style={{
-                              top: `${eventPosition(event.start_time) % 60}px`,
-                              height: `${eventHeight(event.start_time, event.end_time)}px`
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              <IconComponent className="w-4 h-4 flex-shrink-0" />
-                              <div className="font-bold truncate">{event.title}</div>
+                  {/* Cells */}
+                  {weekDays.map((day, dayIndex) => {
+                    const dayEvents = eventsForDay(day);
+                    const cellEvents = dayEvents.filter(event => {
+                      const eventStartMinutes = eventPosition(event.start_time);
+                      const cellStartMinutes = timeIndex * 60;
+                      return eventStartMinutes >= cellStartMinutes && eventStartMinutes < cellStartMinutes + 60;
+                    });
+
+                    return (
+                      <div
+                        key={`cell-${timeIndex}-${dayIndex}`}
+                        className={`bg-gray-900/30 p-1 min-h-[60px] border-t border-gray-700/30 relative overflow-visible ${isToday(day) ? 'bg-gold-500/5' : ''
+                          }`}
+                      >
+                        {cellEvents.map((event, eventIndex) => {
+                          const IconComponent = getRandomIcon(event.id);
+                          return (
+                            <div
+                              key={`event-${event.id}-${eventIndex}`}
+                              className="absolute left-1 right-1 rounded-lg p-2 text-xs cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-gold-500/90 text-gray-900 border border-gold-400 z-10"
+                              style={{
+                                top: `${eventPosition(event.start_time) % 60}px`,
+                                height: `${eventHeight(event.start_time, event.end_time)}px`
+                              }}
+                            >
+                              <div className="flex items-center gap-2">
+                                <IconComponent className="w-4 h-4 flex-shrink-0" />
+                                <div className="font-bold truncate">{event.title}</div>
+                              </div>
+                              <div className="text-xs opacity-90 truncate ml-6">{event.instructor}</div>
                             </div>
-                            <div className="text-xs opacity-90 truncate ml-6">{event.instructor}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </>
-            ))}
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </>
+              ))}
+            </div>
           </div>
         </div>
       </div>

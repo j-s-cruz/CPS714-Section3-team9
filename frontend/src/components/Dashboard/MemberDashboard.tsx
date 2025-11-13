@@ -258,7 +258,7 @@ export const MemberDashboard = () => {
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
               {/* Membership Status Widget */}
-              <div className="relative rounded-2xl border border-gold-500/30 p-6 overflow-hidden">
+              <div className="relative rounded-2xl border border-gold-500/30 p-6 overflow-hidden hover:border-gold-500/30 hover:shadow-xl hover:shadow-gold-500/5">
                 {/* Background Image */}
                 <div
                   className="absolute inset-0 bg-cover bg-center"
@@ -355,7 +355,7 @@ export const MemberDashboard = () => {
                   </button>
                 </div>
 
-                <div className="bg-gray-800/60 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-2">
+                <div className="bg-gray-800/60 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-1">
                   <h3 className="text-xl font-bold text-gray-100 mb-5 flex items-center gap-2">
                     <GiMuscleUp className="w-7 h-7 text-gold-400" />
                     Gym Achievements Feed
