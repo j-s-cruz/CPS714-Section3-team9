@@ -18,4 +18,12 @@ app.add_middleware(
 async def root():
     return {"message": "Hello World"}
 
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+        "service": "FitHub Class Booking API",
+        "version": "1.0.0"
+    }
+
 app.include_router(data_router.data_router)
