@@ -37,7 +37,7 @@ export const StaffDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-yellow-500 space-y-6 p-6">
+    <div className="min-h-screen bg-gray-900 text-slate-500 space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-slate-100">Staff Dashboard</h2>
         <div className="flex gap-2">
@@ -93,106 +93,166 @@ export const StaffDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentMembers />
-        <PopularClasses />
+        <MemberManagement />
+        <ClassManagement />
       </div>
-
       {showAddClass && <AddClassModal onClose={() => setShowAddClass(false)} />}
       {showAnnouncement && <AnnouncementModal onClose={() => setShowAnnouncement(false)} />}
     </div>
   );
 };
 
-const RecentMembers = () => {
-  const [members, setMembers] = useState<any[]>([]);
+//COMPONENT: MEMBER MANAGEMENT
+const MemberManagement = () => {
+  const [members, setMembers] = useState<any[]>([
+    {
+      id: 1,
+      full_name: 'Reyhan Emik',
+      created_at: new Date().toISOString(),
+      membership_subscriptions: [{membership_tiers: {name: 'Gold'}}],
+    },
+    {
+      id: 2,
+      full_name: 'Rana Hamood',
+      created_at: new Date().toISOString(),
+      membership_subscriptions: [{membership_tiers: {name: 'Gold'}}]
+    },
+  ]);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    fetchRecentMembers();
+    fetchMembers(); 
   }, []);
 
-  const fetchRecentMembers = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*, membership_subscriptions(*, membership_tiers(name))')
-      .order('created_at', { ascending: false })
-      .limit(5);
+  //Function to fetch data from Supabase
+  const fetchMembers = async () => {
+    try{
+        const { data } = await supabase
+        .from('profiles') //the table in Supabase we fetch from
+        .select('*, membership_subscriptions(*, membership_tiers(name))')
+        .order('created_at', { ascending: false }) //get newest members first
+        .limit(25);
 
-    setMembers(data || []);
+        if (data && data.length > 0) {
+          setMembers(data) // if fetch from DB was successful and data exists, replace the members state with the fetched data
+        } else {
+          setMembers(prevMembers => prevMembers); //if no data was fetched, keep prev dummy values in 'members'
+        }
+      } catch (error) {
+        console.log("Error getting members from DB: ", error); //keep dummy members if there was an error
+        setMembers(prevMembers => prevMembers); 
+    }
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-white">
-      <h3 className="text-white font-bold text-slate-900 mb-4">Recent Members</h3>
-      <div className="space-y-3">
-        {members.map((member) => (
-          <div key={member.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-            <div>
-              <p className="font-semibold text-slate-900">{member.full_name}</p>
-              <p className="text-sm text-slate-600">
-                {member.membership_subscriptions[0]?.membership_tiers?.name || 'No subscription'}
-              </p>
-            </div>
-            <span className="text-sm text-slate-500">
-              {new Date(member.created_at).toLocaleDateString()}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+    <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-white self-start">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full text-left text-white font-bold text-lg mb-4 flex justify-between items-center"
+      >
+        Member Management
+        <span className="text-slate-300 text-l">{open ? '-' : '+'}</span> 
+      </button>
 
-const PopularClasses = () => {
-  const [classes, setClasses] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetchPopularClasses();
-  }, []);
-
-  const fetchPopularClasses = async () => {
-    const { data } = await supabase
-      .from('fitness_classes')
-      .select('*, class_schedules(current_bookings)')
-      .order('name')
-      .limit(5);
-
-    const withBookings = (data || []).map((cls) => ({
-      ...cls,
-      totalBookings: cls.class_schedules.reduce((sum: number, s: any) => sum + s.current_bookings, 0),
-    }));
-
-    withBookings.sort((a, b) => b.totalBookings - a.totalBookings);
-    setClasses(withBookings);
-  };
-
-  return (
-    <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-slate-200">
-      <h3 className="text-white font-bold text-slate-900 mb-4">Popular Classes</h3>
-      <div className="space-y-3">
-        {classes.map((cls, index) => (
-          <div key={cls.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-                {index + 1}
-              </div>
+      {open && (
+        <div className="space-y-3 max-h-[600px] overflow-y-auto">
+          {members.map((member) => (
+            <div key={member.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
               <div>
-                <p className="font-semibold text-slate-900">{cls.name}</p>
-                <p className="text-sm text-slate-600">{cls.instructor_name}</p>
+                <p className="font-semibold text-slate-900">{member.full_name}</p>
+                <p className="text-sm text-slate-600">
+                  {member.membership_subscriptions[0]?.membership_tiers?.name || 'No subscription'}
+                </p>
               </div>
+              <span className="text-sm text-slate-500">
+                {new Date(member.created_at).toLocaleDateString()}
+              </span>
             </div>
-            <span className="text-sm font-semibold text-slate-700">{cls.totalBookings} bookings</span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
+//COMPONENT: CLASS MANAGEMENT
+const ClassManagement = () => {
+  const [classes, setClasses] = useState<any[]>([
+    {id: 1, name: 'Cardio with Carly', instructor_name: 'Carly Davis', class_schedules: [{current_bookings:5}], totalBookings: 5},
+    {id: 2, name: 'Drop-in Basketball', instructor_name: 'Anthony Mello', class_schedules: [{current_bookings:10}], totalBookings: 10},
+    {id: 3, name: 'Boxing & Kickboxing', instructor_name: 'Nico Ali Walsh', class_schedules: [{current_bookings:30}], totalBookings: 30},
+  ]);
+  const [openClass, setOpenClass] = useState(false);
+
+  useEffect(() => {
+    fetchAllClasses();
+  }, []);
+
+  const fetchAllClasses = async () => {
+    try{
+      const { data } = await supabase
+        .from('fitness_classes')
+        .select('*, class_schedules(current_bookings)')
+        .order('name');
+      
+      if (data && data.length > 0){
+        const withBookings = (data || []).map((cls) => ({
+        ...cls,
+        totalBookings: cls.class_schedules.reduce((sum: number, s: any) => sum + s.current_bookings, 0),
+        }));
+        
+        withBookings.sort((a, b) => b.totalBookings - a.totalBookings);
+        setClasses(withBookings);
+
+      }else{
+        setClasses(prevClasses => prevClasses);
+      }
+
+    }catch (error){
+      console.log('Error fetching Classes:', error);
+      setClasses(prevClasses => prevClasses); 
+    }
+  };
+
+  return (
+     <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-white self-start">
+        <button
+          onClick={() => setOpenClass(!openClass)}
+          className="w-full text-left text-white font-bold text-lg mb-4 flex justify-between items-center"
+        >
+          Class Management
+          <span className="text-slate-300 text-l">{openClass ? '-' : '+'}</span> 
+        </button>
+        {openClass &&
+          <div className="space-y-3 max-h-[600px] overflow-y-auto">
+            {classes.map((cls, index) => (
+              <div key={cls.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900">{cls.name}</p>
+                    <p className="text-sm text-slate-600">{cls.instructor_name}</p>
+                  </div>
+                </div>
+                <span className="text-sm font-semibold text-slate-700">{cls.totalBookings} bookings</span>
+              </div>
+            ))}
+          </div>
+        }
+    </div>
+  );
+};
+
+//COMPONENT: ADD CLASS FEAUTURE
 const AddClassModal = ({ onClose }: { onClose: () => void }) => {
   const [formData, setFormData] = useState({
     date: '',
     time: '',
     classId: '',
+    instructor_full_name: '',
+    capacity: '',
   });
   const [classes, setClasses] = useState<any[]>([]);
 
@@ -252,6 +312,31 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Assign Instructor</label>
+            <input
+              type="text"
+              value={formData.instructor_full_name}
+              onChange={(e) => setFormData({ ...formData, instructor_full_name: e.target.value })}
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 italic"
+              required
+              placeholder="ex: Nico Ali Walsh"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Set Class Capacity</label>
+            <input
+              type="number"
+              min="0"
+              value={formData.capacity}
+              onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 italic"
+              required
+              placeholder="ex: 14"
+            />
           </div>
 
           <div>
