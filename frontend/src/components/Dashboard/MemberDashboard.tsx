@@ -8,6 +8,7 @@ import {
   Bell,
   Clock,
   LogOut,
+  Crown,
 } from 'lucide-react';
 import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe } from 'react-icons/gi';
 import { FaDumbbell } from 'react-icons/fa';
@@ -175,14 +176,6 @@ export const MemberDashboard = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Notifications */}
-              <button className="relative p-2 text-gray-400 hover:text-gold-400 transition-all duration-200 hover:bg-gray-700/50 rounded-lg">
-                <Bell className="w-5 h-5" />
-                {notifications.length > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-gold-500 rounded-full animate-pulse-gold shadow-lg shadow-gold-500/50"></span>
-                )}
-              </button>
-
               {/* Section for dashboard and profile buttons */}
               <div className="flex items-center gap-2">
                 <button
@@ -218,6 +211,14 @@ export const MemberDashboard = () => {
                   </button>
                 )}
               </div>
+
+              {/* Notifications */}
+              <button className="relative p-2 text-gray-400 hover:text-gold-400 transition-all duration-200 hover:bg-gray-700/50 rounded-lg">
+                <Bell className="w-5 h-5" />
+                {notifications.length > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-gold-500 rounded-full animate-pulse-gold shadow-lg shadow-gold-500/50"></span>
+                )}
+              </button>
 
               {/* Sign out section */}
               <div className="relative">
@@ -271,9 +272,13 @@ export const MemberDashboard = () => {
                 {/* Content */}
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="bg-gold-500/90 p-3 rounded-xl shadow-lg">
-                      <GiMuscleUp className="w-8 h-8 text-gray-900" />
-                    </div>
+                    <button
+                      onClick={() => setActiveTab('profile')}
+                      className="bg-gold-500/90 p-3 rounded-xl shadow-lg hover:bg-gold-500 transition-all duration-300 hover:scale-110 cursor-pointer"
+                      title="Membership Details"
+                    >
+                      <Crown className="w-8 h-8 text-gray-900" />
+                    </button>
                     <div>
                       <h2 className="text-2xl font-bold text-white drop-shadow-lg">{tier?.name || 'No Active Plan'}</h2>
                       <p className="text-gray-100 text-sm mt-1 drop-shadow">
