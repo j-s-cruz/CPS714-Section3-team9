@@ -375,7 +375,16 @@ export const MemberDashboard = () => {
                   </div>
                 </div>
               </div>
-
+              {/* Add a stock image of a gym for more asthetics and seperation */}
+              <div className="relative rounded-2xl border border-gray-700/50 overflow-hidden h-48">
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: "url('https://images.unsplash.com/photo-1689877020200-403d8542d95d?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent" />
+              </div>
               {/* class calendar section */}
               <div id="class-calendar" className="stagger-2">
                 <ClassCalendar userId={user?.id} />
