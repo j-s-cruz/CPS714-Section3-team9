@@ -17,13 +17,6 @@ import { ClassCalendar } from './ClassCalendar';
 
 type TabType = 'dashboard' | 'profile' | 'staff';
 
-function startOfWeek(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + 1;
-  return new Date(d.setDate(diff));
-}
-
 export const MemberDashboard = () => {
   const { user, profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -127,27 +120,23 @@ export const MemberDashboard = () => {
       }
     ];
 
-    // Get this week's start (Monday) and end (Sunday)
-    const now = new Date();
-    const weekStart = startOfWeek(now);
-    weekStart.setHours(0, 0, 0, 0);
+    // Get today and 7 days from now
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
+    const sevenDaysFromNow = new Date(today);
+    sevenDaysFromNow.setDate(today.getDate() + 7);
+    sevenDaysFromNow.setHours(23, 59, 59, 999);
 
-    /* Limit the upcoming events to this week and filter out past events */
-    const thisWeekEvents = dummyEvents
+    /* Limit the upcoming events to the next 7 days */
+    const upcomingEvents = dummyEvents
       .filter(event => {
         /* Parse date string as local date (avoid timezone issues) */
         const [year, month, day] = event.date.split('-').map(Number);
         const eventDate = new Date(year, month - 1, day);
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        /* Keep event only if its today or on a future day within this week */
-        return eventDate >= weekStart && eventDate <= weekEnd && eventDate >= today;
+        /* Keep event only if it's within the next 7 days (today through 7 days from now) */
+        return eventDate >= today && eventDate <= sevenDaysFromNow;
       })
       .sort((a, b) => {
         const dateA = new Date(`${a.date} ${a.start_time}`);
@@ -155,7 +144,7 @@ export const MemberDashboard = () => {
         return dateA.getTime() - dateB.getTime();
       });
 
-    setUpcomingBookings(thisWeekEvents);
+    setUpcomingBookings(upcomingEvents);
     console.log('Bookings set');
   };
 
@@ -314,7 +303,7 @@ export const MemberDashboard = () => {
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
                       <GiRunningShoe className="w-6 h-6 text-gold-400" />
-                      Upcoming Classes
+                      Upcoming Classes In The Next <span className="text-gold-400">7 Days!</span>
                     </h3>
                   </div>
 
