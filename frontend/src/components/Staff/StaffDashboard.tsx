@@ -96,12 +96,44 @@ export const StaffDashboard = () => {
         </div>
       </div>
 
+      <div className="mb-6">
+        <Report/>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <MemberManagement />
         <ClassManagement />
       </div>
       {showAddClass && <AddClassModal onClose={() => setShowAddClass(false)} />}
       {showAnnouncement && <AnnouncementModal onClose={() => setShowAnnouncement(false)} />}
+    </div>
+  );
+};
+
+//COMPONENT: REPORTS & ANALYTICS
+
+const Report = () => {
+  const [charts, setCharts] = useState<any[]>([]);
+
+  useEffect(() => {
+    //fetchReports();//to be included by team 8, these are just placeholders
+  }, []);
+
+  //const fetchReports = async () => {}
+
+  return(
+    <div
+        style={{
+        width: "100%",
+        height: "300px", // reserve height for charts
+        border: "2px dashed #ccc",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#999",
+        fontStyle: "italic",
+      }}
+    >
+    Reports & Analytics Charts
     </div>
   );
 };
@@ -303,19 +335,21 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-yellow-600 mb-2">Class</label>
-            <select
+            <input
+              type="text"
               value={formData.classId}
-              onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
+              onChange={(e) => {
+                if (!/^[a-zA-Z\s]*$/.test(e.target.value))  // /regex/.test(string) --> for client-side input validation
+                {
+                  console.error("Input for the 'Class' field is invalid or you entered an empty string.")
+                  return; 
+                }
+                setFormData({ ...formData, classId: e.target.value })            
+                }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               required
-            >
-              <option value="">Select a class</option>
-              {classes.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.name} - {cls.instructor_name}
-                </option>
-              ))}
-            </select>
+              placeholder="ex: Boxing and Kickboxing"
+            />
           </div>
 
           <div>
