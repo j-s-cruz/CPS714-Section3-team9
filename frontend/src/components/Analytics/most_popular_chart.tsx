@@ -86,9 +86,8 @@ export const MostPopularChart: React.FC = () => {
     }
 
     return (
-        <div>
-            <ReactApexChart options={chartInfo.options} series={chartInfo.series} type="bar" height={380} />
-        </div>
+        //@ts-expect-error
+        <ReactApexChart options={chartInfo.options} series={chartInfo.series} type="bar" height={380} />
     );
 };
 

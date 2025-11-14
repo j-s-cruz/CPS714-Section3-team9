@@ -45,9 +45,23 @@ async def signups_cancellations_data_get():
 
     return signups_cancellations_data
 
-@data_router.get("/data/class_popoularity_data", tags=["data"])
+@data_router.get("/data/class_popularity_data", tags=["data"])
 async def class_popularity_data_get():
 
     class_popularity_data = getClassPopularityData()
 
     return class_popularity_data
+
+@data_router.get("/data/class_busy_time_data", tags=["data"])
+async def class_busy_time_data_get():
+
+    class_busy_time_data = getClassTimesPopularityData()
+
+    return class_busy_time_data
+
+@data_router.get("/data/gym_occupancy_data", tags=["data"])
+async def gym_occupancy_data_get():
+
+    gym_occupancy_data = getGymOccupancyData()
+
+    return gym_occupancy_data

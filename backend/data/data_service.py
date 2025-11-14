@@ -100,3 +100,58 @@ def getClassPopularityData():
     top_class_counts = class_counts[:10]
 
     return [top_class_names, top_class_counts]
+
+def getClassTimesPopularityData():
+    class_popularity_data = [
+        ["Yoga", "10:00 am", 15],
+        ["Pilates", "4:00 pm", 12],
+        ["Spinning", "10:00 am",20],
+        ["Zumba", "4:00 pm", 18],
+        ["CrossFit", "10:00 am",22],
+        ["Boxing", "10:00 am",30],
+        ["HIIT", "4:00 pm", 25],
+        ["Yoga2", "4:00 pm", 15],
+        ["Pilates2", "4:00 pm", 12],
+        ["Spinning2", "10:00 am",20],
+        ["Zumba2", "4:00 pm", 18],
+        ["CrossFit2", "10:00 am",22],
+        ["Boxing2", "4:00 pm", 30],
+        ["HIIT2", "10:00 am",25],
+        ["Yoga3", "4:00 pm", 15],
+        ["Pilates3", "10:00 am",12],
+        ["Spinning3", "4:00 pm", 20],
+        ["Zumba3", "10:00 am",18],
+        ["CrossFit3", "4:00 pm", 22],
+        ["Boxing3", "10:00 am", 30],
+        ["HIIT3", "4:00 pm", 25],
+    ]
+
+    class_popularity_data.sort(key=lambda x: x[2], reverse=True)
+
+    class_names = [row[0] + ": " + row[1] for row in class_popularity_data]
+    class_counts = [row[2] for row in class_popularity_data]
+
+    top_class_names = class_names[:10]
+    top_class_counts = class_counts[:10]
+
+    return [top_class_names, top_class_counts]
+
+def getGymOccupancyData():
+    occupancy_data = [
+        ["2024-01-01 10:00", 30],
+        ["2024-01-01 11:00", 45],
+        ["2024-01-01 12:00", 50],
+        ["2024-01-01 13:00", 40],
+        ["2024-01-01 14:00", 60],
+        ["2024-01-01 15:00", 55],
+        ["2024-01-01 16:00", 70],
+        ["2025-01-01 10:00", 30],
+        ["2025-01-01 11:00", 45],
+        ["2025-01-01 12:00", 50],
+        ["2025-01-01 13:00", 40],
+        ["2025-01-01 14:00", 60],
+        ["2025-01-01 15:00", 55],
+        ["2025-01-01 16:00", 70],
+    ]
+
+    return occupancy_data

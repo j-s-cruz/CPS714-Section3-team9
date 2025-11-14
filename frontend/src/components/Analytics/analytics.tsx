@@ -4,6 +4,10 @@ import { getData } from './analytics_service';
 import MembershipChart from './membership_chart';
 import SignupsCancellationsChart from './signups_cancellations_chart';
 import MostPopularChart from './most_popular_chart';
+import MostBusyTimesChart from './most_busy_chart';
+import GymUsageChart from './hourly_gym_usage_chart';
+import GymUsageChartv2 from './hourly_gym_usage_chartv2';
+import MembershipChartv2 from './membership_chartv2';
 
 // https://www.react-google-charts.com/examples/
 // https://developers.google.com/chart/interactive/docs
@@ -31,7 +35,7 @@ import MostPopularChart from './most_popular_chart';
 // Show which class times are most busy?
 // just list them? same as gym usage?
 
-// Show what times are most busy    <- histogram over time
+// Show what times are most busy
 // [member_id, checkin_datetime, checkout_datetime]
 
 // Date gym usage? https://www.react-google-charts.com/examples/calendar
@@ -102,7 +106,11 @@ export const Analytics: React.FC = () => {
             <MostPopularChart />
             <br></br><br></br><br></br>
             
-            <MembershipChart />
+            <MostBusyTimesChart />
+            <br></br><br></br><br></br>
+            <GymUsageChartv2 />
+            <br></br><br></br><br></br>
+            <MembershipChartv2 />
             <br></br><br></br><br></br>
             <Chart 
                 chartType="LineChart"

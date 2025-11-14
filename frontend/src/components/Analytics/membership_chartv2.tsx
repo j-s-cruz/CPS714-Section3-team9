@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { getGymOccupancyData } from './analytics_service';
+import { getMembershipData } from './analytics_service';
 import ReactApexChart from "react-apexcharts";
 
-export const GymUsageChart: React.FC = () => {
+export const MembershipChartv2: React.FC = () => {
 
     const [chartData, setChartData] = useState<(string | number)[][]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getGymOccupancyData();
+            const data = await getMembershipData();
             setChartData(data as (string | number)[][]);
         };
 
@@ -18,7 +18,7 @@ export const GymUsageChart: React.FC = () => {
     var chartInfo = {
           
             series: [{
-              name: 'Gym Occupancy',
+              name: 'Gym Membership',
               data: chartData
             }],
             options: {
@@ -59,7 +59,7 @@ export const GymUsageChart: React.FC = () => {
               },
               yaxis: [
                 {
-                  seriesName: 'Gym Occupancy',
+                  seriesName: 'Gym Membership',
                   axisTicks: {
                     show: true,
                     color: '#008FFB'
@@ -87,7 +87,7 @@ export const GymUsageChart: React.FC = () => {
             },
           
             seriesLine: [{
-              name: 'Gym Occupancy',
+              name: 'Gym Membership',
               data: chartData
             }],
             optionsLine: {
@@ -149,4 +149,4 @@ export const GymUsageChart: React.FC = () => {
     );
 }
 
-export default GymUsageChart;
+export default MembershipChartv2;
