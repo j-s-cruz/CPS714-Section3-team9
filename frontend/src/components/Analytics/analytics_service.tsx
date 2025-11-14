@@ -151,3 +151,20 @@ export const getDailyVisitsData = async () => {
         }
     }
 }
+
+export const getDaysHoursData = async () => {
+    try {
+        const apiData = await axios.get<any[]>(api + '/data/hourly_usage_data');
+        console.log(apiData.data);
+        return apiData.data;
+    }
+    catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.log(error.message);
+            return error.message;
+        } 
+        else {
+            console.log("Unexpected Error");
+        }
+    }
+}

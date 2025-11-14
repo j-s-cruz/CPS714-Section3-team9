@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def getMembershipData():
     membership_data = [
         ["2024-01-01", 50],
@@ -166,3 +169,58 @@ def getDailyVisitsData():
     ]
 
     return daily_visits_data
+
+def getHourlyUsageData():
+    hourly_usage_data = [
+        ["2024-01-01 06:00", 20],
+        ["2024-01-01 07:00", 35],
+        ["2024-01-01 08:00", 50],
+        ["2024-01-01 09:00", 40],
+        ["2024-01-01 10:00", 60],
+        ["2024-01-01 11:00", 55],
+        ["2024-01-01 12:00", 70],
+        ["2025-01-01 06:00", 20],
+        ["2025-01-01 07:00", 35],
+        ["2025-01-01 08:00", 50],
+        ["2025-01-01 09:00", 40],
+        ["2025-01-01 10:00", 60],
+        ["2025-01-01 11:00", 55],
+        ["2025-01-01 12:00", 70],
+        ["2025-01-08 12:00", 70],
+    ]
+
+    format_string = "%Y-%m-%d %H:%M"
+
+    converted_datetime_dates = [datetime.strptime(row[0], format_string) for row in hourly_usage_data]
+    converted_days_of_week_and_times = [date.strftime("%A %H:%M") for date in converted_datetime_dates]
+
+    recombined_hourly_usage_data = [[converted_days_of_week_and_times[i], hourly_usage_data[i][1]] for i in range(len(hourly_usage_data))]
+
+    summed_data = {}
+
+    for row in recombined_hourly_usage_data:
+        key = row[0]
+        value = row[1]
+        if key in summed_data:
+            summed_data[key] += value
+        else:
+            summed_data[key] = value
+
+    converted_hourly_usage_data = [[key, value] for key, value in summed_data.items()]
+    for row in converted_hourly_usage_data:
+        row[0] = row[0].replace("Sunday", "2025-11-02")
+        row[0] = row[0].replace("Monday", "2025-11-03")
+        row[0] = row[0].replace("Tuesday", "2025-11-04")
+        row[0] = row[0].replace("Wednesday", "2025-11-05")
+        row[0] = row[0].replace("Thursday", "2025-11-06")
+        row[0] = row[0].replace("Friday", "2025-11-07")
+        row[0] = row[0].replace("Saturday", "2025-11-08")
+
+    total = sum(row[1] for row in converted_hourly_usage_data)
+
+
+
+    # Convert number of people in gym to percentages
+    final_hourly_usage_data = [[row[0], round(row[1] / total * 100, 2)] for row in converted_hourly_usage_data]
+
+    return final_hourly_usage_data

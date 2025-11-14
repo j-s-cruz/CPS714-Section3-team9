@@ -72,3 +72,10 @@ async def daily_visits_data_get():
     daily_visits_data = getDailyVisitsData()
 
     return daily_visits_data
+
+@data_router.get("/data/hourly_usage_data", tags=["data"])
+async def hourly_usage_data_get():
+
+    hourly_usage_data = getHourlyUsageData()
+
+    return hourly_usage_data

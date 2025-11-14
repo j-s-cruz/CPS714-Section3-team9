@@ -9,6 +9,7 @@ import GymUsageChart from './hourly_gym_usage_chart';
 import GymUsageChartv2 from './hourly_gym_usage_chartv2';
 import MembershipChartv2 from './membership_chartv2';
 import GymPopulationCalendarchart from './gym_population_calendar_chart';
+import DaysHoursChart from './days_hours_chart';
 
 // https://www.react-google-charts.com/examples/
 // https://developers.google.com/chart/interactive/docs
@@ -116,6 +117,8 @@ export const Analytics: React.FC = () => {
             />
             <br></br><br></br><br></br>
             <GymPopulationCalendarchart />
+            <br></br><br></br><br></br>
+            <DaysHoursChart />
         </div>
     );
 };
