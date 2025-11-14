@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-//import { supabase } from '../../lib/supabase';
+import { admin_supabase } from './supabaseClient';
 import { Users, Calendar, TrendingUp, DollarSign, Plus, Bell, BarChart3 } from 'lucide-react';
 import DumbbellIcon from '../../assets/dumbbell.png';
+
 
 
 export const StaffDashboard = () => {
@@ -20,10 +21,10 @@ export const StaffDashboard = () => {
 
   const fetchStats = async () => {
     const [profiles, subscriptions, classes, bookings] = await Promise.all([
-      supabase.from('profiles').select('id', { count: 'exact' }),
-      supabase.from('membership_subscriptions').select('id', { count: 'exact' }).eq('status', 'active'),
-      supabase.from('fitness_classes').select('id', { count: 'exact' }),
-      supabase
+      admin_supabase.from('profiles').select('id', { count: 'exact' }),
+      admin_supabase.from('membership_subscriptions').select('id', { count: 'exact' }).eq('status', 'active'),
+      admin_supabase.from('class').select('id', { count: 'exact' }),
+      admin_supabase
         .from('class_bookings')
         .select('id', { count: 'exact' })
         .eq('status', 'confirmed')
@@ -213,11 +214,7 @@ const MemberManagement = () => {
 
 //COMPONENT: CLASS MANAGEMENT
 const ClassManagement = () => {
-  const [classes, setClasses] = useState<any[]>([
-    {id: 1, name: 'Cardio with Carly', instructor_name: 'Carly Davis', class_schedules: [{current_bookings:5}], totalBookings: 5},
-    {id: 2, name: 'Drop-in Basketball', instructor_name: 'Anthony Mello', class_schedules: [{current_bookings:10}], totalBookings: 10},
-    {id: 3, name: 'Boxing & Kickboxing', instructor_name: 'Nico Ali Walsh', class_schedules: [{current_bookings:30}], totalBookings: 30},
-  ]);
+  const [classes, setClasses] = useState<any[]>([]);
   const [openClass, setOpenClass] = useState(false);
 
   useEffect(() => {
@@ -226,28 +223,27 @@ const ClassManagement = () => {
 
   const fetchAllClasses = async () => {
     try{
-      const { data } = await supabase
-        .from('fitness_classes')
-        .select('*, class_schedules(current_bookings)')
-        .order('name');
+      const { data, error } = await admin_supabase
+        .from('class')
+        .select('*')
+        .order('class_name');
       
-      if (data && data.length > 0){
-        const withBookings = (data || []).map((cls) => ({
-        ...cls,
-        totalBookings: cls.class_schedules.reduce((sum: number, s: any) => sum + s.current_bookings, 0),
-        }));
-        
-        withBookings.sort((a, b) => b.totalBookings - a.totalBookings);
-        setClasses(withBookings);
-
-      }else{
-        setClasses(prevClasses => prevClasses);
+      if (error){
+        console.log("Issues fetching classes: ", error);
+        return;
       }
+      if (data){
+        const formatted_name = data.map((cls) => ({
+          ...cls,
+          instructor_name:  `${cls.instructor_fname ?? ""} ${cls.instructor_lname ?? ""}`.trim(),
 
-    }catch (error){
-      console.log('Error fetching Classes:', error);
-      setClasses(prevClasses => prevClasses); 
-    }
+        }));
+        setClasses(formatted_name);
+      }
+    
+  }catch (err){
+    console.log("some error occured:", err);
+  }
   };
 
   return (
@@ -264,15 +260,16 @@ const ClassManagement = () => {
             {classes.map((cls, index) => (
               <div key={cls.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                  <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold">
                     {index + 1}
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900">{cls.name}</p>
+                    <p className="font-semibold text-yellow-600">{cls.class_name}</p>
                     <p className="text-sm text-slate-600">{cls.instructor_name}</p>
+                    <p className="text-xs text-slate-600">{cls.day} {cls.time}</p>
                   </div>
                 </div>
-                <span className="text-sm font-semibold text-slate-700">{cls.totalBookings} bookings</span>
+                <span className="text-sm font-semibold text-slate-700">Bookings: {cls.total_bookings} Capacity: {cls.capacity} </span>
               </div>
             ))}
           </div>
@@ -284,41 +281,27 @@ const ClassManagement = () => {
 //COMPONENT: ADD CLASS FEAUTURE
 const AddClassModal = ({ onClose }: { onClose: () => void }) => {
   const [formData, setFormData] = useState({
+    classId: '',
+    first_name: '',
+    last_name: '',
+    capacity: '',
     date: '',
     time: '',
-    classId: '',
-    instructor_full_name: '',
-    capacity: '',
   });
-  const [classes, setClasses] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetchClasses();
-  }, []);
-
-  const fetchClasses = async () => {
-    const { data } = await supabase.from('fitness_classes').select('*').order('name');
-    setClasses(data || []);
-  };
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const selectedClass = classes.find((c) => c.id === formData.classId);
-      const startTime = formData.time;
-      const endTime = new Date(
-        new Date(`2000-01-01T${startTime}`).getTime() + selectedClass.duration_minutes * 60000
-      )
-        .toTimeString()
-        .slice(0, 5);
+      const { error } = await admin_supabase.from('Class').insert({
+        class_name: formData.classId,
+        instructor_fname: formData.first_name, 
+        instructor_lname: formData.last_name,
+        capacity: formData.capacity,
+        day: formData.date,
+        time: formData.time,
 
-      const { error } = await supabase.from('class_schedules').insert({
-        class_id: formData.classId,
-        scheduled_date: formData.date,
-        start_time: startTime,
-        end_time: endTime,
-        status: 'scheduled',
-        current_bookings: 0,
+        
       });
 
       if (error) throw error;
@@ -353,14 +336,26 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-yellow-600 mb-2">Assign Instructor</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Instructor First Name</label>
             <input
               type="text"
-              value={formData.instructor_full_name}
-              onChange={(e) => setFormData({ ...formData, instructor_full_name: e.target.value })}
+              value={formData.first_name}
+              onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 italic"
               required
-              placeholder="ex: Nico Ali Walsh"
+              placeholder="ex: Nico"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Instructor Last Name</label>
+            <input
+              type="text"
+              value={formData.last_name}
+              onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 italic"
+              required
+              placeholder="ex: Ali Walsh"
             />
           </div>
 
