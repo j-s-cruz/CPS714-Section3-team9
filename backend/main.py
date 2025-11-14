@@ -6,6 +6,7 @@ from typing import Optional
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
+from pydantic import BaseModel
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,6 +18,10 @@ supabase: Client = create_client(
 )
 
 app = FastAPI()
+
+class BookingRequest(BaseModel): #Pydantic model for the booking request
+    user_id: str
+    schedule_id: str
 
 # Configure CORS
 app.add_middleware(
@@ -66,7 +71,7 @@ async def get_classes_schedules(
 
     return final_result.data #get JSON data from the query returned
 
-
+#integration with team 1 and team 6 to help with this with membership tier validation and notification system
 @app.post("/classes/book")
 async def book_class():
     return{}
