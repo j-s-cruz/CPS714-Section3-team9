@@ -74,6 +74,14 @@ async def get_classes_schedules(
 #integration with team 1 and team 6 to help with this with membership tier validation and notification system
 @app.post("/classes/book")
 async def book_class():
-    return{}
+    return{"message": "not yet implemented"}
+
+@app.post("/classes/cancel")
+async def cancel_class():
+    return{"message": "not yet implemented"}
+
+@app.get("/classes/my-bookings")
+async def get_my_bookings():
+    return{"message": "not yet implemented"}
 
 app.include_router(data_router.data_router)
