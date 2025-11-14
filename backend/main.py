@@ -5,6 +5,10 @@ from datetime import date as date_type, time as time_type, datetime
 from typing import Optional
 from supabase import create_client, Client
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize Supabase client
 supabase: Client = create_client(
