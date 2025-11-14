@@ -65,3 +65,10 @@ async def gym_occupancy_data_get():
     gym_occupancy_data = getGymOccupancyData()
 
     return gym_occupancy_data
+
+@data_router.get("/data/daily_visits_data", tags=["data"])
+async def daily_visits_data_get():
+
+    daily_visits_data = getDailyVisitsData()
+
+    return daily_visits_data

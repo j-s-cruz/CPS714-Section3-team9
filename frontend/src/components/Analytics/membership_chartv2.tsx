@@ -22,6 +22,10 @@ export const MembershipChartv2: React.FC = () => {
               data: chartData
             }],
             options: {
+              title: {
+                  text: 'Gym Memberships',
+                  align: 'left'
+              },
               chart: {
                 id: 'chart2',
                 type: 'line',
@@ -59,7 +63,7 @@ export const MembershipChartv2: React.FC = () => {
               },
               yaxis: [
                 {
-                  seriesName: 'Gym Membership',
+                  seriesName: 'Gym Memberships',
                   axisTicks: {
                     show: true,
                     color: '#008FFB'
@@ -74,7 +78,7 @@ export const MembershipChartv2: React.FC = () => {
                     }
                   },
                   title: {
-                    text: "Flies",
+                    text: "Gym Memberships",
                     style: {
                       color: '#008FFB'
                     }
@@ -85,9 +89,8 @@ export const MembershipChartv2: React.FC = () => {
                 type: 'datetime'
               }
             },
-          
             seriesLine: [{
-              name: 'Gym Membership',
+              name: 'Gym Memberships',
               data: chartData
             }],
             optionsLine: {

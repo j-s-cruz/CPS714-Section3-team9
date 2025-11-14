@@ -1,5 +1,3 @@
-# service here
-
 def getMembershipData():
     membership_data = [
         ["2024-01-01", 50],
@@ -155,3 +153,16 @@ def getGymOccupancyData():
     ]
 
     return occupancy_data
+
+def getDailyVisitsData():
+    daily_visits_data = [
+        ["2024-01-01", 150],
+        ["2024-02-02", 175],
+        ["2024-03-03", 200],
+        ["2024-04-04", 180],
+        ["2024-05-05", 220],
+        ["2024-06-06", 190],
+        ["2024-07-07", 210],
+    ]
+
+    return daily_visits_data
