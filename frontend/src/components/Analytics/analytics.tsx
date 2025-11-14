@@ -39,56 +39,6 @@ import MostPopularChart from './most_popular_chart';
 
 
 export const Analytics: React.FC = () => {
-    const [chartData, setChartData] = useState<(string | number)[][]>([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getData();
-            setChartData(data as (string | number)[][]);
-        };
-
-        fetchData();
-    }, []);
-
-    var newSignupsData = [
-        ['Month', 'New Signups'],
-        [new Date('2024-01-02'), 50],
-        [new Date('2024-02-02'), 75],
-        [new Date('2024-03-02'), 100],
-        [new Date('2024-04-02'), 80],
-        [new Date('2024-05-02'), 120],
-        [new Date('2025-06-02'), 90],
-        [new Date('2025-07-02'), 110]
-    ]
-    
-    var cancellationsData = [
-        ['Month', 'New Signups'],
-        [new Date('2024-01-02'), 5],
-        [new Date('2024-02-02'), 7],
-        [new Date('2024-03-02'), 10],
-        [new Date('2024-04-02'), 8],
-        [new Date('2024-05-02'), 12],
-        [new Date('2025-06-02'), 9],
-        [new Date('2025-07-02'), 11]
-    ]
-
-    var activeMembersData = [
-        ['Month', 'New Signups'],
-        [new Date('2024-01-02'), 500],
-        [new Date('2024-02-02'), 750],
-        [new Date('2024-03-02'), 1000],
-        [new Date('2024-04-02'), 800],
-        [new Date('2024-05-02'), 1200],
-        [new Date('2025-06-02'), 900],
-        [new Date('2025-07-02'), 1100]
-    ]
-
-    var popularClassesData = [
-        ['Class Name', 'Attendance Count'],
-        ['MMA', 50],
-        ['High Intensity', 45],
-        ['Bodybuilding', 30],
-    ]
 
     // ONLY WORKS FOR THE PAST 1 YEAR
     var dailyGymUsageData = [
@@ -140,38 +90,24 @@ export const Analytics: React.FC = () => {
         legend: "none",
     };
 
-    var popularClassesOptions = {
-        title: 'Most Popular Classes by Attendance',
-    };
-
     var dailyGymUsageOptions = {
         title: 'Daily Gym Usage',
     };
 
     return (
         <div>
-            <MostPopularChart />
-            <br></br><br></br><br></br>
             <SignupsCancellationsChart />
             <br></br><br></br><br></br>
-            <MembershipChart />
+
+            <MostPopularChart />
             <br></br><br></br><br></br>
-            <Chart 
-                chartType="LineChart"
-                data={newSignupsData}
-                options={lineOptions}
-            />
+            
+            <MembershipChart />
             <br></br><br></br><br></br>
             <Chart 
                 chartType="LineChart"
                 data={lineData}
                 options={lineOptions}
-            />
-            <br></br><br></br><br></br>
-            <Chart
-                chartType="BarChart"
-                data={popularClassesData}
-                options={popularClassesOptions}
             />
             <br></br><br></br><br></br>
             <Chart

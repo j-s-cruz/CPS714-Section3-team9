@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactApexChart from "react-apexcharts";
-import { getCancellationsData, getSignupsData } from './analytics_service';
+import { getCancellationsData, getSignupsAndCancellationsData, getSignupsData } from './analytics_service';
 
 // https://apexcharts.com/react-chart-demos/line-charts/syncing-charts/
 
@@ -11,11 +11,10 @@ export const SignupsCancellationsChart: React.FC = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const signupsDataTemp = await getSignupsData();
-            setSignupsData(signupsDataTemp as (string | number)[][]);
+            const signupsCancellationsDataTemp: any = await getSignupsAndCancellationsData();
 
-            const cancellationsDataTemp = await getCancellationsData();
-            setCancellationsData(cancellationsDataTemp as (string | number)[][]);
+            setSignupsData(signupsCancellationsDataTemp[0] as (string | number)[][]);
+            setCancellationsData(signupsCancellationsDataTemp[1] as (string | number)[][]);
         };
 
         fetchData();

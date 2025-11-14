@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import ReactApexChart from "react-apexcharts";
+import { getClassPopularityData } from './analytics_service';
 
 export const MostPopularChart: React.FC = () => {
-    const [popularityData, setPopularityData] = useState<(string | number)[][]>([]);
+    const [popularClassNames, setPopularClassNames] = useState<(string | number)[][]>([]);
+    const [popularClassAttendance, setPopularClassAttendance] = useState<(string | number)[][]>([]);
 
     useEffect(() => {
-        // const fetchData = async () => {
-        //     const popularityDataTemp = await getPopularityData();
-        //     setPopularityData(popularityDataTemp as (string | number)[][]);
-        // };
+        const fetchData = async () => {
+            const popularityDataTemp: any = await getClassPopularityData();
+            setPopularClassNames(popularityDataTemp[0] as (string | number)[][]);
+            setPopularClassAttendance(popularityDataTemp[1] as (string | number)[][]);
+        };
 
-        // fetchData();
+        fetchData();
     }, []);
 
     var chartInfo = {
         series: [{
-            data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380]
+            data: popularClassAttendance
         }],
         options: {
             chart: {
@@ -54,9 +57,7 @@ export const MostPopularChart: React.FC = () => {
             colors: ['#fff']
             },
             xaxis: {
-            categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan',
-                'United States', 'China', 'India'
-            ],
+            categories: popularClassNames,
             },
             yaxis: {
             labels: {
@@ -64,7 +65,7 @@ export const MostPopularChart: React.FC = () => {
             }
             },
             title: {
-                text: 'Most Popular Classes',
+                text: 'Top 10 Most Popular Classes',
                 align: 'center',
                 floating: true
             },

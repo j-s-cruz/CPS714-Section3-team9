@@ -37,3 +37,17 @@ async def cancellations_data_get():
     cancellations_data = getCancellationsData()
 
     return cancellations_data
+
+@data_router.get("/data/signups_cancellations_data", tags=["data"])
+async def signups_cancellations_data_get():
+
+    signups_cancellations_data = getSignupsAndCancellationsData()
+
+    return signups_cancellations_data
+
+@data_router.get("/data/class_popoularity_data", tags=["data"])
+async def class_popularity_data_get():
+
+    class_popularity_data = getClassPopularityData()
+
+    return class_popularity_data
