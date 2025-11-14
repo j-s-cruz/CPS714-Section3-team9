@@ -1,81 +1,87 @@
 import React, { useEffect, useState } from 'react';
 import ReactApexChart from "react-apexcharts";
+import { getCancellationsData, getSignupsData } from './analytics_service';
 
 // https://apexcharts.com/react-chart-demos/line-charts/syncing-charts/
 
 export const SignupsCancellationsChart: React.FC = () => {
 
-    const [chartData, setChartData] = useState<(string | number)[][]>([]);
+    const [signupsData, setSignupsData] = useState<(string | number)[][]>([]);
+    const [cancellationsData, setCancellationsData] = useState<(string | number)[][]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getMembershipData();
-            setChartData(data as (string | number)[][]);
+            const signupsDataTemp = await getSignupsData();
+            setSignupsData(signupsDataTemp as (string | number)[][]);
+
+            const cancellationsDataTemp = await getCancellationsData();
+            setCancellationsData(cancellationsDataTemp as (string | number)[][]);
         };
 
         fetchData();
     }, []);
     
-    var chartInfo = {
+    var chartInfo = {       
         series: [{
-            name: 'Members',
-            data: chartData
+            name: 'Signups',
+            data: signupsData
         }],
         options: {
             chart: {
-            type: 'area',
-            stacked: false,
-            height: 350,
-            zoom: {
-                type: 'x',
-                enabled: true,
-                autoScaleYaxis: true
-            },
-            toolbar: {
-                autoSelected: 'zoom'
-            }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            markers: {
-                size: 0,
-            },
-            title: {
-                text: 'Number of FitHub Members',
-                align: 'left'
-            },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    inverseColors: false,
-                    opacityFrom: 0.5,
-                    opacityTo: 0,
-                    stops: [0, 90, 100]
-                },
-            },
-            yaxis: {
-                // title: {
-                //     text: 'Number of Members'
-                // },
+                id: 'fb',
+                group: 'social',
+                type: 'line',
             },
             xaxis: {
                 type: 'datetime',
             },
-            tooltip: {
-                shared: false,
-            }
+            title: {
+                text: 'New Signups Per Month',
+                align: 'left'
+            },
+            stroke: {
+                curve: 'smooth',
+            },
+            colors: ['#008FFB']
         },
+        
+        seriesLine2: [{
+            name: 'Cancellations',
+            data: cancellationsData
+        }],
+        optionsLine2: {
+            chart: {
+                id: 'tw',
+                group: 'social',
+                type: 'line',
+            },
+            xaxis: {
+                type: 'datetime',
+            },
+            title: {
+                text: 'Cancellations Per Month',
+                align: 'left'
+            },
+            stroke: {
+                curve: 'smooth',
+            },
+            colors: ['#ff0000ff']
+        },    
     };
 
     return (
         <div>
             <div id="chart">
                 {
-                    (chartData.length > 0) &&
-                    //@ts-expect-error
-                    <ReactApexChart options={chartInfo.options} series={chartInfo.series} type="area" height={350} />
+                    (signupsData.length > 0) && (cancellationsData.length > 0) &&
+                    <div>
+                        <div id="chart-line">
+                            <ReactApexChart options={chartInfo.options} series={chartInfo.series} type="line" height={160} />
+                        </div>
+                        <div id="chart-line2">
+                            <ReactApexChart options={chartInfo.optionsLine2} series={chartInfo.seriesLine2} type="line" height={160} />
+                        </div>
+                    </div>
                 }
             </div>
         </div>

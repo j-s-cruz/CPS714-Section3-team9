@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Chart } from "react-google-charts";
 import { getData } from './analytics_service';
 import MembershipChart from './membership_chart';
+import SignupsCancellationsChart from './signups_cancellations_chart';
+import MostPopularChart from './most_popular_chart';
 
 // https://www.react-google-charts.com/examples/
 // https://developers.google.com/chart/interactive/docs
@@ -148,6 +150,10 @@ export const Analytics: React.FC = () => {
 
     return (
         <div>
+            <MostPopularChart />
+            <br></br><br></br><br></br>
+            <SignupsCancellationsChart />
+            <br></br><br></br><br></br>
             <MembershipChart />
             <br></br><br></br><br></br>
             <Chart 
@@ -174,14 +180,6 @@ export const Analytics: React.FC = () => {
                 options={dailyGymUsageOptions}
             />
             <br></br><br></br><br></br>
-            <Chart
-                chartType="ScatterChart"
-                data={chartData}
-                options={{
-                    title: "Average Weight by Age",
-                    legend: "none",
-                }}
-            />
         </div>
     );
 };

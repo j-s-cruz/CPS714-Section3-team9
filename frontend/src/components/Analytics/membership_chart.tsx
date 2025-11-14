@@ -64,7 +64,10 @@ export const MembershipChart: React.FC = () => {
             },
             tooltip: {
                 shared: false,
-            }
+            },
+            stroke: {
+                curve: 'straight',
+            },
         },
     };
 
@@ -73,7 +76,7 @@ export const MembershipChart: React.FC = () => {
             <div id="chart">
                 {
                     (chartData.length > 0) &&
-                    //@ts-expect-error
+                    // @ts-expect-error
                     <ReactApexChart options={chartInfo.options} series={chartInfo.series} type="area" height={350} />
                 }
             </div>
