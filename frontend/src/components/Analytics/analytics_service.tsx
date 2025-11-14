@@ -132,7 +132,14 @@ export const getGymOccupancyData = async () => {
 export const getDailyVisitsData = async () => {
     try {
         const apiData = await axios.get<any[]>(api + '/data/daily_visits_data');
-        return apiData.data;
+
+        // Convert Python strings to Date objects
+        var convertedData = apiData.data.map(item => [new Date(item[0]), item[1]])
+
+        // Increment date by 1 because Typescript dates are 0-indexed
+        convertedData = [['Day', 'Number of Gym Visits'], ...convertedData.map(item => [new Date(item[0].setDate(item[0].getDate() + 1)), item[1]])]
+        console.log(convertedData);
+        return convertedData;
     }
     catch (error) {
         if (axios.isAxiosError(error)) {

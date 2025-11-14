@@ -8,6 +8,7 @@ import MostBusyTimesChart from './most_busy_chart';
 import GymUsageChart from './hourly_gym_usage_chart';
 import GymUsageChartv2 from './hourly_gym_usage_chartv2';
 import MembershipChartv2 from './membership_chartv2';
+import GymPopulationCalendarchart from './gym_population_calendar_chart';
 
 // https://www.react-google-charts.com/examples/
 // https://developers.google.com/chart/interactive/docs
@@ -94,10 +95,6 @@ export const Analytics: React.FC = () => {
         legend: "none",
     };
 
-    var dailyGymUsageOptions = {
-        title: 'Daily Gym Usage',
-    };
-
     return (
         <div>
             <SignupsCancellationsChart />
@@ -118,12 +115,7 @@ export const Analytics: React.FC = () => {
                 options={lineOptions}
             />
             <br></br><br></br><br></br>
-            <Chart
-                chartType="Calendar"
-                data={dailyGymUsageData}
-                options={dailyGymUsageOptions}
-            />
-            <br></br><br></br><br></br>
+            <GymPopulationCalendarchart />
         </div>
     );
 };
