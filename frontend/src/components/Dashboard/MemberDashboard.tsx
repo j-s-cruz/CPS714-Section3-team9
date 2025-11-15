@@ -169,7 +169,7 @@ export const MemberDashboard = () => {
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-gold-500/90 p-2 rounded-lg shadow-md hover:shadow-gold-500/30 transition-all duration-300 hover:scale-105">
+              <div className="bg-gold-500/90 p-2 rounded-lg shadow-md transition-all duration-300">
                 <FaDumbbell className="w-6 h-6 text-gray-900" />
               </div>
               <span className="text-xl font-bold text-gold-400 tracking-tight">FitHub</span>
