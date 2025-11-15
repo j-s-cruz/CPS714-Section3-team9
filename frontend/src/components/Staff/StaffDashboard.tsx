@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { admin_supabase } from './supabaseClient';
-import { Users, Calendar, TrendingUp, Plus, Bell, BarChart3, UserIcon, SparkleIcon } from 'lucide-react';
+import { Users, Calendar, TrendingUp, Plus, Bell, BarChart3, UserIcon, SparkleIcon, PencilIcon } from 'lucide-react';
 // import DumbbellIcon from '../../assets/dumbbell.png';
 import { FaDumbbell } from "react-icons/fa";
+import { SiAlteryx } from 'react-icons/si';
 
 
 export const StaffDashboard = () => {
@@ -307,6 +308,7 @@ const ClassManagement = () => {
         <ClassDetailsModal
           cls={selectedClass}
           onClose={() => { setShowClassModal(false); setSelectedClass(null);}}
+          refreshClasses={fetchAllClasses}
         />
       )}
      </div>
@@ -314,9 +316,40 @@ const ClassManagement = () => {
   };
 
   
-const ClassDetailsModal = ({ cls, onClose }: { cls: any, onClose: () => void}) => {
-  const label = "font-semibold text-yellow-600";
-  
+const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose: () => void, refreshClasses : () => void}) => {
+  const [editingField, setEditingField] = useState<null | string>(null); //editing field will be things like: class type, instructor fname, instructor lname, time, day and capacity
+  const [editValue, setEditValue] = useState("");  
+
+
+  if (!cls) return null  
+
+  //Editing Window
+  const openEditor = (field: string, currentValue: string) => {
+    setEditingField(field); //the column value for the class we are updating in the db
+    setEditValue(currentValue);
+  }
+
+  //Update the supabase backend
+  const saveEdit = async() => {
+    if (!editingField) return;
+    try{
+      const {error} = await admin_supabase
+      .from("class")
+        .update({[editingField]: editValue})
+        .eq("id", cls.id)
+
+        if (error) throw error;
+        
+        await refreshClasses();
+        cls[editingField] = editValue;
+        setEditingField(null);
+        setEditValue("");
+    } catch (err: any){
+      console.log(err)
+      alert("failed to update the class, sorry");
+    }
+  }
+
   const deleteClass = async (classId : string) => {
     try{
 
@@ -340,8 +373,7 @@ const ClassDetailsModal = ({ cls, onClose }: { cls: any, onClose: () => void}) =
       alert("Error deleting class");
     }
   };
-  
-  if (!cls) return null
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-yellow-500">
@@ -351,32 +383,107 @@ const ClassDetailsModal = ({ cls, onClose }: { cls: any, onClose: () => void}) =
         </div>
         
           <div className="space-y-1 text-sm text-slate-200 leading-6">
-            <span className={label}>Class Type: </span>{cls.class_type}<br />
-            <span className={label}>Instructor: </span>{cls.instructor_fname}<br />
-            <span className={label}>Date: </span>{cls.day}<br />
-            <span className={label}>Time: </span>{cls.time.slice(0, -3)}<br />
-            <span className={label}>Class Capacity: </span>{cls.capacity}<br />
-            <span className={label}>Total Bookings: </span>{cls.total_bookings}
+          
+            <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
+              <span className="font-semibold text-white">Class Type: {cls.class_type}</span>
+              <PencilIcon
+                className="cursor-pointer"
+                onClick= {() => openEditor("class_type", cls.class_type)}
+              />
+            </div>
+            <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
+              <span className="font-semibold text-white">Instructor First Name: {cls.instructor_fname}</span>
+                <PencilIcon
+                className="cursor-pointer"
+                onClick= {() => openEditor("instructor_fname", cls.instructor_fname)}
+                />
+            </div>
+             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
+              <span className="font-semibold text-white">Instructor Last Name: {cls.instructor_lname}</span>
+                <PencilIcon
+                className="cursor-pointer"
+                onClick= {() => openEditor("instructor_fname", cls.instructor_lname)}
+                />
+            </div>
+            <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
+              <span className="font-semibold text-white">Date: {cls.day}</span>
+                <PencilIcon
+                className="cursor-pointer"
+                onClick= {() => openEditor("day", cls.day)}
+                />
+            </div>
+            <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
+              <span className="font-semibold text-white">Time: {cls.time.slice(0, -3)}</span>
+              <PencilIcon
+                className="cursor-pointer"
+                onClick= {() => openEditor("time", cls.time)}
+              />
+            </div>
+            <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
+              <span className="font-semibold text-white"> Class Capacity: {cls.capacity}</span>
+              <PencilIcon
+                className="cursor-pointer"
+                onClick= {() => openEditor("capacity", cls.capacity)}
+              />
+            </div>
+            <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
+              <span className="font-semibold text-white">Total Bookings: {cls.total_bookings}</span>
+            </div>
+          
+          
           </div>
 
         
+        
         <div className="mt-5">
-          <button
-            onClick={ () => deleteClass(cls.id)}
-            className='w-full px-4 py-2 bg-red-600 text-black rounded-lg font-semibold'
-          >
-            Delete Class
-          </button>
-          
+        
           <button
             onClick={onClose}
-            className='w-full mt-3 px-4 py-2 bg-yellow-600 text-black rounded-lg font-semibold'
+            className='w-full px-4 py-2 bg-slate-200 text-black rounded-lg font-semibold'
           >
             Close Window
           </button>
+
+          <button
+            onClick={ () => deleteClass(cls.id)}
+            className='w-full mt-3 px-4 py-2 bg-red-500 text-black rounded-lg font-semibold'
+          >
+            Delete Class
+          </button>
+        </div>
         </div>
 
-        </div>
+      
+        {editingField && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+            <div className='bg-gray-800 p-5 rounded-lg w-80 border border-yellow-500'>
+              <h2 className='text-white text-lg font-bold mb-3 uppercase'>
+                Edit {editingField.replace("_", "")}
+              </h2>
+              <input
+                className='w-full p-2 rounded bg-gray-700 text-white mb-4'
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+              />
+              <div className='flex gap-2'>
+                <button
+                  className='flex-1 bg-red-500 p-2 rounded font-semibold text-black'
+                  onClick={() => setEditingField(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className='flex-1 bg-green-500 p-2 rounded font-semibold text-black'
+                  onClick={saveEdit}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+
+        )}
+
     </div>
   );
 
@@ -576,88 +683,88 @@ const ViewAdmins = ({onClose}: {onClose: () => void}) => {
 
 
 
-//REMOVE COMPONENT LATER NOT NEEDED FOR NOW
-const AnnouncementModal = ({ onClose }: { onClose: () => void }) => {
-  const [formData, setFormData] = useState({
-    title: '',
-    message: '',
-    priority: 'normal',
-  });
+// //REMOVE COMPONENT LATER NOT NEEDED FOR NOW
+// const AnnouncementModal = ({ onClose }: { onClose: () => void }) => {
+//   const [formData, setFormData] = useState({
+//     title: '',
+//     message: '',
+//     priority: 'normal',
+//   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { error } = await supabase.from('announcements').insert({
-        title: formData.title,
-        message: formData.message,
-        priority: formData.priority,
-        is_active: true,
-      });
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     try {
+//       const { error } = await supabase.from('announcements').insert({
+//         title: formData.title,
+//         message: formData.message,
+//         priority: formData.priority,
+//         is_active: true,
+//       });
 
-      if (error) throw error;
-      onClose();
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
+//       if (error) throw error;
+//       onClose();
+//     } catch (error: any) {
+//       alert(error.message);
+//     }
+//   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full m-4">
-        <h3 className="text-xl font-bold text-slate-900 mb-4">Create Announcement</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Title</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
-              required
-            />
-          </div>
+//   return (
+//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//       <div className="bg-white rounded-xl p-6 max-w-md w-full m-4">
+//         <h3 className="text-xl font-bold text-slate-900 mb-4">Create Announcement</h3>
+//         <form onSubmit={handleSubmit} className="space-y-4">
+//           <div>
+//             <label className="block text-sm font-medium text-slate-700 mb-2">Title</label>
+//             <input
+//               type="text"
+//               value={formData.title}
+//               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+//               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
+//               required
+//             />
+//           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Message</label>
-            <textarea
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
-              rows={4}
-              required
-            />
-          </div>
+//           <div>
+//             <label className="block text-sm font-medium text-slate-700 mb-2">Message</label>
+//             <textarea
+//               value={formData.message}
+//               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+//               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
+//               rows={4}
+//               required
+//             />
+//           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
-            <select
-              value={formData.priority}
-              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
-            >
-              <option value="low">Low</option>
-              <option value="normal">Normal</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+//           <div>
+//             <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
+//             <select
+//               value={formData.priority}
+//               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+//               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
+//             >
+//               <option value="low">Low</option>
+//               <option value="normal">Normal</option>
+//               <option value="high">High</option>
+//             </select>
+//           </div>
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700"
-            >
-              Publish
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+//           <div className="flex gap-2">
+//             <button
+//               type="button"
+//               onClick={onClose}
+//               className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50"
+//             >
+//               Cancel
+//             </button>
+//             <button
+//               type="submit"
+//               className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700"
+//             >
+//               Publish
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// };
