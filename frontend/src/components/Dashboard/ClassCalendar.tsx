@@ -243,7 +243,7 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
   const weekDays = daysOfWeek(currentWeekStart);
 
   return (
-    <div className="relative bg-gray-800/60 rounded-2xl border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 overflow-hidden">
+    <div className="relative bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-10"
