@@ -297,7 +297,7 @@ export const ProfileEditor = () => {
         </div>
 
         {/* Combined Membership Details & Upgrade Section */}
-        <div className="bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-1">
+        <div className="bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-1 h-full flex flex-col">
           <div
             className="bg-gold-500/90 p-3 rounded-xl shadow-lg hover:bg-gold-500 transition-all cursor-pointer h-14 w-auto flex items-center gap-8"
             title="Membership Details">
@@ -311,7 +311,7 @@ export const ProfileEditor = () => {
             </h3>
           </div>
 
-          <button className="w-full mt-6 px-6 py-3 bg-gold-500/90 text-gray-900 rounded-xl font-semibold hover:bg-gold-500 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-gold-500/30">
+          <button className="w-full mt-6 px-6 py-3 bg-gold-500/90 text-gray-900 rounded-xl font-semibold hover:bg-gold-500 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-gold-500/30 mt-auto">
             <GiTrophy className="w-5 h-5" />
             Upgrade Membership
           </button>
@@ -319,7 +319,7 @@ export const ProfileEditor = () => {
       </div>
 
       {/* Fitness Goals Widget */}
-      <div className="bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-2">
+      <div className="relative bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-2">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-10"
@@ -327,7 +327,7 @@ export const ProfileEditor = () => {
             backgroundImage: "url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=1550&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
           }}
         />
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 relative z-10">
           <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
             <GiMuscleUp className="w-6 h-6 text-gold-400" />
             Fitness Goals
@@ -364,7 +364,7 @@ export const ProfileEditor = () => {
         <textarea
           value={fitnessGoals}
           onChange={(e) => setFitnessGoals(e.target.value)}
-          className="input-field min-h-[160px] resize-none w-full"
+          className="input-field min-h-[160px] resize-none w-full relative z-10"
           placeholder="What are your fitness goals?"
           disabled={!isEditingGoals}
         />
