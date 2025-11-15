@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { Save, User, Phone, Upload, Edit2, X } from 'lucide-react';
+import { Save, User, Phone, Upload, Edit2, X, Crown } from 'lucide-react';
 import { GiMuscleUp, GiTrophy } from 'react-icons/gi';
 
 export const ProfileEditor = () => {
@@ -298,7 +298,13 @@ export const ProfileEditor = () => {
 
         {/* Combined Membership Details & Upgrade Section */}
         <div className="bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-1">
-          <h3 className="text-xl font-bold text-gray-100 mb-6">Membership Details</h3>
+          <div
+            className="bg-gold-500/90 p-3 rounded-xl shadow-lg hover:bg-gold-500 transition-all cursor-pointer h-14 w-auto flex items-center gap-8"
+            title="Membership Details">
+            <Crown className="w-8 h-8 text-gray-900" />
+            <h3 className="text-xl font-bold text-gray-900">Membership Details</h3>
+
+          </div>
           <div className="space-y-4">
             <h3 className="text-lg text-gray-200">
               Need to figure out what goes here
