@@ -53,7 +53,7 @@ async def get_classes_schedules(
 ):
     # supabase query to get classes schedules (need to fix for final table)
     db_query = supabase.table('class_schedules')\
-        .select('*, ficlasses(*)')\
+        .select('*, classes(*)')\
         .gte('scheduled_date', datetime.now().date().isoformat())
 
     #if filters are provided in the query, add them to the query
@@ -80,7 +80,7 @@ async def book_class():
 async def cancel_class():
     return{"message": "not yet implemented"}
 
-@app.get("/classes/my-bookings")
+@app.get("/classes/my-bookings") 
 async def get_my_bookings():
     return{"message": "not yet implemented"}
 
