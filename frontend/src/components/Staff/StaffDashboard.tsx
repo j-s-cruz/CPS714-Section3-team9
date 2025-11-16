@@ -82,15 +82,15 @@ export const StaffDashboard = () => {
           <p className="text-3xl font-bold text-white">{stats.totalMembers}</p>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
+        {/* <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Active Subscriptions</span>
             <TrendingUp className="w-5 h-5 text-green-600" />
           </div>
           <p className="text-3xl font-bold text-white">{stats.activeMembers}</p>
-        </div>
+        </div> */}
 
-        <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
+        <div className="bg-gray-800 left rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Total Classes</span>
             <Calendar className="w-5 h-5 text-blue-500" />
@@ -98,13 +98,13 @@ export const StaffDashboard = () => {
           <p className="text-3xl font-bold text-white">{stats.totalClasses}</p>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
+        {/* <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Today's Bookings</span>
             <BarChart3 className="w-5 h-5 text-amber-600" />
           </div>
           <p className="text-3xl font-bold text-white">{stats.todayBookings}</p>
-        </div>
+        </div> */}
       </div>
 
       <div className="mb-6">
@@ -153,20 +153,8 @@ const Report = () => {
 
 //COMPONENT: MEMBER MANAGEMENT
 const MemberManagement = () => {
-  const [members, setMembers] = useState<any[]>([
-    {
-      id: 1,
-      full_name: 'Reyhan Emik',
-      created_at: new Date().toISOString(),
-      membership_subscriptions: [{membership_tiers: {name: 'Gold'}}],
-    },
-    {
-      id: 2,
-      full_name: 'Rana Hamood',
-      created_at: new Date().toISOString(),
-      membership_subscriptions: [{membership_tiers: {name: 'Gold'}}]
-    },
-  ]);
+  const [members, setMembers] = useState<any[]>([]);
+
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -176,20 +164,40 @@ const MemberManagement = () => {
   //Function to fetch data from Supabase
   const fetchMembers = async () => {
     try{
-        const { data } = await supabase
+      //Get User Profiles first
+        const { data: profilesData, error: profilesError } = await admin_supabase
         .from('profiles') //the table in Supabase we fetch from
-        .select('*, membership_subscriptions(*, membership_tiers(name))')
-        .order('created_at', { ascending: false }) //get newest members first
-        .limit(25);
+        .select('*')
+        .order('created_at', { ascending: false }); //get newest members first
+      
+      if (profilesError){
+        console.error("Error occured while fetching profiles: ", profilesError);
+        throw profilesError;
+      }
+      if (!profilesData){
+        console.log("DATA is NULL: ", {profilesData})
+        return;
+      }
 
-        if (data && data.length > 0) {
-          setMembers(data) // if fetch from DB was successful and data exists, replace the members state with the fetched data
-        } else {
-          setMembers(prevMembers => prevMembers); //if no data was fetched, keep prev dummy values in 'members'
-        }
-      } catch (error) {
-        console.log("Error getting members from DB: ", error); //keep dummy members if there was an error
-        setMembers(prevMembers => prevMembers); 
+      //Then retrive all memberships
+      const {data: membershipsData, error: membershipsError} = await admin_supabase
+      .from('memberships')
+      .select('*')
+      if (membershipsError){
+        console.error("Error occured while fetching memberships: ", membershipsError);
+        throw membershipsError;
+      } 
+      //manually map each profile to thier memberships. The reason i do this is cuz, there is no FK relatoinship supabase knows about in its schema cache even though memberships.user_id points to profiles.id. I got this error --> PGRST200, 'searched for FK relationship but no match was found. Could not find a relationship between profiles and memberships in schema cache
+      //profiledata is an array.  Map iterates over the array and returns a new one where each one can be transformed.
+      const mergeData = profilesData.map(profile => ({ 
+        ...profile, //spread operator: copy all existing properties of profile into new object.
+        memberships: membershipsData?.filter(m => m.user_id === profile.id) || [], //memberships is the new property too add to each profile. using filter to keep only ones that match m.user id and profile.id
+      }));
+
+      console.log(mergeData);
+      setMembers(mergeData);
+    }catch (error){
+      console.log("error happened while fetching members: ", error);
     }
   };
 
@@ -210,7 +218,7 @@ const MemberManagement = () => {
               <div>
                 <p className="font-semibold text-slate-900">{member.full_name}</p>
                 <p className="text-sm text-slate-600">
-                  {member.membership_subscriptions[0]?.membership_tiers?.name || 'No subscription'}
+                  {member.memberships?.[0]?.tier || 'No subscription'}
                 </p>
               </div>
               <span className="text-sm text-slate-500">
@@ -256,9 +264,10 @@ const ClassManagement = () => {
       }
     
   }catch (err){
-    console.log("some error occured:", err);
+   console.log("some error occured:", err);
   }
   };
+
 
 
   return (
@@ -534,7 +543,7 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
               type="text"
               value={formData.classId}
               onChange={(e) => {
-                if (!/^[a-zA-Z\s]*$/.test(e.target.value))  // /regex/.test(string) --> for client-side input validation
+                if (!/^[a-zA-Z0-9\s]*$/.test(e.target.value))  // /regex/.test(string) --> for client-side input validation
                 {
                   console.error("Input for the 'Class' field is invalid or you entered an empty string.")
                   return; 
