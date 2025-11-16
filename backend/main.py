@@ -23,6 +23,10 @@ class BookingRequest(BaseModel): #Pydantic model for the booking request
     user_id: str
     schedule_id: str
 
+class CancelRequest(BaseModel):
+    user_id: str
+    booking_id: int
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -53,19 +57,19 @@ async def get_classes_schedules(
 ):
     # supabase query to get classes schedules (need to fix for final table)
     db_query = supabase.table('class_schedules')\
-        .select('*, classes(*)')\
+        .select('*, class(*)')\
         .gte('scheduled_date', datetime.now().date().isoformat())
 
     #if filters are provided in the query, add them to the query
     if date:
         db_query = db_query.eq('scheduled_date', date)
     if time_from:
-        db_query = db_query.gte('start_time', time_from)
+        db_query = db_query.gte('time_from', time_from)
     if time_to:
-        db_query = db_query.lte('end_time', time_to)
+        db_query = db_query.lte('time_to', time_to)
 
     #Sort the results of the query by start_time
-    db_query = db_query.order('scheduled_date').order('start_time')
+    db_query = db_query.order('scheduled_date').order('time_from')
 
     final_result = db_query.execute() #execute the query and get the results
 
@@ -77,8 +81,53 @@ async def book_class():
     return{"message": "not yet implemented"}
 
 @app.post("/classes/cancel")
-async def cancel_class():
-    return{"message": "not yet implemented"}
+async def cancel_class(request: CancelRequest):
+    try:
+        #supabase query to class_bookings table to cancel the booking
+        #verify that the user owns the booking 
+        booking_query = supabase.table('class_bookings')\
+            .select('*, class_schedules(taken_spots, total_spots)')\
+            .eq('id', request.booking_id)\
+            .execute()
+
+        if not booking_query.data: #if the booking is not found, return an error
+            return {
+                "success": False,
+                "message": "Booking not found or does not belong to this user"
+            }
+        
+        booking = booking_query.data[0] #otherwise, get the booking data
+
+        #verify that the boojing is not already cancelled
+        if booking['cancelled_at'] is not None:
+            return {
+                "success": False,
+                "message": "Booking already cancelled"
+            }
+        
+        schedule_id = booking['schedule_id']
+
+
+        #Update booking status to cancelled with current timestamp
+        cancel_result = supabase.table('class_bookings')\
+            .update({'cancelled_at': datetime.now().isoformat()})\
+            .eq('id', request.booking_id)\
+            .execute()
+        
+        #return success cancellation response
+        return {
+            "success": True,
+            "message": "Booking cancelled successfully",
+            "booking_id": request.booking_id
+        }
+    
+    except Exception as e: #if an error occurs in cancelling the booking, return an error response
+        return {
+            "success": False,
+            "message": f"Error cancelling booking: {str(e)}"
+        }
+
+
 
 @app.get("/classes/my-bookings") 
 async def get_my_bookings():
