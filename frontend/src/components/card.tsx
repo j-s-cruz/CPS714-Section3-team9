@@ -66,11 +66,11 @@ export const Card: React.FC<CardProps> = ({
   // Determines the button style based on its value (for example: BOOK, CANCEL, FULL)
   const buttonStatus = (buttonValue : string) => {
     if (buttonValue === "CANCEL") {
-      return "btn-danger"
+      return (<div className="btn-group btn-sm rounded-5 overflow-hidden" role="group"> <button type="button" className="btn btn-dark px-3" style={{fontSize: "13px"}}>BOOKED</button> <button type="button" className="btn btn-danger px-3" style={{fontSize: "13px"}}>CANCEL</button></div>)
     } else if (buttonValue === "FULL") {
-      return "btn-secondary"
+      return (<button className="btn btn-secondary btn-sm rounded-5 px-3" style={{fontSize: "13px"}}>FULL</button>)
     } else {
-      return "btn-success"
+      return (<button className="btn btn-success btn-sm rounded-5 px-3" style={{fontSize: "13px"}}>BOOK</button>)
     }
   }
 
@@ -114,7 +114,7 @@ export const Card: React.FC<CardProps> = ({
             <p className={`${seatsLeftColor(seatsLeft)} mb-1`} style={{fontSize: "14px"}}>{seatsLeft} seats left</p>
             <hr className="my-1 mx-0" />
           </span>
-          <button className={`btn ${buttonStatus(buttonValue)} btn-sm rounded-5 px-3`} style={{fontSize: "13px"}}>{buttonValue}</button>
+        {buttonStatus(buttonValue)}
       </section>
     </div>
   );
