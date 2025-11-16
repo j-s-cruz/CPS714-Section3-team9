@@ -3,7 +3,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import {
   User,
-  TrendingUp,
   Settings,
   Bell,
   Clock,
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe, GiBiceps } from 'react-icons/gi';
 import { FaDumbbell } from 'react-icons/fa';
+import dummyData from '../../data/data.json';
 import { ProfileEditor } from '../Profile/ProfileEditor';
 import { StaffDashboard } from '../Staff/StaffDashboard';
 import { ClassCalendar } from './ClassCalendar';
@@ -37,90 +37,6 @@ export const MemberDashboard = () => {
       .select('ph');
 
 
-    /* Dummy data. Once we get the database we can ignore this*/
-    const dummyEvents: any[] = [
-      {
-        id: '1',
-        title: 'Morning Yoga',
-        start_time: '9:00 AM',
-        end_time: '3:00 PM',
-        date: '2025-11-15',
-        instructor: 'Instructor'
-      },
-      {
-        id: '2',
-        title: 'HIIT Training',
-        start_time: '6:00 PM',
-        end_time: '7:00 PM',
-        date: '2025-11-16',
-        instructor: 'Instructor'
-      },
-      {
-        id: '3',
-        title: 'Spin Class',
-        start_time: '10:00 AM',
-        end_time: '11:00 AM',
-        date: '2025-11-18',
-        instructor: 'Instructor'
-      },
-      {
-        id: '4',
-        title: 'CrossFit',
-        start_time: '7:00 AM',
-        end_time: '8:00 AM',
-        date: '2025-11-19',
-        instructor: 'Instructor'
-      },
-      {
-        id: '5',
-        title: 'Pilates',
-        start_time: '5:30 PM',
-        end_time: '6:30 PM',
-        date: '2025-11-20',
-        instructor: 'Instructor'
-      },
-      {
-        id: '6',
-        title: 'Boxing',
-        start_time: '8:00 AM',
-        end_time: '9:00 AM',
-        date: '2025-11-21',
-        instructor: 'Instructor'
-      },
-      {
-        id: '7',
-        title: 'Zumba',
-        start_time: '12:00 PM',
-        end_time: '1:00 PM',
-        date: '2025-11-22',
-        instructor: 'Instructor'
-      },
-      {
-        id: '8',
-        title: 'Power Lifting',
-        start_time: '4:00 PM',
-        end_time: '5:00 PM',
-        date: '2025-11-23',
-        instructor: 'Instructor'
-      },
-      {
-        id: '9',
-        title: 'Power Lifting',
-        start_time: '4:00 PM',
-        end_time: '5:00 PM',
-        date: '2025-11-13',
-        instructor: 'Instructor'
-      },
-      {
-        id: '1',
-        title: 'lmao?',
-        start_time: '9:00 AM',
-        end_time: '3:00 PM',
-        date: '2025-11-11',
-        instructor: 'Instructor'
-      }
-    ];
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -130,7 +46,9 @@ export const MemberDashboard = () => {
     sevenDaysFromNow.setHours(23, 59, 59, 999);
 
     /* Limit the upcoming events to the next 7 days */
-    const upcomingEvents = dummyEvents
+    const bookings = (dummyData as any).bookings as any[];
+
+    const upcomingEvents = bookings
       .filter(event => {
         /* Parse date string as local date (avoid timezone issues) */
         const [year, month, day] = event.date.split('-').map(Number);
@@ -150,18 +68,26 @@ export const MemberDashboard = () => {
   };
 
   const fetchNotifications = async () => {
-    /* Placeholder for notifications database */
-    const { data } = await supabase
+    /* Placeholder for notifications database. Use shared dummy data while backend isn't available. */
+    await supabase
       .from('ph')
       .select('ph');
 
-    setNotifications(data || []);
+    const notifications = (dummyData as any).notifications || [];
+    setNotifications(notifications);
   };
 
   /* User data */
-  const subscription = profile?.membership_subscriptions?.[0];
+  const dummyProfile = (dummyData as any).profiles?.[0] || null;
+  /* If no profile is fetched then use dummy data */
+  const myProfile = profile ?? dummyProfile;
+  const subscription = myProfile?.membership_subscriptions?.[0];
   const tier = subscription?.membership_tiers;
-  const initials = (profile?.full_name || 'U').split(' ').map((p: string) => p[0]).slice(0, 2).join('');
+  const profile_picture = myProfile?.profile_picture || null;
+  const userId = myProfile?.id || '';
+
+  /* Use initials if profile picture not found */ 
+  const initials = (myProfile?.full_name || 'U').split(' ').map((p: string) => p[0]).slice(0, 2).join('');
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 overflow-hidden">
@@ -202,7 +128,7 @@ export const MemberDashboard = () => {
                   Profile
                 </button>
                 {/* TODO: I haven't touched this, not sure if you guys want to. */}
-                {profile?.is_staff && (
+                {myProfile?.is_staff && (
                   <button
                     onClick={() => setActiveTab('staff')}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'staff'
@@ -228,15 +154,20 @@ export const MemberDashboard = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="w-10 h-10 bg-gold-500/90 rounded-full flex items-center justify-center text-gray-900 font-bold text-sm shadow-md hover:shadow-gold-500/30 transition-all duration-300 hover:scale-105"
+                  className="w-10 h-10 bg-gold-500/90 rounded-full flex items-center justify-center text-gray-900 font-bold text-sm shadow-md hover:shadow-gold-500/30 transition-all duration-300 hover:scale-105 overflow-hidden"
                 >
-                  {initials}
+                  {/* If a profile picture is defined then use it */ }
+                  {profile_picture ? (
+                    <img src={profile_picture} className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{initials}</span>
+                  )}
                 </button>
 
                 {showProfileMenu && (
                   <div className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
                     <div className="p-4 border-b border-gray-700">
-                      <div className="text-sm font-bold text-gray-100 truncate">{profile?.full_name || 'User'}</div>
+                      <div className="text-sm font-bold text-gray-100 truncate">{myProfile?.full_name || 'User'}</div>
                       <div className="text-xs text-gray-400 truncate">{user?.email}</div>
                     </div>
                     <div className="p-2">
@@ -301,7 +232,7 @@ export const MemberDashboard = () => {
                   <div className="text-right">
                     <p className="text-gray-100 text-lg font-semibold drop-shadow">
                       {subscription?.renewal_date
-                        ? `Renews ${new Date(subscription.renewal_date).toLocaleDateString()}`
+                        ? `Renewal Date: ${new Date(subscription.renewal_date).toLocaleDateString()}`
                         : 'No renewal date'}
                     </p>
                   </div>
@@ -388,13 +319,13 @@ export const MemberDashboard = () => {
               </div>
               {/* Add the Class Calendar component to the page  */}
               <div id="class-calendar" className="stagger-2">
-                <ClassCalendar userId={user?.id} />
+                <ClassCalendar userId={userId} />
               </div>
             </div>
           )}
 
           {activeTab === 'profile' && <ProfileEditor />}
-          {activeTab === 'staff' && profile?.is_staff && <StaffDashboard />}
+          {activeTab === 'staff' && myProfile?.is_staff && <StaffDashboard />}
         </div>
       </main>
     </div>

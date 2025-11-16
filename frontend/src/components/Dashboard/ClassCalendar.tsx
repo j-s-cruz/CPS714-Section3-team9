@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe, GiBiceps, GiBoxingGlove, GiStrongMan } from 'react-icons/gi';
 import { FaDumbbell, FaHeartbeat } from 'react-icons/fa';
+import dummyData from '../../data/data.json';
 import { supabase } from '../../lib/supabase';
 
 interface classInSchedule {
@@ -102,97 +103,18 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
       const startDate = dateString(weekDays[0]);
       const endDate = dateString(weekDays[6]);
 
-      /* Fetch the data from team 3
-       TODO: Update this once we get the database. */
-      const { data: bookings } = await supabase
+      /* Fetch the data from team 3 (placeholder). Keep the call so it's easy to swap in later. */
+      await supabase
         .from('ph')
-        .select('ph')
+        .select('ph');
 
-      /* Dummy data. Once we get the database we can ignore this*/
-      const dummyEvents: classInSchedule[] = [
-        {
-          id: '1',
-          title: 'Morning Yoga',
-          start_time: '9:00 AM',
-          end_time: '3:00 PM',
-          date: '2025-11-15',
-          instructor: 'Instructor'
-        },
-        {
-          id: '2',
-          title: 'HIIT Training',
-          start_time: '6:00 PM',
-          end_time: '7:00 PM',
-          date: '2025-11-16',
-          instructor: 'Instructor'
-        },
-        {
-          id: '3',
-          title: 'Spin Class',
-          start_time: '10:00 AM',
-          end_time: '11:00 AM',
-          date: '2025-11-18',
-          instructor: 'Instructor'
-        },
-        {
-          id: '4',
-          title: 'CrossFit',
-          start_time: '7:00 AM',
-          end_time: '8:00 AM',
-          date: '2025-11-19',
-          instructor: 'Instructor'
-        },
-        {
-          id: '5',
-          title: 'Pilates',
-          start_time: '5:30 PM',
-          end_time: '6:30 PM',
-          date: '2025-11-20',
-          instructor: 'Instructor'
-        },
-        {
-          id: '6',
-          title: 'Boxing',
-          start_time: '8:00 AM',
-          end_time: '9:00 AM',
-          date: '2025-11-21',
-          instructor: 'Instructor'
-        },
-        {
-          id: '7',
-          title: 'Zumba',
-          start_time: '12:00 PM',
-          end_time: '1:00 PM',
-          date: '2025-11-22',
-          instructor: 'Instructor'
-        },
-        {
-          id: '8',
-          title: 'Power Lifting',
-          start_time: '4:00 PM',
-          end_time: '5:00 PM',
-          date: '2025-11-23',
-          instructor: 'Instructor'
-        },
-        {
-          id: '9',
-          title: 'Power Lifting',
-          start_time: '4:00 PM',
-          end_time: '5:00 PM',
-          date: '2025-11-13',
-          instructor: 'Instructor'
-        },
-        {
-          id: '1',
-          title: 'lmao?',
-          start_time: '9:00 AM',
-          end_time: '3:00 PM',
-          date: '2025-11-11',
-          instructor: 'Instructor'
-        }
-      ];
+      /* Use shared dummy data (frontend/src/data/data.json) while backend isn't available. */
+      const bookings = (dummyData as any).bookings as classInSchedule[];
 
-      updateEvents(dummyEvents);
+      /* Filter bookings to the current week (startDate and endDate are YYYY-MM-DD strings) */
+      const weekBookings = bookings.filter(b => b.date >= startDate && b.date <= endDate);
+
+      updateEvents(weekBookings);
     } catch (error) {
       console.error('Error fetching schedule:', error);
     }

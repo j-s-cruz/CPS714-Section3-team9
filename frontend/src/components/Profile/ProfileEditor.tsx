@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { Save, User, Phone, Upload, Edit2, X, Crown } from 'lucide-react';
 import { GiBiceps, GiMuscleUp, GiTrophy } from 'react-icons/gi';
+import dummyData from '../../data/data.json';
 
 export const ProfileEditor = () => {
   const { user, profile, refreshProfile } = useAuth();
@@ -31,13 +32,15 @@ export const ProfileEditor = () => {
       setFitnessGoals(profile.fitness_goals || '');
       setProfilePicture(profile.profile_picture || '');
     } else {
-      /* Dummy data */
-      setFirstName('Vlad');
-      setLastName('Scraba');
-      setEmail('Vlad.Scraba@torontomu.ca');
-      setPhoneNumber('(123) 456-7890');
-      setFitnessGoals('-Finish CPS714 Project\n-Exercise regularly\n-Eat healthy');
-      setProfilePicture('');
+      /* Dummy data to be used if profile does not return anything */
+      const dummyProfile = (dummyData as any).profiles?.[0] || {};
+      const nameParts = (dummyProfile.full_name || '').split(' ');
+      setFirstName(nameParts[0] || '');
+      setLastName(nameParts.slice(1).join(' ') || '');
+      setEmail(dummyProfile.email || '');
+      setPhoneNumber(dummyProfile.phone_number || '(123) 456-7890');
+      setFitnessGoals(dummyProfile.fitness_goals || '-Finish CPS714 Project\n-Exercise regularly\n-Eat healthy');
+      setProfilePicture(dummyProfile.profile_picture || '');
     }
   }, [profile, user]);
 
@@ -63,12 +66,13 @@ export const ProfileEditor = () => {
       setPhoneNumber(profile.phone_number || '');
       setProfilePicture(profile.profile_picture || '');
     } else {
-      /* Dummy data */
-      setFirstName('Vlad');
-      setLastName('Scraba');
-      setEmail('Vlad.Scraba@torontomu.ca');
-      setPhoneNumber('(123) 456-7890');
-      setProfilePicture('');
+      const dummyProfile = (dummyData as any).profiles?.[0] || {};
+      const nameParts = (dummyProfile.full_name || '').split(' ');
+      setFirstName(nameParts[0] || '');
+      setLastName(nameParts.slice(1).join(' ') || '');
+      setEmail(dummyProfile.email || '');
+      setPhoneNumber(dummyProfile.phone_number || '(123) 456-7890');
+      setProfilePicture(dummyProfile.profile_picture || '');
     }
   };
 
@@ -86,7 +90,8 @@ export const ProfileEditor = () => {
     if (profile) {
       setFitnessGoals(profile.fitness_goals || '');
     } else {
-      setFitnessGoals('-Finish CPS714 Project\n-Exercise regularly\n-Eat healthy');
+      const dummyProfile = (dummyData as any).profiles?.[0] || {};
+      setFitnessGoals(dummyProfile.fitness_goals || '-Finish CPS714 Project\n-Exercise regularly\n-Eat healthy');
     }
   };
 
