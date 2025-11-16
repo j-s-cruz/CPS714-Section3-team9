@@ -27,13 +27,16 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM'
   ];
 
+  /* The start of the week is always Monday */
   function startOfWeek(date: Date): Date {
     const d = new Date(date);
     const day = d.getDay();
+    /* Funky thing where 0 is Sunday so 1 is Monday thus we must add 1 to get the corresponding Monday*/
     const diff = d.getDate() - day + 1;
     return new Date(d.setDate(diff));
   }
 
+  /* Get all days of the week from a start date */
   function daysOfWeek(startDate: Date): Date[] {
     const days: Date[] = [];
     for (let i = 0; i < 7; i++) {
@@ -44,16 +47,19 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     return days;
   }
 
+  /* Convert a Date object to a string in YYYY-MM-DD format */
   function dateString(date: Date): string {
     return date.toISOString().split('T')[0];
   }
 
+  /* Basic Helper to format the day and date in the calendar header */
   function formatDayHeader(date: Date): string {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const dayName = days[date.getDay()];
     return `${date.getDate()} ${dayName}`;
   }
 
+  /* Helper function that displays the month and year on the calendar */
   function monthYearDisplay(startDate: Date): string {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
@@ -65,16 +71,20 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     const startYear = startDate.getFullYear();
     const endYear = endDate.getFullYear();
 
-    /* Check if the date crosses month or year*/
+    /* Check if the date crosses month or year and will display accordingly*/
     if (startYear !== endYear) {
+      /* e.g December 2025 - January 2026 */
       return `${startMonth} ${startYear} - ${endMonth} ${endYear}`;
     } else if (startMonth !== endMonth) {
+      /* e.g November 2025 - December 2025 */
       return `${startMonth} - ${endMonth} ${startYear}`;
     } else {
+      /* e.g November 2025 */
       return `${startMonth} ${startYear}`;
     }
   }
 
+  /* Helper function to check if a given date is today */
   function isToday(date: Date): boolean {
     const today = new Date();
     return date.toDateString() === today.toDateString();
@@ -195,10 +205,12 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     setCurrentWeekStart(newDate);
   };
 
+  /* Go back to the current week (specifically back to the week that holds today) */
   const goToToday = () => {
     setCurrentWeekStart(startOfWeek(new Date()));
   };
 
+  /* Helper function that calculates the minutes difference from 9am */
   function eventPosition(startTime: string): number {
     const [time, period] = startTime.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
@@ -211,17 +223,20 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     return position;
   }
 
-  function eventHeight(startTime: string, endTime: string): number {
+  /* Gets the events duration which allows you to calculate the height of the block in the calendar */
+  function blockHeight(startTime: string, endTime: string): number {
     const start = eventPosition(startTime);
     const end = eventPosition(endTime);
     return end - start;
   }
 
-  function eventsForDay(date: Date): classInSchedule[] {
+  /* Helper function to get events for a specific day */
+  function todaysEvents(date: Date): classInSchedule[] {
     const dateStr = dateString(date);
     return events.filter(event => event.date === dateStr);
   }
 
+  /* Add icons to events for fun and extra personalization */
   function getRandomIcon(eventId: string) {
     const icons = [
       GiWeightLiftingUp,
@@ -318,7 +333,7 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
 
                   {/* Cells */}
                   {weekDays.map((day, dayIndex) => {
-                    const dayEvents = eventsForDay(day);
+                    const dayEvents = todaysEvents(day);
                     const cellEvents = dayEvents.filter(event => {
                       const eventStartMinutes = eventPosition(event.start_time);
                       const cellStartMinutes = timeIndex * 60;
@@ -339,7 +354,7 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
                               className="absolute left-1 right-1 rounded-lg p-2 text-xs cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-gold-500/90 text-gray-900 border border-gold-400 z-10"
                               style={{
                                 top: `${eventPosition(event.start_time) % 60}px`,
-                                height: `${eventHeight(event.start_time, event.end_time)}px`
+                                height: `${blockHeight(event.start_time, event.end_time)}px`
                               }}
                             >
                               <div className="flex items-center gap-2">

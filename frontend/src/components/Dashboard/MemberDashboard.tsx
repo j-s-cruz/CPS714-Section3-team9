@@ -10,7 +10,7 @@ import {
   LogOut,
   Crown,
 } from 'lucide-react';
-import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe } from 'react-icons/gi';
+import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe, GiBiceps } from 'react-icons/gi';
 import { FaDumbbell } from 'react-icons/fa';
 import { ProfileEditor } from '../Profile/ProfileEditor';
 import { StaffDashboard } from '../Staff/StaffDashboard';
@@ -121,10 +121,10 @@ export const MemberDashboard = () => {
       }
     ];
 
-    // Get today and 7 days from now
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    /* Grab the date 7 days from today and set the time to 11:59 PM */
     const sevenDaysFromNow = new Date(today);
     sevenDaysFromNow.setDate(today.getDate() + 7);
     sevenDaysFromNow.setHours(23, 59, 59, 999);
@@ -139,6 +139,7 @@ export const MemberDashboard = () => {
         /* Keep event only if it's within the next 7 days (today through 7 days from now) */
         return eventDate >= today && eventDate <= sevenDaysFromNow;
       })
+      /* Basic sorting by date and time to show the upcoming classes in the correct order */
       .sort((a, b) => {
         const dateA = new Date(`${a.date} ${a.start_time}`);
         const dateB = new Date(`${b.date} ${b.start_time}`);
@@ -146,7 +147,6 @@ export const MemberDashboard = () => {
       });
 
     setUpcomingBookings(upcomingEvents);
-    console.log('Bookings set');
   };
 
   const fetchNotifications = async () => {
@@ -158,17 +158,19 @@ export const MemberDashboard = () => {
     setNotifications(data || []);
   };
 
+  /* User data */
   const subscription = profile?.membership_subscriptions?.[0];
   const tier = subscription?.membership_tiers;
   const initials = (profile?.full_name || 'U').split(' ').map((p: string) => p[0]).slice(0, 2).join('');
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 overflow-hidden">
-      {/* Banner */}
+      {/* Top Banner */}
       <header className="bg-gray-800/95 border-b border-gray-700/50 backdrop-blur-md shadow-lg">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              {/* FITHUB LOGO */}
               <div className="bg-gold-500/90 p-2 rounded-lg shadow-md transition-all duration-300">
                 <FaDumbbell className="w-6 h-6 text-gray-900" />
               </div>
@@ -185,9 +187,10 @@ export const MemberDashboard = () => {
                     : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
                     }`}
                 >
-                  <TrendingUp className="w-4 h-4 inline mr-1" />
+                  <GiBiceps className="w-4 h-4 inline mr-1" />
                   Dashboard
                 </button>
+                {/* Send to the profile editor */}
                 <button
                   onClick={() => setActiveTab('profile')}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'profile'
@@ -198,6 +201,7 @@ export const MemberDashboard = () => {
                   <User className="w-4 h-4 inline mr-1" />
                   Profile
                 </button>
+                {/* TODO: I haven't touched this, not sure if you guys want to. */}
                 {profile?.is_staff && (
                   <button
                     onClick={() => setActiveTab('staff')}
@@ -212,7 +216,7 @@ export const MemberDashboard = () => {
                 )}
               </div>
 
-              {/* Notifications */}
+              {/* Notifications (Again haven't touched this at all) */}
               <button className="relative p-2 text-gray-400 hover:text-gold-400 transition-all duration-200 hover:bg-gray-700/50 rounded-lg">
                 <Bell className="w-5 h-5" />
                 {notifications.length > 0 && (
@@ -220,7 +224,7 @@ export const MemberDashboard = () => {
                 )}
               </button>
 
-              {/* Sign out section */}
+              {/* Sign drop down and banner */}
               <div className="relative">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -259,7 +263,7 @@ export const MemberDashboard = () => {
             <div className="space-y-6">
               {/* Membership Status Widget */}
               <div className="relative rounded-2xl border border-gold-500/30 p-6 overflow-hidden hover:border-gold-500/30 hover:shadow-xl hover:shadow-gold-500/5 h-28">
-                {/* Background Image */}
+                {/* Background Image For Membership Status */}
                 <div
                   className="absolute inset-0 bg-cover bg-center"
                   style={{
@@ -269,9 +273,10 @@ export const MemberDashboard = () => {
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-gold-500/60 to-gold-600/60" />
 
-                {/* Content */}
+                {/* Basic Membership Status Info */}
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-4">
+                    {/* Added a crown button that also sends you to the users profile page to see more info on membership */}
                     <button
                       onClick={() => setActiveTab('profile')}
                       className="bg-gold-500/90 p-3 rounded-xl shadow-lg hover:bg-gold-500 transition-all duration-300 hover:scale-110 cursor-pointer"
@@ -303,6 +308,7 @@ export const MemberDashboard = () => {
                 </div>
               </div>
 
+              {/* Upcoming Classes */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-gray-800/90 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-1">
                   <div className="flex items-center justify-between mb-6">
@@ -313,7 +319,6 @@ export const MemberDashboard = () => {
                   </div>
 
                   <div className="mb-2 max-h-64 overflow-y-auto">
-                    {console.log('Rendering bookings, length:', upcomingBookings.length, 'bookings:', upcomingBookings)}
                     {upcomingBookings.length === 0 ? (
                       <div className="text-center py-16 bg-gray-700/30 rounded-xl border border-dashed border-gray-600">
                         <p className="text-gray-400 mb-4">No upcoming classes booked</p>
@@ -346,6 +351,7 @@ export const MemberDashboard = () => {
                   <button
                     onClick={() => {
                       const scheduleElement = document.getElementById('class-calendar');
+                      {/* Scroll down to the calendar view for upcoming classes */ }
                       scheduleElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
                     className="group w-full mt-2 px-6 py-4 bg-gold-500/90 hover:bg-gold-500 text-gray-900 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-gold-500/30 hover:scale-[1.02] active:scale-[0.98]"
@@ -355,6 +361,7 @@ export const MemberDashboard = () => {
                   </button>
                 </div>
 
+                {/* Gym Acheivement Feed (Maybe goals we've acheived idk) */}
                 <div className="bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 hover:-translate-y-1 stagger-1">
                   <h3 className="text-xl font-bold text-gray-100 mb-5 flex items-center gap-2">
                     <GiMuscleUp className="w-7 h-7 text-gold-400" />
@@ -379,7 +386,7 @@ export const MemberDashboard = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent" />
               </div>
-              {/* class calendar section */}
+              {/* Add the Class Calendar component to the page  */}
               <div id="class-calendar" className="stagger-2">
                 <ClassCalendar userId={user?.id} />
               </div>
