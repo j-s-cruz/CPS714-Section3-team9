@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { Save, User, Phone, Upload, Edit2, X, Crown } from 'lucide-react';
-import { GiMuscleUp, GiTrophy } from 'react-icons/gi';
+import { GiBiceps, GiMuscleUp, GiTrophy } from 'react-icons/gi';
 
 export const ProfileEditor = () => {
   const { user, profile, refreshProfile } = useAuth();
@@ -14,15 +14,19 @@ export const ProfileEditor = () => {
   const [profilePicture, setProfilePicture] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingGoals, setIsEditingGoals] = useState(false);
 
   useEffect(() => {
+    /* TODO: Need to change this. profile comes from an old section related to the auth form. This should be handled by team 1s stuff*/
     if (profile) {
+      /* This assumes the databse only contains full name. Should probably change this otherwise */
       const fullname = (profile.full_name || '').split(' ');
       setFirstName(fullname[0] || '');
-      setLastName(fullname.slice(1).join(' ') || '');
+      setLastName(fullname[1] || '');
       setEmail(user?.email || '');
+      /* Again assuming we even have phone number as a field */
       setPhoneNumber(profile.phone_number || '');
       setFitnessGoals(profile.fitness_goals || '');
       setProfilePicture(profile.profile_picture || '');
@@ -39,13 +43,18 @@ export const ProfileEditor = () => {
 
   /* if the user hits the edit button enable the fields in the form */
   const handleEditProfile = () => {
+    setSuccess(false);
+    setError(false);
     setIsEditingProfile(true);
   };
 
   /* if the user hits the cancel button it should reset the form*/
   const handleCancelProfile = () => {
+    setSuccess(false);
+    setError(false);
     setIsEditingProfile(false);
 
+    /* If the user hits cancel we reset the form to the original data */
     if (profile) {
       const nameParts = (profile.full_name || '').split(' ');
       setFirstName(nameParts[0] || '');
@@ -65,10 +74,14 @@ export const ProfileEditor = () => {
 
   /* same logic as above but for fitness goals */
   const handleEditGoals = () => {
+    setSuccess(false);
+    setError(false);
     setIsEditingGoals(true);
   };
 
   const handleCancelGoals = () => {
+    setSuccess(false);
+    setError(false);
     setIsEditingGoals(false);
     if (profile) {
       setFitnessGoals(profile.fitness_goals || '');
@@ -78,9 +91,14 @@ export const ProfileEditor = () => {
   };
 
   const handlePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    /* Make sure the sure selects a file */
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      /* Use a FileReader to convert the image to string */
       const reader = new FileReader();
+
+      /* Once the file is read, set the profile picture (as a string to be able to store in a database) */
       reader.onloadend = () => {
         setProfilePicture(reader.result as string);
       };
@@ -88,59 +106,47 @@ export const ProfileEditor = () => {
     }
   };
 
-  const handleSubmitProfile = async (e: React.FormEvent) => {
+  /* This function submits changes to the database (for both profile and goals) */
+  const handleSubmitButton = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    /* Reset from previous submit if somehow not done so already */
     setSuccess(false);
+    setError(false);
 
     try {
+      /* Assuming name is one DB field */
       const fullName = `${firstName} ${lastName}`.trim();
 
-      const { error } = await supabase
+      /* Update the database entry related to user ID */
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({
           full_name: fullName,
           phone_number: phoneNumber,
           profile_picture: profilePicture,
-          updated_at: new Date().toISOString(),
+          email: email,
+          fitness_goals: fitnessGoals,
         })
         .eq('id', user?.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
       await refreshProfile();
       setSuccess(true);
       setIsEditingProfile(false);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (error: any) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmitGoals = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          fitness_goals: fitnessGoals,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user?.id);
-
-      if (error) throw error;
-
-      await refreshProfile();
-      setSuccess(true);
       setIsEditingGoals(false);
-      setTimeout(() => setSuccess(false), 3000);
+      setTimeout(() => setSuccess(false), 1000);
     } catch (error: any) {
-      alert(error.message);
+      /* PURELY FOR TESTING. SINCE AN UPDATE ALWAYS RETURNS ERROR. COMMENT THIS LINE OUT IF NOT DONE SO */
+      // setSuccess(true);
+      // setTimeout(() => setSuccess(false), 1000);
+
+      /* Actual code that should show fail */
+      setError(true);
+      setTimeout(() => setError(false), 1000);
+
     } finally {
       setLoading(false);
     }
@@ -148,14 +154,21 @@ export const ProfileEditor = () => {
 
   return (
     <div className="space-y-6">
+      {/* Success Message If User Updates Info Correctly */}
+      {error && (
+        <div className="bg-red-500/20 border border-red-500 text-red-400 px-6 py-4 rounded-xl flex items-center gap-3 shadow-lg animate-scale-in">
+          <X className="w-6 h-6" />
+          <span className="font-medium">Error updating profile. Please try again.</span>
+        </div>
+      )}
       {success && (
         <div className="bg-gold-500/20 border border-gold-500 text-gold-400 px-6 py-4 rounded-xl flex items-center gap-3 shadow-lg animate-scale-in">
-          <GiTrophy className="w-6 h-6" />
+          <GiBiceps className="w-6 h-6" />
           <span className="font-medium">Profile updated successfully!</span>
         </div>
       )}
 
-      {/* Membership Status Widget */}
+      {/* Same Widget From Dashboard But With Buttons and INFO removed */}
       <div className="relative rounded-2xl border border-gold-500/30 p-6 overflow-hidden hover:border-gold-500/30 hover:shadow-xl hover:shadow-gold-500/5 h-28">
         {/* Background Image */}
         <div
@@ -194,7 +207,7 @@ export const ProfileEditor = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleSubmitProfile}
+                  onClick={handleSubmitButton}
                   disabled={loading}
                   className="flex items-center gap-2 px-4 py-2 bg-gold-500/90 hover:bg-gold-500 text-gray-900 rounded-lg font-medium transition-all duration-300 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -239,9 +252,11 @@ export const ProfileEditor = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmitProfile} className="space-y-5">
+          {/* Form for profile information */}
+          <form onSubmit={handleSubmitButton} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
+                {/* Update first name */}
                 <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">First Name</label>
                 <input
                   type="text"
@@ -253,6 +268,7 @@ export const ProfileEditor = () => {
                 />
               </div>
               <div>
+                {/* Update last name */}
                 <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">Last Name</label>
                 <input
                   type="text"
@@ -266,6 +282,7 @@ export const ProfileEditor = () => {
             </div>
 
             <div>
+              {/* Update email name */}
               <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">Email</label>
               <input
                 type="email"
@@ -278,6 +295,7 @@ export const ProfileEditor = () => {
             </div>
 
             <div>
+              {/* Update phone number (not actually sure if phone number is needed but added anyways) */}
               <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
                 <span className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
@@ -302,7 +320,7 @@ export const ProfileEditor = () => {
             className="bg-gold-500/90 p-3 rounded-xl shadow-lg hover:bg-gold-500 transition-all cursor-pointer h-14 w-auto flex items-center gap-8"
             title="Membership Details">
             <Crown className="w-8 h-8 text-gray-900" />
-            <h3 className="text-xl font-bold text-gray-900">Membership Details</h3>
+            <span className="text-xl font-bold text-gray-900">Membership Details</span>
 
           </div>
           <div className="space-y-4">
@@ -311,6 +329,7 @@ export const ProfileEditor = () => {
             </h3>
           </div>
 
+          {/* Button that should send you to billing details */}
           <button className="w-full mt-6 px-6 py-3 bg-gold-500/90 text-gray-900 rounded-xl font-semibold hover:bg-gold-500 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-gold-500/30 mt-auto">
             <GiTrophy className="w-5 h-5" />
             Upgrade Membership
@@ -350,7 +369,7 @@ export const ProfileEditor = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSubmitGoals}
+                onClick={handleSubmitButton}
                 disabled={loading}
                 className="flex items-center gap-2 px-4 py-2 bg-gold-500/90 hover:bg-gold-500 text-gray-900 rounded-lg font-medium transition-all duration-300 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -361,6 +380,7 @@ export const ProfileEditor = () => {
           )}
         </div>
 
+        {/* Update fitness goals */}
         <textarea
           value={fitnessGoals}
           onChange={(e) => setFitnessGoals(e.target.value)}
