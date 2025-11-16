@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { admin_supabase } from './supabaseClient';
-import { Users, Calendar, TrendingUp, Plus, Bell, BarChart3, UserIcon, SparkleIcon, PencilIcon } from 'lucide-react';
-// import DumbbellIcon from '../../assets/dumbbell.png';
+import { Users, Calendar, Plus, Bell, UserIcon, SparkleIcon, PencilIcon } from 'lucide-react';
 import { FaDumbbell } from "react-icons/fa";
-import { SiAlteryx } from 'react-icons/si';
 
 
 export const StaffDashboard = () => {
@@ -82,14 +80,6 @@ export const StaffDashboard = () => {
           <p className="text-3xl font-bold text-white">{stats.totalMembers}</p>
         </div>
 
-        {/* <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-white">Active Subscriptions</span>
-            <TrendingUp className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-3xl font-bold text-white">{stats.activeMembers}</p>
-        </div> */}
-
         <div className="bg-gray-800 left rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Total Classes</span>
@@ -98,13 +88,6 @@ export const StaffDashboard = () => {
           <p className="text-3xl font-bold text-white">{stats.totalClasses}</p>
         </div>
 
-        {/* <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-white">Today's Bookings</span>
-            <BarChart3 className="w-5 h-5 text-amber-600" />
-          </div>
-          <p className="text-3xl font-bold text-white">{stats.todayBookings}</p>
-        </div> */}
       </div>
 
       <div className="mb-6">
@@ -268,8 +251,6 @@ const ClassManagement = () => {
   }
   };
 
-
-
   return (
      <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-yellow-500 self-start">
         <button
@@ -325,6 +306,7 @@ const ClassManagement = () => {
   };
 
   
+//COMPONENT: this component is used when user clicks on a specific class
 const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose: () => void, refreshClasses : () => void}) => {
   const [editingField, setEditingField] = useState<null | string>(null); //editing field will be things like: class type, instructor fname, instructor lname, time, day and capacity
   const [editValue, setEditValue] = useState("");  
@@ -411,7 +393,7 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
               <span className="font-semibold text-white">Instructor Last Name: {cls.instructor_lname}</span>
                 <PencilIcon
                 className="cursor-pointer"
-                onClick= {() => openEditor("instructor_fname", cls.instructor_lname)}
+                onClick= {() => openEditor("instructor_lname", cls.instructor_lname)}
                 />
             </div>
             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
@@ -688,92 +670,3 @@ const ViewAdmins = ({onClose}: {onClose: () => void}) => {
   );
 
 };
-
-
-
-
-// //REMOVE COMPONENT LATER NOT NEEDED FOR NOW
-// const AnnouncementModal = ({ onClose }: { onClose: () => void }) => {
-//   const [formData, setFormData] = useState({
-//     title: '',
-//     message: '',
-//     priority: 'normal',
-//   });
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     try {
-//       const { error } = await supabase.from('announcements').insert({
-//         title: formData.title,
-//         message: formData.message,
-//         priority: formData.priority,
-//         is_active: true,
-//       });
-
-//       if (error) throw error;
-//       onClose();
-//     } catch (error: any) {
-//       alert(error.message);
-//     }
-//   };
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//       <div className="bg-white rounded-xl p-6 max-w-md w-full m-4">
-//         <h3 className="text-xl font-bold text-slate-900 mb-4">Create Announcement</h3>
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//           <div>
-//             <label className="block text-sm font-medium text-slate-700 mb-2">Title</label>
-//             <input
-//               type="text"
-//               value={formData.title}
-//               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-//               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
-//               required
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-sm font-medium text-slate-700 mb-2">Message</label>
-//             <textarea
-//               value={formData.message}
-//               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-//               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
-//               rows={4}
-//               required
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
-//             <select
-//               value={formData.priority}
-//               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-//               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 text-black"
-//             >
-//               <option value="low">Low</option>
-//               <option value="normal">Normal</option>
-//               <option value="high">High</option>
-//             </select>
-//           </div>
-
-//           <div className="flex gap-2">
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50"
-//             >
-//               Cancel
-//             </button>
-//             <button
-//               type="submit"
-//               className="flex-1 px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700"
-//             >
-//               Publish
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
