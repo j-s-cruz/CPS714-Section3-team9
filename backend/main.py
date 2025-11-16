@@ -109,9 +109,16 @@ async def cancel_class(request: CancelRequest):
 
 
         #Update booking status to cancelled with current timestamp
-        cancel_result = supabase.table('class_bookings')\
+        supabase.table('class_bookings')\
             .update({'cancelled_at': datetime.now().isoformat()})\
             .eq('id', request.booking_id)\
+            .execute()
+
+        #decrement the taken spots in the schedule and update the table
+        current_taken = booking['class_schedules']['taken_spots']
+        supabase.table('class_schedules')\
+            .update({'taken_spots': current_taken - 1})\
+            .eq('id', schedule_id)\
             .execute()
         
         #return success cancellation response
