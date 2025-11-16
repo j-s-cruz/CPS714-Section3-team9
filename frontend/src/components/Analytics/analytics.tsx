@@ -46,56 +46,6 @@ import DaysHoursChart from './days_hours_chart';
 
 export const Analytics: React.FC = () => {
 
-    // ONLY WORKS FOR THE PAST 1 YEAR
-    var dailyGymUsageData = [
-        ['Day', 'Number of Gym Visits'],
-        // REMEMBER THAT DATES ARE ZERO INDEXED SO JANUARY 2 IS JANUARY 1
-        [new Date('2024-01-08'), 50],
-        [new Date('2024-01-02'), 75],
-        [new Date('2024-01-03'), 60],
-        [new Date('2024-01-04'), 80],
-        [new Date('2024-01-05'), 30],
-        [new Date('2024-01-06'), 90],
-    ]
-
-    var lineData = [
-        ['Time of Day', 'Number of Members in Gym'],
-        ['12 am', 2],
-        ['1 am', 3],
-        ['2 am', 4],
-        ['3 am', 2],
-        ['4 am', 1],
-        ['5 am', 0],
-        ['6 am', 1],
-        ['7 am', 2],
-        ['8 am', 3],
-        ['9 am', 4],
-        ['10 am', 5],
-        ['11 am', 2],
-        ['12 pm', 2],
-        ['1 pm', 3],
-        ['2 pm', 4],
-        ['3 pm', 2],
-        ['4 pm', 1],
-        ['5 pm', 0],
-        ['6 pm', 1],
-        ['7 pm', 2],
-        ['8 pm', 3],
-        ['9 pm', 4],
-        ['10 pm', 5],
-        ['11 pm', 2],
-    ]
-
-    var lineOptions = {
-        title: 'Number of Gym Occupants by Time of Day',
-        hAxis: {
-            title: 'Time of Day',
-            showTextEvery: 1,
-            textPosition: 'out',
-        }, 
-        legend: "none",
-    };
-
     return (
         <div>
             <SignupsCancellationsChart />
@@ -109,12 +59,6 @@ export const Analytics: React.FC = () => {
             <GymUsageChartv2 />
             <br></br><br></br><br></br>
             <MembershipChartv2 />
-            <br></br><br></br><br></br>
-            <Chart 
-                chartType="LineChart"
-                data={lineData}
-                options={lineOptions}
-            />
             <br></br><br></br><br></br>
             <GymPopulationCalendarchart />
             <br></br><br></br><br></br>
