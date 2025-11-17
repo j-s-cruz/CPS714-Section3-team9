@@ -6,7 +6,6 @@ import { StaffDashboard } from './components/Staff/StaffDashboard.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* <App /> */}
-    <StaffDashboard />
+    <App />
   </StrictMode>
 );
