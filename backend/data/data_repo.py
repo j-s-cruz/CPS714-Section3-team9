@@ -55,3 +55,14 @@ def getSignupsAndCancellationsDataFromRepo():
     )
     data = response.data
     return data
+
+def getMembershipDataFromRepo():
+    supabase: Client = create_client(url, key)
+
+    response = (
+        supabase.table("memberships")
+        .select("created_at, current_period_end")
+        .execute()
+    )
+    data = response.data
+    return data

@@ -2,17 +2,82 @@ from datetime import datetime, date, timedelta
 from data.data_repo import *
 
 def getMembershipData():
-    membership_data = [
-        ["2024-01-01", 50],
-        ["2024-02-01", 75],
-        ["2024-03-01", 100],
-        ["2024-04-01", 80],
-        ["2024-05-01", 120],
-        ["2024-06-01", 90],
-        ["2024-07-01", 110],
-    ]
 
-    return membership_data
+    data = getMembershipDataFromRepo()
+
+    signup_dates = []
+    cancellation_dates = []
+
+    today = date.today()
+
+    for row in data:
+        # convert to datetime and then date
+        signup_dates.append(datetime.fromisoformat(row['created_at']).date())
+
+        if row['current_period_end'] != None:
+            # only count memberships that have ended, not ones that will end
+            if (datetime.fromisoformat(row['current_period_end']) < (today + timedelta(days = 1))):
+                cancellation_dates.append(datetime.fromisoformat(row['current_period_end']).date())
+
+    # sort to get the earliest date
+    signup_dates.sort()
+
+    # generate list of dates starting from earliest day to today
+    start = signup_dates[0]
+    end = today
+    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 1)).days)]
+
+    signup_dates_dict = {}
+
+    # create signup_dates_dict with 0 values and date strings
+    for generated_date in date_generated:
+        signup_dates_dict[generated_date.strftime("%Y-%m-%d")] = 0
+
+    cancellation_dates_dict = signup_dates_dict.copy()
+    memberships_dict = signup_dates_dict.copy()
+
+    # read through signup_dates and cancellation_dates and increment dictionary
+    for signup_date in signup_dates:
+        signup_dates_dict[signup_date.strftime("%Y-%m-%d")] = signup_dates_dict[signup_date.strftime("%Y-%m-%d")] + 1
+
+    for cancellation_date in cancellation_dates:
+        cancellation_dates_dict[cancellation_date.strftime("%Y-%m-%d")] = cancellation_dates_dict[cancellation_date.strftime("%Y-%m-%d")] + 1
+
+    # turns dictionary into list
+    signups_data = [list(item) for item in signup_dates_dict.items()]
+    cancellations_data = [list(item) for item in cancellation_dates_dict.items()]
+    memberships_data = [list(item) for item in memberships_dict.items()]
+
+    total_memberships = 0
+
+    for row in memberships_data:
+        for signup in signups_data:
+            if row[0] == signup[0]:
+                total_memberships += signup[1]
+                row[1] = total_memberships
+                signups_data.pop(0)
+
+                # use break because signups_data and cancellations_data were dictionaries where the key is the day and the value is the number of signups / cancellations on that day
+                break
+        
+        for cancellation in cancellations_data:
+            if row[0] == cancellation[0]:
+                total_memberships -= cancellation[1]
+                row[1] = total_memberships
+                cancellations_data.pop(0)
+                break
+
+    # memberships_data = [
+    #     ["2024-01-01", 50],
+    #     ["2024-02-01", 75],
+    #     ["2024-03-01", 100],
+    #     ["2024-04-01", 80],
+    #     ["2024-05-01", 120],
+    #     ["2024-06-01", 90],
+    #     ["2024-07-01", 110],
+    # ]
+
+    return memberships_data
 
 def getSignupsAndCancellationsData():
 

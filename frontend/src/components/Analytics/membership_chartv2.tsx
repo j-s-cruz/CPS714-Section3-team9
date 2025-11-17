@@ -18,7 +18,7 @@ export const MembershipChartv2: React.FC = () => {
     var chartInfo = {
           
       series: [{
-              name: 'Gym Membership',
+              name: 'Gym Memberships',
               data: chartData
             }],
             options: {
