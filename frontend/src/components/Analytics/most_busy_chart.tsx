@@ -68,7 +68,10 @@ export const MostBusyTimesChart: React.FC = () => {
             title: {
                 text: 'Most Popular Class Times',
                 align: 'center',
-                floating: true
+                floating: true,
+                style: {
+                    fontSize: '16px',
+                }
             },
             tooltip: {
                 theme: 'dark',
@@ -76,8 +79,6 @@ export const MostBusyTimesChart: React.FC = () => {
                     show: false
                 },
                 y: {
-                    title: {
-                    }
                 },
             },
             legend: {

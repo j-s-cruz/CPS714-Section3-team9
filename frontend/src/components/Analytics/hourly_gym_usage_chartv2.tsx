@@ -46,7 +46,10 @@ export const GymUsageChartv2: React.FC = () => {
               },
               title: {
                   text: 'Hourly Gym Occupancy',
-                  align: 'left'
+                  align: 'left',
+                  style: {
+                    fontSize: '16px',
+                }
               },
               fill: {
                   type: 'gradient',

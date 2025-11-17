@@ -18,18 +18,29 @@ export const MemberTypesChart: React.FC = () => {
         series: memberTypesData[1],
         options: {
             chart: {
-            width: 380,
-            type: 'pie',
+                width: 380,
+                type: 'pie',
+                foreColor: '#FFF'
+            },
+            legend: {
+                    position: 'bottom'
+            },
+            title: {
+                text: 'Membership Types',
+                align: 'left',
+                style: {
+                    fontSize: '16px',
+                }
             },
             labels: memberTypesData[0],
             responsive: [{
             breakpoint: 480,
             options: {
                 chart: {
-                width: 200
+                    width: 20
                 },
                 legend: {
-                position: 'bottom'
+                    position: 'left'
                 }
             }
             }]

@@ -68,7 +68,10 @@ export const MostPopularChart: React.FC = () => {
             title: {
                 text: 'Most Popular Classes',
                 align: 'center',
-                floating: true
+                floating: true,
+                style: {
+                    fontSize: '16px',
+                }
             },
             tooltip: {
                 theme: 'dark',

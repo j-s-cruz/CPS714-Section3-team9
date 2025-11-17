@@ -42,8 +42,11 @@ export const DaysHoursChart: React.FC = () => {
                   size: 0,
               },
               title: {
-                  text: 'Percentage Hourly Gym Occupancy',
-                  align: 'left'
+                    text: 'Percentage Hourly Gym Occupancy',
+                    align: 'left',
+                    style: {
+                        fontSize: '16px',
+                    }
               },
               fill: {
                   type: 'gradient',

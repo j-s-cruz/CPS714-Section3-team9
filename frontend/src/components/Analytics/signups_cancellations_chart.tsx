@@ -39,7 +39,10 @@ export const SignupsCancellationsChart: React.FC = () => {
             },
             title: {
                 text: 'New Signups Per Month',
-                align: 'left'
+                align: 'left',
+                style: {
+                    fontSize: '16px',
+                }
             },
             stroke: {
                 curve: 'smooth',
@@ -67,7 +70,10 @@ export const SignupsCancellationsChart: React.FC = () => {
             },
             title: {
                 text: 'Cancellations Per Month',
-                align: 'left'
+                align: 'left',
+                style: {
+                    fontSize: '16px',
+                }
             },
             stroke: {
                 curve: 'smooth',

@@ -129,7 +129,7 @@ def getClassTimesPopularityData():
 
     class_popularity_data.sort(key=lambda x: x[2], reverse=True)
 
-    class_names = [row[0] + ": " + row[1] for row in class_popularity_data]
+    class_names = [row[1] for row in class_popularity_data]
     class_counts = [row[2] for row in class_popularity_data]
 
     top_class_names = class_names[:10]

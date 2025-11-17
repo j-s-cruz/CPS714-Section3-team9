@@ -24,7 +24,10 @@ export const MembershipChartv2: React.FC = () => {
             options: {
               title: {
                   text: 'Gym Memberships',
-                  align: 'left'
+                  align: 'left',
+                  style: {
+                    fontSize: '16px',
+                  }
               },
               chart: {
                 id: 'chart2',
@@ -70,21 +73,15 @@ export const MembershipChartv2: React.FC = () => {
                   seriesName: 'Gym Memberships',
                   axisTicks: {
                     show: true,
-                    color: '#008FFB'
+                    color: '#fff'
                   },
                   axisBorder: {
                     show: true,
-                    color: '#008FFB'
+                    color: '#fff'
                   },
                   labels: {
                     style: {
-                      colors: '#008FFB',
-                    }
-                  },
-                  title: {
-                    text: "Gym Memberships",
-                    style: {
-                      color: '#008FFB'
+                      colors: '#fff',
                     }
                   },
                 }
@@ -101,6 +98,7 @@ export const MembershipChartv2: React.FC = () => {
               chart: {
                 id: 'chart1',
                 height: 130,
+                foreColor: '#FFF',
                 type: 'area',
                 brush:{
                   target: 'chart2',
