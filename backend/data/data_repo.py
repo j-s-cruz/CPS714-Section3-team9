@@ -13,14 +13,6 @@ key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpn
 
 supabase: Client = create_client(url, key)
 
-# response = (
-#     supabase.table("memberships")
-#     .select("*")
-#     .execute()
-# )
-
-# print(response)
-
 def getNumberActiveMembersFromRepo():
     supabase: Client = create_client(url, key)
 
@@ -62,6 +54,28 @@ def getMembershipDataFromRepo():
     response = (
         supabase.table("memberships")
         .select("created_at, current_period_end")
+        .execute()
+    )
+    data = response.data
+    return data
+
+def getClassNamesFromRepo():
+    supabase: Client = create_client(url, key)
+
+    response = (
+        supabase.table("class")
+        .select("class_name, total_bookings")
+        .execute()
+    )
+    data = response.data
+    return data
+
+def getClassTimesFromRepo():
+    supabase: Client = create_client(url, key)
+
+    response = (
+        supabase.table("class")
+        .select("time, total_bookings")
         .execute()
     )
     data = response.data
