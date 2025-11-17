@@ -52,21 +52,21 @@ export const StaffDashboard = () => {
             onClick={() => setshowViewAdmins(true)}
             className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
-            {/* <UserIcon className="w-4 h-4" /> */}
+            <UserIcon className="w-4 h-4" />
             View Admins
           </button>
           <button
             onClick={() => setShowAddClass(true)} //update state
             className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
-            {/* <Plus className="w-4 h-4" /> */}
+            <Plus className="w-4 h-4" />
             Add Class
           </button>
           <button
             onClick={() => setShowAnnouncement(true)}
             className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
-            {/* <Bell className="w-4 h-4" /> */}
+            <Bell className="w-4 h-4" />
             Announce
           </button>
         </div>
@@ -76,7 +76,7 @@ export const StaffDashboard = () => {
         <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Total Members</span>
-            {/* <Users className="w-5 h-5 text-orange" /> */}
+            <Users className="w-5 h-5 text-orange" />
           </div>
           <p className="text-3xl font-bold text-white">{stats.totalMembers}</p>
         </div>
@@ -84,7 +84,7 @@ export const StaffDashboard = () => {
         <div className="bg-gray-800 left rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Total Classes</span>
-            {/* <Calendar className="w-5 h-5 text-blue-500" /> */}
+            <Calendar className="w-5 h-5 text-blue-500" />
           </div>
           <p className="text-3xl font-bold text-white">{stats.totalClasses}</p>
         </div>
