@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getNumberActiveMembers } from './analytics_service';
+import { getNumberActiveMembers } from '../analytics_service';
 
 export const ActiveMembers: React.FC = () => {
     const [totalMembers, setTotalMembers] = useState<number | null>(null);

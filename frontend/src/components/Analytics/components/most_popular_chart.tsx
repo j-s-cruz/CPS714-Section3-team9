@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactApexChart from "react-apexcharts";
-import { getClassPopularityData } from './analytics_service';
+import { getClassPopularityData } from '../analytics_service';
 
 export const MostPopularChart: React.FC = () => {
     const [popularClassNames, setPopularClassNames] = useState<(string | number)[][]>([]);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getGymOccupancyData } from './analytics_service';
+import { getGymOccupancyData } from '../analytics_service';
 import ReactApexChart from "react-apexcharts";
 
 export const GymUsageChartv2: React.FC = () => {

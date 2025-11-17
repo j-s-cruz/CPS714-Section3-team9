@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMemberTypesData } from './analytics_service';
+import { getMemberTypesData } from '../analytics_service';
 import ReactApexChart from 'react-apexcharts';
 
 export const MemberTypesChart: React.FC = () => {
@@ -53,6 +53,7 @@ export const MemberTypesChart: React.FC = () => {
     return (
         <div>
             { memberTypesData.length > 0 &&
+                //@ts-expect-error
                 <ReactApexChart options={chartInfo.options} series={chartInfo.series} type="pie" width={380} />
             }  
         </div>

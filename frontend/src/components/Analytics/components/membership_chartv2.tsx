@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMembershipData } from './analytics_service';
+import { getMembershipData } from '../analytics_service';
 import ReactApexChart from "react-apexcharts";
 
 export const MembershipChartv2: React.FC = () => {
@@ -58,6 +58,7 @@ export const MembershipChartv2: React.FC = () => {
               dataLabels: {
                 enabled: false
               },
+              //@ts-expect-error
               stroke: {
                 width: [2,6],
                 curve: ['straight','monotoneCubic']

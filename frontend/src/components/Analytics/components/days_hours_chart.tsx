@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDaysHoursData } from './analytics_service';
+import { getDaysHoursData } from '../analytics_service';
 import ReactApexChart from "react-apexcharts";
 
 export const DaysHoursChart: React.FC = () => {

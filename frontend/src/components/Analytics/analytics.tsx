@@ -1,13 +1,13 @@
 import React from 'react';
-import SignupsCancellationsChart from './signups_cancellations_chart';
-import MostPopularChart from './most_popular_chart';
-import MostBusyTimesChart from './most_busy_chart';
-import GymUsageChartv2 from './hourly_gym_usage_chartv2';
-import MembershipChartv2 from './membership_chartv2';
-import DaysHoursChart from './days_hours_chart';
-import ActiveMembers from './active_members';
-import MemberTypesChart from './member_types_chart';
-import Card from './Card';
+import SignupsCancellationsChart from './components/signups_cancellations_chart';
+import MostPopularChart from './components/most_popular_chart';
+import MostBusyTimesChart from './components/most_busy_chart';
+import GymUsageChartv2 from './components/hourly_gym_usage_chartv2';
+import MembershipChartv2 from './components/membership_chartv2';
+import DaysHoursChart from './components/days_hours_chart';
+import ActiveMembers from './components/active_members';
+import MemberTypesChart from './components/member_types_chart';
+import Card from './components/Card';
 
 export const Analytics: React.FC = () => {
     return (

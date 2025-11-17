@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactApexChart from "react-apexcharts";
-import { getClassBusyTimeData } from './analytics_service';
+import { getClassBusyTimeData } from '../analytics_service';
 
 export const MostBusyTimesChart: React.FC = () => {
     const [popularClassNames, setPopularClassNames] = useState<(string | number)[][]>([]);
