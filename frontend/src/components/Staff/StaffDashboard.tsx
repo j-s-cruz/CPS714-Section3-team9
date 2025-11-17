@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-// import { admin_supabase } from './supabaseClient';
-// import { Users, Calendar, Plus, Bell, UserIcon, SparkleIcon, PencilIcon } from 'lucide-react';
+import { admin_supabase } from './supabaseClient';
+import { Users, Calendar, Plus, Bell, UserIcon, SparkleIcon, PencilIcon } from 'lucide-react';
 import { FaDumbbell } from "react-icons/fa";
 import Analytics from '../Analytics/analytics';
 
@@ -21,23 +21,23 @@ export const StaffDashboard = () => {
   }, []);
 
   const fetchStats = async () => {
-    // const [profiles, subscriptions, classes, bookings] = await Promise.all([
-    //   admin_supabase.from('profiles').select('id', { count: 'exact' }),
-    //   admin_supabase.from('membership_subscriptions').select('id', { count: 'exact' }).eq('status', 'active'),
-    //   admin_supabase.from('class').select('id', { count: 'exact' }),
-    //   admin_supabase
-    //     .from('class_bookings')
-    //     .select('id', { count: 'exact' })
-    //     .eq('status', 'confirmed')
-    //     .gte('booked_at', new Date().toISOString().split('T')[0]),
-    // ]);
+    const [profiles, subscriptions, classes, bookings] = await Promise.all([
+      admin_supabase.from('profiles').select('id', { count: 'exact' }),
+      admin_supabase.from('membership_subscriptions').select('id', { count: 'exact' }).eq('status', 'active'),
+      admin_supabase.from('class').select('id', { count: 'exact' }),
+      admin_supabase
+        .from('class_bookings')
+        .select('id', { count: 'exact' })
+        .eq('status', 'confirmed')
+        .gte('booked_at', new Date().toISOString().split('T')[0]),
+    ]);
 
-    // setStats({
-    //   totalMembers: profiles.count || 0,
-    //   activeMembers: subscriptions.count || 0,
-    //   totalClasses: classes.count || 0,
-    //   todayBookings: bookings.count || 0,
-    // });
+    setStats({
+      totalMembers: profiles.count || 0,
+      activeMembers: subscriptions.count || 0,
+      totalClasses: classes.count || 0,
+      todayBookings: bookings.count || 0,
+    });
   };
 
   return (
@@ -52,21 +52,21 @@ export const StaffDashboard = () => {
             onClick={() => setshowViewAdmins(true)}
             className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
-            {/* <UserIcon className="w-4 h-4" /> */}
+            <UserIcon className="w-4 h-4" />
             View Admins
           </button>
           <button
             onClick={() => setShowAddClass(true)} //update state
             className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
-            {/* <Plus className="w-4 h-4" /> */}
+            <Plus className="w-4 h-4" />
             Add Class
           </button>
           <button
             onClick={() => setShowAnnouncement(true)}
             className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center gap-2"
           >
-            {/* <Bell className="w-4 h-4" /> */}
+            <Bell className="w-4 h-4" />
             Announce
           </button>
         </div>
@@ -76,7 +76,7 @@ export const StaffDashboard = () => {
         <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Total Members</span>
-            {/* <Users className="w-5 h-5 text-orange" /> */}
+            <Users className="w-5 h-5 text-orange" />
           </div>
           <p className="text-3xl font-bold text-white">{stats.totalMembers}</p>
         </div>
@@ -84,7 +84,7 @@ export const StaffDashboard = () => {
         <div className="bg-gray-800 left rounded-xl p-6 shadow-md border border-yellow-500">
           <div className="flex items-center justify-between mb-2">
             <span className="text-white">Total Classes</span>
-            {/* <Calendar className="w-5 h-5 text-blue-500" /> */}
+            <Calendar className="w-5 h-5 text-blue-500" />
           </div>
           <p className="text-3xl font-bold text-white">{stats.totalClasses}</p>
         </div>
@@ -100,7 +100,7 @@ export const StaffDashboard = () => {
       </div>
       {showViewAdmins && <ViewAdmins onClose={() => setshowViewAdmins(false)}/>} 
       {showAddClass && <AddClassModal onClose={() => setShowAddClass(false)} />}
-      {/* {showAnnouncement && <AnnouncementModal onClose={() => setShowAnnouncement(false)} />} */}
+      {showAnnouncement && <AnnouncementModal onClose={() => setShowAnnouncement(false)} />}
     </div>
   );
 };
@@ -128,42 +128,42 @@ const MemberManagement = () => {
 
   //Function to fetch data from Supabase
   const fetchMembers = async () => {
-    // try{
-    //   //Get User Profiles first
-    //     const { data: profilesData, error: profilesError } = await admin_supabase
-    //     .from('profiles') //the table in Supabase we fetch from
-    //     .select('*')
-    //     .order('created_at', { ascending: false }); //get newest members first
+    try{
+      //Get User Profiles first
+        const { data: profilesData, error: profilesError } = await admin_supabase
+        .from('profiles') //the table in Supabase we fetch from
+        .select('*')
+        .order('created_at', { ascending: false }); //get newest members first
       
-    //   if (profilesError){
-    //     console.error("Error occured while fetching profiles: ", profilesError);
-    //     throw profilesError;
-    //   }
-    //   if (!profilesData){
-    //     console.log("DATA is NULL: ", {profilesData})
-    //     return;
-    //   }
+      if (profilesError){
+        console.error("Error occured while fetching profiles: ", profilesError);
+        throw profilesError;
+      }
+      if (!profilesData){
+        console.log("DATA is NULL: ", {profilesData})
+        return;
+      }
 
-    //   //Then retrive all memberships
-    //   const {data: membershipsData, error: membershipsError} = await admin_supabase
-    //   .from('memberships')
-    //   .select('*')
-    //   if (membershipsError){
-    //     console.error("Error occured while fetching memberships: ", membershipsError);
-    //     throw membershipsError;
-    //   } 
-    //   //manually map each profile to thier memberships. The reason i do this is cuz, there is no FK relatoinship supabase knows about in its schema cache even though memberships.user_id points to profiles.id. I got this error --> PGRST200, 'searched for FK relationship but no match was found. Could not find a relationship between profiles and memberships in schema cache
-    //   //profiledata is an array.  Map iterates over the array and returns a new one where each one can be transformed.
-    //   const mergeData = profilesData.map(profile => ({ 
-    //     ...profile, //spread operator: copy all existing properties of profile into new object.
-    //     memberships: membershipsData?.filter(m => m.user_id === profile.id) || [], //memberships is the new property too add to each profile. using filter to keep only ones that match m.user id and profile.id
-    //   }));
+      //Then retrive all memberships
+      const {data: membershipsData, error: membershipsError} = await admin_supabase
+      .from('memberships')
+      .select('*')
+      if (membershipsError){
+        console.error("Error occured while fetching memberships: ", membershipsError);
+        throw membershipsError;
+      } 
+      //manually map each profile to thier memberships. The reason i do this is cuz, there is no FK relatoinship supabase knows about in its schema cache even though memberships.user_id points to profiles.id. I got this error --> PGRST200, 'searched for FK relationship but no match was found. Could not find a relationship between profiles and memberships in schema cache
+      //profiledata is an array.  Map iterates over the array and returns a new one where each one can be transformed.
+      const mergeData = profilesData.map(profile => ({ 
+        ...profile, //spread operator: copy all existing properties of profile into new object.
+        memberships: membershipsData?.filter(m => m.user_id === profile.id) || [], //memberships is the new property too add to each profile. using filter to keep only ones that match m.user id and profile.id
+      }));
 
-    //   console.log(mergeData);
-    //   setMembers(mergeData);
-    // }catch (error){
-    //   console.log("error happened while fetching members: ", error);
-    // }
+      console.log(mergeData);
+      setMembers(mergeData);
+    }catch (error){
+      console.log("error happened while fetching members: ", error);
+    }
   };
 
   return (
@@ -209,28 +209,28 @@ const ClassManagement = () => {
   }, []);
 
   const fetchAllClasses = async () => {
-  //   try{
-  //     const { data, error } = await admin_supabase
-  //       .from('class')
-  //       .select('*')
-  //       .order('class_name');
+    try{
+      const { data, error } = await admin_supabase
+        .from('class')
+        .select('*')
+        .order('class_name');
       
-  //     if (error){
-  //       console.log("Issues fetching classes: ", error);
-  //       return;
-  //     }
-  //     if (data){
-  //       const formatted_name = data.map((cls) => ({
-  //         ...cls,
-  //         instructor_name:  `${cls.instructor_fname ?? ""} ${cls.instructor_lname ?? ""}`.trim(),
+      if (error){
+        console.log("Issues fetching classes: ", error);
+        return;
+      }
+      if (data){
+        const formatted_name = data.map((cls) => ({
+          ...cls,
+          instructor_name:  `${cls.instructor_fname ?? ""} ${cls.instructor_lname ?? ""}`.trim(),
 
-  //       }));
-  //       setClasses(formatted_name);
-  //     }
+        }));
+        setClasses(formatted_name);
+      }
     
-  // }catch (err){
-  //  console.log("some error occured:", err);
-  // }
+  }catch (err){
+   console.log("some error occured:", err);
+  }
   };
 
   return (
@@ -304,47 +304,47 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
 
   //Update the supabase backend
   const saveEdit = async() => {
-    // if (!editingField) return;
-    // try{
-    //   const {error} = await admin_supabase
-    //   .from("class")
-    //     .update({[editingField]: editValue})
-    //     .eq("id", cls.id)
+    if (!editingField) return;
+    try{
+      const {error} = await admin_supabase
+      .from("class")
+        .update({[editingField]: editValue})
+        .eq("id", cls.id)
 
-    //     if (error) throw error;
+        if (error) throw error;
         
-    //     await refreshClasses();
-    //     cls[editingField] = editValue;
-    //     setEditingField(null);
-    //     setEditValue("");
-    // } catch (err: any){
-    //   console.log(err)
-    //   alert("failed to update the class, sorry");
-    // }
+        await refreshClasses();
+        cls[editingField] = editValue;
+        setEditingField(null);
+        setEditValue("");
+    } catch (err: any){
+      console.log(err)
+      alert("failed to update the class, sorry");
+    }
   }
 
   const deleteClass = async (classId : string) => {
-    // try{
+    try{
 
-    //   if(!confirm("Are you sure you want to delete this class?")) return;
+      if(!confirm("Are you sure you want to delete this class?")) return;
       
-    //   const result = await admin_supabase
-    //   .from('class')
-    //   .delete()
-    //   .eq('id', classId);
+      const result = await admin_supabase
+      .from('class')
+      .delete()
+      .eq('id', classId);
       
-    //   const error = result.error;
+      const error = result.error;
       
-    //   if (error) {
-    //     throw error;
-    //   }else{
-    //     alert("Class was succesfully deleted");
-    //     onClose();
-    //   }
-    // }catch (err: any){
-    //   console.error("An Error occured", err.message)
-    //   alert("Error deleting class");
-    // }
+      if (error) {
+        throw error;
+      }else{
+        alert("Class was succesfully deleted");
+        onClose();
+      }
+    }catch (err: any){
+      console.error("An Error occured", err.message)
+      alert("Error deleting class");
+    }
   };
 
   return (
@@ -359,45 +359,45 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
           
             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
               <span className="font-semibold text-white">Class Type: {cls.class_type}</span>
-              {/* <PencilIcon
+              <PencilIcon
                 className="cursor-pointer"
                 onClick= {() => openEditor("class_type", cls.class_type)}
-              /> */}
+              />
             </div>
             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
               <span className="font-semibold text-white">Instructor First Name: {cls.instructor_fname}</span>
-                {/* <PencilIcon
+                <PencilIcon
                 className="cursor-pointer"
                 onClick= {() => openEditor("instructor_fname", cls.instructor_fname)}
-                /> */}
+                />
             </div>
              <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
               <span className="font-semibold text-white">Instructor Last Name: {cls.instructor_lname}</span>
-                {/* <PencilIcon
+                <PencilIcon
                 className="cursor-pointer"
                 onClick= {() => openEditor("instructor_lname", cls.instructor_lname)}
-                /> */}
+                />
             </div>
             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
               <span className="font-semibold text-white">Date: {cls.day}</span>
-                {/* <PencilIcon
+                <PencilIcon
                 className="cursor-pointer"
                 onClick= {() => openEditor("day", cls.day)}
-                /> */}
+                />
             </div>
             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
               <span className="font-semibold text-white">Time: {cls.time.slice(0, -3)}</span>
-              {/* <PencilIcon
+              <PencilIcon
                 className="cursor-pointer"
                 onClick= {() => openEditor("time", cls.time)}
-              /> */}
+              />
             </div>
             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
               <span className="font-semibold text-white"> Class Capacity: {cls.capacity}</span>
-              {/* <PencilIcon
+              <PencilIcon
                 className="cursor-pointer"
                 onClick= {() => openEditor("capacity", cls.capacity)}
-              /> */}
+              />
             </div>
             <div className="bg-gray-700 p-3 rounded-lg flex justify-between">
               <span className="font-semibold text-white">Total Bookings: {cls.total_bookings}</span>
@@ -475,25 +475,25 @@ const AddClassModal = ({ onClose }: { onClose: () => void }) => {
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    // e.preventDefault();
-    // try {
-    //   const { error } = await admin_supabase.from('class').insert({
-    //     class_name: formData.classId,
-    //     class_type: formData.class_type.toUpperCase(),
-    //     instructor_fname: formData.first_name, 
-    //     instructor_lname: formData.last_name,
-    //     capacity: formData.capacity,
-    //     day: formData.date,
-    //     time: formData.time,
+    e.preventDefault();
+    try {
+      const { error } = await admin_supabase.from('class').insert({
+        class_name: formData.classId,
+        class_type: formData.class_type.toUpperCase(),
+        instructor_fname: formData.first_name, 
+        instructor_lname: formData.last_name,
+        capacity: formData.capacity,
+        day: formData.date,
+        time: formData.time,
 
         
-    //   });
+      });
 
-    //   if (error) throw error;
-    //   onClose();
-    // } catch (error: any) {
-    //   alert(error.message);
-    // }
+      if (error) throw error;
+      onClose();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -634,7 +634,7 @@ const ViewAdmins = ({onClose}: {onClose: () => void}) => {
               className="p-3 bg-slate-200 rounded-lg text-slate-900"
             >
             <div className="flex items-center gap-2 ">
-                {/* <SparkleIcon className="w-4 h-4" /> */}
+                <SparkleIcon className="w-4 h-4" />
                 <span>{admin.full_name}</span>
             </div>
             </div>

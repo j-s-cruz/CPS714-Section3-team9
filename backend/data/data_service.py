@@ -184,27 +184,17 @@ def getClassPopularityData():
     #     ["CrossFit", 22],
     #     ["Boxing", 30],
     #     ["HIIT", 25],
-    #     ["Yoga", 50],
     # ]
 
-    # combine together all the same class names 
-    counter = Counter()
-    for class_name, class_count in class_popularity_data:
-        counter[class_name] += class_count
+    class_popularity_data.sort(key=lambda x: x[1], reverse=True)
 
-    # list(counter.items()) is a list of tuples so we convert to a list of lists
-    added_together_data = [list(t) for t in list(counter.items())]
+    class_names = [row[0] for row in class_popularity_data]
+    class_counts = [row[1] for row in class_popularity_data]
 
-    added_together_data.sort(key=lambda x: x[1], reverse=True)
+    top_class_names = class_names[:10]
+    top_class_counts = class_counts[:10]
 
-    top_class_names = []
-    top_class_counts = []
-
-    for i in range(len(added_together_data)):
-        top_class_names.append(added_together_data[i][0])
-        top_class_counts.append(added_together_data[i][1])
-
-    return [top_class_names[:10], top_class_counts[:10]]
+    return [top_class_names, top_class_counts]
 
 def getClassTimesPopularityData():
 
@@ -224,27 +214,17 @@ def getClassTimesPopularityData():
     #     ["14:00", 22],
     #     ["15:00", 30],
     #     ["16:00", 25],
-    #     ["10:00", 50],
     # ]
 
-    # combine together all the same class names 
-    counter = Counter()
-    for class_time, class_count in class_popularity_data:
-        counter[class_time] += class_count
+    class_popularity_data.sort(key=lambda x: x[1], reverse=True)
 
-    # list(counter.items()) is a list of tuples so we convert to a list of lists
-    added_together_data = [list(t) for t in list(counter.items())]
+    class_times = [row[0] for row in class_popularity_data]
+    class_counts = [row[1] for row in class_popularity_data]
 
-    added_together_data.sort(key=lambda x: x[1], reverse=True)
+    top_class_times = class_times[:10]
+    top_class_counts = class_counts[:10]
 
-    top_class_times = []
-    top_class_counts = []
-
-    for i in range(len(added_together_data)):
-        top_class_times.append(added_together_data[i][0])
-        top_class_counts.append(added_together_data[i][1])
-
-    return [top_class_times[:10], top_class_counts[:10]]
+    return [top_class_times, top_class_counts]
 
 def getGymOccupancyData():
     occupancy_data = [
