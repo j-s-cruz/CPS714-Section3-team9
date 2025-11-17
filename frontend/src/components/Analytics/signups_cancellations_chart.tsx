@@ -12,24 +12,27 @@ export const SignupsCancellationsChart: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const signupsCancellationsDataTemp: any = await getSignupsAndCancellationsData();
-
-            setSignupsData(signupsCancellationsDataTemp[0] as (string | number)[][]);
+                       
             setCancellationsData(signupsCancellationsDataTemp[1] as (string | number)[][]);
+            setSignupsData(signupsCancellationsDataTemp[0] as (string | number)[][]);
         };
 
         fetchData();
     }, []);
-    
-    var chartInfo = {       
-        series: [{
+
+    var chartInfoLine1 = {       
+        seriesLine1: [{
             name: 'Signups',
             data: signupsData
         }],
-        options: {
+        optionsLine1: {
             chart: {
                 id: 'fb',
-                group: 'social',
                 type: 'line',
+                foreColor: '#ffe3e3d2'
+            },
+            tooltip: {
+                theme: 'dark',
             },
             xaxis: {
                 type: 'datetime',
@@ -43,7 +46,9 @@ export const SignupsCancellationsChart: React.FC = () => {
             },
             colors: ['#008FFB']
         },
-        
+    };
+
+    var chartInfoLine2 = {
         seriesLine2: [{
             name: 'Cancellations',
             data: cancellationsData
@@ -51,8 +56,11 @@ export const SignupsCancellationsChart: React.FC = () => {
         optionsLine2: {
             chart: {
                 id: 'tw',
-                group: 'social',
                 type: 'line',
+                foreColor: '#ffe3e3d2'
+            },
+            tooltip: {
+                theme: 'dark',
             },
             xaxis: {
                 type: 'datetime',
@@ -72,14 +80,15 @@ export const SignupsCancellationsChart: React.FC = () => {
         <div>
             <div id="chart">
                 {
-                    (signupsData.length > 0) && (cancellationsData.length > 0) &&
+                    (signupsData.length > 0) &&
+                        <div>
+                            <ReactApexChart options={chartInfoLine1.optionsLine1} series={chartInfoLine1.seriesLine1} type="line" height={250} />
+                        </div>
+                }
+                {
+                    (cancellationsData.length > 0) &&
                     <div>
-                        <div id="chart-line">
-                            <ReactApexChart options={chartInfo.options} series={chartInfo.series} type="line" height={160} />
-                        </div>
-                        <div id="chart-line2">
-                            <ReactApexChart options={chartInfo.optionsLine2} series={chartInfo.seriesLine2} type="line" height={160} />
-                        </div>
+                        <ReactApexChart options={chartInfoLine2.optionsLine2} series={chartInfoLine2.seriesLine2} type="line" height={250} />
                     </div>
                 }
             </div>

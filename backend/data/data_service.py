@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from data.data_repo import *
 
 def getMembershipData():
     membership_data = [
@@ -224,3 +224,30 @@ def getHourlyUsageData():
     final_hourly_usage_data = [[row[0], round(row[1] / total * 100, 2)] for row in converted_hourly_usage_data]
 
     return final_hourly_usage_data
+
+def getNumberActiveMembers():
+    data = getNumberActiveMembersFromRepo()
+
+    total_members = len(data)
+
+    return total_members
+    
+def getMemberTypesData():
+
+    data = getMemberTypesDataFromRepo()
+
+    tiers = []
+
+    for row in data:
+        tiers.append(row['tier'])
+
+    tier_counts = Counter(tiers)
+
+    tiersList = []
+    tiersCountList = []
+
+    for tier, count in tier_counts.items():
+        tiersList.append(tier)
+        tiersCountList.append(count)
+
+    return [tiersList, tiersCountList]

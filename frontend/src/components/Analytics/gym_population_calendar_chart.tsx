@@ -16,7 +16,15 @@ export const GymPopulationCalendarchart: React.FC = () => {
     }, []);
 
     var dailyGymUsageOptions = {
-        title: 'Daily Gym Usage',
+        title: 'Daily Gym Usage Year-To-Date',
+        hAxis: {
+            //use style for horizontal axis 
+             textStyle: { color: '#FFF' }
+        },
+        vAxis: {
+            //use style for horizontal axis 
+             textStyle: { color: '#FFF' }
+        }
     };
 
 
@@ -24,11 +32,15 @@ export const GymPopulationCalendarchart: React.FC = () => {
         <div>
             { 
                 (chartData.length > 0) && 
-                <Chart
-                    chartType="Calendar"
-                    data={chartData}
-                    options={dailyGymUsageOptions}
-                />
+                <div
+                    style={{ color: '#ffe3e3d2' }}
+                >
+                    <Chart
+                        chartType="Calendar"
+                        data={chartData}
+                        options={dailyGymUsageOptions}
+                    />
+                </div>
             }
         </div>
     );

@@ -22,18 +22,22 @@ export const GymUsageChartv2: React.FC = () => {
           }],
           options: {
               chart: {
-              type: 'area',
-              stacked: false,
-              height: 350,
-              zoom: {
-                  type: 'x',
-                  enabled: true,
-                  autoScaleYaxis: true
+                type: 'area',
+                stacked: false,
+                height: 350,
+                foreColor: '#ffe3e3d2',
+                zoom: {
+                    type: 'x',
+                    enabled: true,
+                    autoScaleYaxis: true
+                },
+                toolbar: {
+                    autoSelected: 'zoom'
+                }
               },
-              toolbar: {
-                  autoSelected: 'zoom'
-              }
-              },
+                tooltip: {
+                    theme: 'dark',
+                },
               dataLabels: {
                   enabled: false
               },
@@ -56,9 +60,6 @@ export const GymUsageChartv2: React.FC = () => {
               },
               xaxis: {
                   type: 'datetime',
-              },
-              tooltip: {
-                  shared: false,
               },
               stroke: {
                   curve: 'straight',

@@ -10,6 +10,8 @@ import GymUsageChartv2 from './hourly_gym_usage_chartv2';
 import MembershipChartv2 from './membership_chartv2';
 import GymPopulationCalendarchart from './gym_population_calendar_chart';
 import DaysHoursChart from './days_hours_chart';
+import ActiveMembers from './active_members';
+import MemberTypesChart from './member_types_chart';
 
 // https://www.react-google-charts.com/examples/
 // https://developers.google.com/chart/interactive/docs
@@ -47,14 +49,72 @@ import DaysHoursChart from './days_hours_chart';
 export const Analytics: React.FC = () => {
 
     return (
-        <div>
-            <SignupsCancellationsChart />
-            <br></br><br></br><br></br>
+        <div
+            style={{
+            width: "100%",
+            // height: "300px", // reserve height for charts
+            border: "2px solid #ca8a04",
+            borderRadius: "12px",
+            padding: "25px",
+            // display: "flex",
+            // alignItems: "center",
+            // justifyContent: "center",
+            color: "#ffe3e3ff",
+            fontStyle: "italic",
+            backgroundColor: "#1e293b",
+        }}>
+            <div style={
+                {
+                    display: "flex",   
+                    flexDirection: "row",
+                    justifyContent: "center",
+                }
+            }>
+            <div
+                style={{
+                    width: "50%",
+                }}
+            >
+                <SignupsCancellationsChart />
+            </div>
+            <div
+                style={{
+                    width: "50%",
+                }}
+            >
+                <ActiveMembers />
+                <MemberTypesChart />
+            </div>
+            <br></br>
 
-            <MostPopularChart />
+            <div style={
+                {
+                    display: "flex",   
+                    flexDirection: "row",
+                    justifyContent: "center",
+                }
+            }>
+                <div
+                    style={{
+                        width: "50%",
+                    }}
+                >
+                    <MostPopularChart />
+                </div>
+                <div
+                    style={{
+                        width: "50%",
+                    }}
+                >
+                    <MostBusyTimesChart />
+                </div>
+            </div>
+            
+            </div>
+            
             <br></br><br></br><br></br>
             
-            <MostBusyTimesChart />
+            
             <br></br><br></br><br></br>
             <GymUsageChartv2 />
             <br></br><br></br><br></br>

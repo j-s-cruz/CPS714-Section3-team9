@@ -22,9 +22,10 @@ export const DaysHoursChart: React.FC = () => {
           }],
           options: {
               chart: {
-              type: 'area',
-              stacked: false,
-              height: 350,
+                type: 'area',
+                stacked: false,
+                height: 350,
+                foreColor: '#ffe3e3d2',
               zoom: {
                   type: 'x',
                   enabled: true,
@@ -62,6 +63,7 @@ export const DaysHoursChart: React.FC = () => {
               },
               tooltip: {
                   shared: false,
+                  theme: 'dark',
                   x: {
                     format: 'ddd HH:mm',
                   }

@@ -17,7 +17,7 @@ export const MembershipChartv2: React.FC = () => {
     
     var chartInfo = {
           
-            series: [{
+      series: [{
               name: 'Gym Membership',
               data: chartData
             }],
@@ -30,6 +30,7 @@ export const MembershipChartv2: React.FC = () => {
                 id: 'chart2',
                 type: 'line',
                 height: 230,
+                foreColor: '#ffe3e3d2',
                 dropShadow: {
                     enabled: true,
                     enabledOnSeries: [1]
@@ -43,6 +44,9 @@ export const MembershipChartv2: React.FC = () => {
                     enabled: true,
                     autoScaleYaxis: true
                 },
+              },
+              tooltip: {
+                    theme: 'dark',
               },
               colors: ['#008FFB'],
               stroke: {

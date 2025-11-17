@@ -22,8 +22,9 @@ export const MostBusyTimesChart: React.FC = () => {
         }],
         options: {
             chart: {
-            type: 'bar',
-            height: 380
+                type: 'bar',
+                height: 380,
+                foreColor: '#ffe3e3d2'
             },
             plotOptions: {
             bar: {
@@ -65,7 +66,7 @@ export const MostBusyTimesChart: React.FC = () => {
             }
             },
             title: {
-                text: 'Top 10 Most Popular Classes and Times',
+                text: 'Most Popular Class Times',
                 align: 'center',
                 floating: true
             },

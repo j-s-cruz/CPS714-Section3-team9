@@ -79,3 +79,17 @@ async def hourly_usage_data_get():
     hourly_usage_data = getHourlyUsageData()
 
     return hourly_usage_data
+
+@data_router.get("/data/number_active_members", tags=["data"])
+async def number_active_members_get():
+
+    number_active_members = getNumberActiveMembers()
+
+    return number_active_members
+
+@data_router.get("/data/member_types_data", tags=["data"])
+async def member_types_data_get():
+
+    member_types_data = getMemberTypesData()
+
+    return member_types_data

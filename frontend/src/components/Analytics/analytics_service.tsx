@@ -138,7 +138,6 @@ export const getDailyVisitsData = async () => {
 
         // Increment date by 1 because Typescript dates are 0-indexed
         convertedData = [['Day', 'Number of Gym Visits'], ...convertedData.map(item => [new Date(item[0].setDate(item[0].getDate() + 1)), item[1]])]
-        console.log(convertedData);
         return convertedData;
     }
     catch (error) {
@@ -155,7 +154,38 @@ export const getDailyVisitsData = async () => {
 export const getDaysHoursData = async () => {
     try {
         const apiData = await axios.get<any[]>(api + '/data/hourly_usage_data');
-        console.log(apiData.data);
+        return apiData.data;
+    }
+    catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.log(error.message);
+            return error.message;
+        } 
+        else {
+            console.log("Unexpected Error");
+        }
+    }
+}
+
+export const getNumberActiveMembers = async () => {
+    try {
+        const apiData = await axios.get<any[]>(api + '/data/number_active_members');
+        return apiData.data;
+    }
+    catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.log(error.message);
+            return error.message;
+        } 
+        else {
+            console.log("Unexpected Error");
+        }
+    }
+}
+
+export const getMemberTypesData = async () => {
+    try {
+        const apiData = await axios.get<any[]>(api + '/data/member_types_data');
         return apiData.data;
     }
     catch (error) {
