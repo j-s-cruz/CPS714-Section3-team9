@@ -17,14 +17,6 @@ export const GymPopulationCalendarchart: React.FC = () => {
 
     var dailyGymUsageOptions = {
         title: 'Daily Gym Usage Year-To-Date',
-        hAxis: {
-            //use style for horizontal axis 
-             textStyle: { color: '#FFF' }
-        },
-        vAxis: {
-            //use style for horizontal axis 
-             textStyle: { color: '#FFF' }
-        }
     };
 
 
@@ -33,7 +25,8 @@ export const GymPopulationCalendarchart: React.FC = () => {
             { 
                 (chartData.length > 0) && 
                 <div
-                    style={{ color: '#ffe3e3d2' }}
+                    className="flex items-center justify-center min-h-[260px]"
+                    style={{ color: '#FFF' }}
                 >
                     <Chart
                         chartType="Calendar"

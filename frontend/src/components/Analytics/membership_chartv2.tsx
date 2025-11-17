@@ -30,7 +30,7 @@ export const MembershipChartv2: React.FC = () => {
                 id: 'chart2',
                 type: 'line',
                 height: 230,
-                foreColor: '#ffe3e3d2',
+                foreColor: '#FFF',
                 dropShadow: {
                     enabled: true,
                     enabledOnSeries: [1]

@@ -29,7 +29,7 @@ export const SignupsCancellationsChart: React.FC = () => {
             chart: {
                 id: 'fb',
                 type: 'line',
-                foreColor: '#ffe3e3d2'
+                foreColor: '#FFF'
             },
             tooltip: {
                 theme: 'dark',
@@ -57,7 +57,7 @@ export const SignupsCancellationsChart: React.FC = () => {
             chart: {
                 id: 'tw',
                 type: 'line',
-                foreColor: '#ffe3e3d2'
+                foreColor: '#FFF'
             },
             tooltip: {
                 theme: 'dark',

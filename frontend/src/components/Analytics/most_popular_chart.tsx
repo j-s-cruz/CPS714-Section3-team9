@@ -24,7 +24,7 @@ export const MostPopularChart: React.FC = () => {
             chart: {
                 type: 'bar',
                 height: 380,
-                foreColor: '#ffe3e3d2'
+                foreColor: '#FFF'
             },
             plotOptions: {
             bar: {

@@ -25,7 +25,7 @@ export const DaysHoursChart: React.FC = () => {
                 type: 'area',
                 stacked: false,
                 height: 350,
-                foreColor: '#ffe3e3d2',
+                foreColor: '#FFF',
               zoom: {
                   type: 'x',
                   enabled: true,
