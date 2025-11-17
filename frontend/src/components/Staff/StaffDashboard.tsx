@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { admin_supabase } from './supabaseClient';
 import { Users, Calendar, Plus, Bell, UserIcon, SparkleIcon, PencilIcon } from 'lucide-react';
 import { FaDumbbell } from "react-icons/fa";
+import Analytics from '../Analytics/analytics';
 
 
 export const StaffDashboard = () => {
@@ -107,29 +108,10 @@ export const StaffDashboard = () => {
 //COMPONENT: REPORTS & ANALYTICS
 
 const Report = () => {
-  const [charts, setCharts] = useState<any[]>([]);
-
-  useEffect(() => {
-    //fetchReports();//to be included by team 8, these are just placeholders
-  }, []);
-
-  //const fetchReports = async () => {}
 
   return(
-    <div
-        style={{
-        width: "100%",
-        height: "300px", // reserve height for charts
-        border: "2px solid #ca8a04",
-        borderRadius: "12px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#999",
-        fontStyle: "italic",
-      }}
-    >
-    Reports & Analytics Charts
+    <div>
+      <Analytics />
     </div>
   );
 };
