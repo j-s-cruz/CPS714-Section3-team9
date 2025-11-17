@@ -1,10 +1,7 @@
-import React, { ChangeEvent } from "react";
+import React, { type ChangeEvent } from "react";
 
 type FilterProps = {
-  onFilterChange: (filters: {
-    date: string;
-    timeRange: string;
-  }) => void;
+  onFilterChange: (filters: { date: string; timeRange: string }) => void;
 };
 
 type FilterState = {
