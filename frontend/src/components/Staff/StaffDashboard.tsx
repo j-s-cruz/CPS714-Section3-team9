@@ -634,7 +634,7 @@ const ViewAdmins = ({onClose}: {onClose: () => void}) => {
               className="p-3 bg-slate-200 rounded-lg text-slate-900"
             >
             <div className="flex items-center gap-2 ">
-                {/* <SparkleIcon className="w-4 h-4" /> */}
+                <SparkleIcon className="w-4 h-4" />
                 <span>{admin.full_name}</span>
             </div>
             </div>
