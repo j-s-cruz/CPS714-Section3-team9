@@ -1,22 +1,19 @@
 import React from "react";
 
-// Define the possible difficulty levels as a TypeScript type
-type Difficulty = "Beginner" | "Intermediate" | "Advanced";
-
 // Mapping of class types to their corresponding image paths
 const classImages: Record<string, string> = {
-  Yoga: "/images/yoga.png",
-  Cardio: "/images/cardio.png",
-  Pilates: "/images/pilates.png",
-  Cycling: "/images/cycling.png",
-  Dance: "/images/dance.png",
-  Strength: "/images/strength.png",
-  Flexibility: "/images/flexibility.png",
-  Combat: "/images/combat.png",
-  Personal: "/images/personal.png",
-  Barre: "/images/barre.png",
-  Water: "/images/water.png",
-  Mindfullness: "/images/mindfullness.png",
+  yoga: "/images/yoga.png",
+  cardio: "/images/cardio.png",
+  pilates: "/images/pilates.png",
+  cycling: "/images/cycling.png",
+  dance: "/images/dance.png",
+  strength: "/images/strength.png",
+  flexibility: "/images/flexibility.png",
+  combat: "/images/combat.png",
+  personal: "/images/personal.png",
+  barre: "/images/barre.png",
+  water: "/images/water.png",
+  mindfulness: "/images/mindfullness.png",
 };
 
 // Define the props for the Card component
@@ -26,7 +23,7 @@ export interface CardProps {
   time: string;
   duration: number;
   trainer: string;
-  difficulty: Difficulty;
+  difficulty: string;
   seatsLeft: number;
   type: string;
   buttonValue?: string;
@@ -109,10 +106,7 @@ export const Card: React.FC<CardProps> = ({
   };
 
   return (
-    <div
-      className="card shadow-sm rounded-4 p-3 m-5"
-      style={{ width: "25%", minWidth: "250px" }}
-    >
+    <div className="card shadow-sm rounded-4 p-3">
       {/* Class Image Section */}
       <section>
         <img src={classImages[type]} alt={type} className="img-fluid mb-4" />
@@ -151,15 +145,15 @@ export const Card: React.FC<CardProps> = ({
         <p className="mb-0" style={{ fontSize: "13px" }}>
           <b>Trainer:</b> {trainer}
         </p>
-        <p style={{ fontSize: "13px" }}>
+        {/* <p style={{ fontSize: "13px" }}>
           <b>Details:</b> Lorem Ipsum has been the industry's standard dummy
           text ever since the 1500s, when an unknown printer took a galley of
           type and scrambled it to make a type specimen book.
-        </p>
+        </p> */}
       </section>
 
       {/* Seats Left and Action Button Section */}
-      <section className="d-flex justify-content-between align-items-center mb-1">
+      <section className="d-flex justify-content-between align-items-center mb-1 mt-2">
         <span className="d-block">
           <p
             className={`${seatsLeftColor(seatsLeft)} mb-1`}
