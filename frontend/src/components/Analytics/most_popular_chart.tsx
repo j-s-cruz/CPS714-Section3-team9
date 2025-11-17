@@ -46,7 +46,7 @@ export const MostPopularChart: React.FC = () => {
                     colors: ['#fff']
                 },
                 formatter: function (val: any, opt: any) {
-                    return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+                    return opt.w.globals.labels[opt.dataPointIndex] + " - " + val + " members enrolled"
                 },
                 offsetX: 0,
                 dropShadow: {

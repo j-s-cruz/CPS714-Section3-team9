@@ -26,7 +26,7 @@ export const MemberTypesChart: React.FC = () => {
                     position: 'bottom'
             },
             title: {
-                text: 'Membership Types',
+                text: 'Number of Active Membership Types',
                 align: 'left',
                 style: {
                     fontSize: '16px',

@@ -46,7 +46,7 @@ export const MostBusyTimesChart: React.FC = () => {
                     colors: ['#fff']
                 },
                 formatter: function (val: any, opt: any) {
-                    return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+                    return opt.w.globals.labels[opt.dataPointIndex] + " - " + val + " members enrolled"
                 },
                 offsetX: 0,
                 dropShadow: {
@@ -58,12 +58,14 @@ export const MostBusyTimesChart: React.FC = () => {
             colors: ['#fff']
             },
             xaxis: {
-            categories: popularClassNames,
+                categories: popularClassNames,
+                labels: {
+                }
             },
             yaxis: {
-            labels: {
-                show: false
-            }
+                labels: {
+                    show: false
+                }
             },
             title: {
                 text: 'Most Popular Class Times',
@@ -75,11 +77,6 @@ export const MostBusyTimesChart: React.FC = () => {
             },
             tooltip: {
                 theme: 'dark',
-                x: {
-                    show: false
-                },
-                y: {
-                },
             },
             legend: {
                 show: false
