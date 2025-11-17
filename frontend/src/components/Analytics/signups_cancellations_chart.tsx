@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactApexChart from "react-apexcharts";
-import { getCancellationsData, getSignupsAndCancellationsData, getSignupsData } from './analytics_service';
+import { getSignupsAndCancellationsData } from './analytics_service';
 
 // https://apexcharts.com/react-chart-demos/line-charts/syncing-charts/
 
@@ -87,9 +87,9 @@ export const SignupsCancellationsChart: React.FC = () => {
             <div id="chart">
                 {
                     (signupsData.length > 0) &&
-                        <div>
-                            <ReactApexChart options={chartInfoLine1.optionsLine1} series={chartInfoLine1.seriesLine1} type="line" height={250} />
-                        </div>
+                    <div>
+                        <ReactApexChart options={chartInfoLine1.optionsLine1} series={chartInfoLine1.seriesLine1} type="line" height={250} />
+                    </div>
                 }
                 {
                     (cancellationsData.length > 0) &&

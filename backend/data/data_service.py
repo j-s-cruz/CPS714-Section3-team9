@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from data.data_repo import *
 
 def getMembershipData():
@@ -14,56 +14,91 @@ def getMembershipData():
 
     return membership_data
 
-def getSignupsData():
-    signups_data = [
-        ["2024-01-01", 50],
-        ["2024-02-01", 75],
-        ["2024-03-01", 100],
-        ["2024-04-01", 80],
-        ["2024-05-01", 120],
-        ["2024-06-01", 90],
-        ["2024-07-01", 110],
-        ["2025-07-01", 110],
-    ]
-
-    return signups_data
-
-def getCancellationsData():
-    cancellations_data = [
-        ["2024-01-01", 5],
-        ["2024-02-01", 7],
-        ["2024-03-01", 10],
-        ["2024-04-01", 8],
-        ["2024-05-01", 12],
-        ["2024-06-01", 9],
-        ["2024-07-01", 11],
-        ["2025-07-01", 11],
-    ]
-
-    return cancellations_data
-
 def getSignupsAndCancellationsData():
-    signups_data = [
-        ["2024-01-01", 50],
-        ["2024-02-01", 75],
-        ["2024-03-01", 100],
-        ["2024-04-01", 80],
-        ["2024-05-01", 120],
-        ["2024-06-01", 90],
-        ["2024-07-01", 110],
-        ["2025-07-01", 110],
-    ]
 
-    cancellations_data = [
-        ["2024-01-01", 5],
-        ["2024-02-01", 7],
-        ["2024-03-01", 10],
-        ["2024-04-01", 8],
-        ["2024-05-01", 12],
-        ["2024-06-01", 9],
-        ["2024-07-01", 11],
-        ["2025-07-01", 11],
-    ]
+    data = getSignupsAndCancellationsDataFromRepo()
+
+    signup_dates = []
+    cancellation_dates = []
+
+    today = date.today()
+
+    for row in data:
+        # convert to datetime and then date
+        signup_dates.append(datetime.fromisoformat(row['created_at']).date())
+
+        if row['current_period_end'] != None:
+            # only count memberships that have ended, not ones that will end
+            if (datetime.fromisoformat(row['current_period_end']) < (today + timedelta(days = 1))):
+                cancellation_dates.append(datetime.fromisoformat(row['current_period_end']).date())
+
+    # sort to get the earliest date
+    signup_dates.sort()
+
+    # generate list of dates starting from earliest day to today
+    start = signup_dates[0]
+    end = today
+    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 1)).days)]
+
+    signup_dates_dict = {}
+
+    # create signup_dates_dict with 0 values
+    for generated_date in date_generated:
+        signup_dates_dict[generated_date.strftime("%Y-%m-%d")] = 0
+
+    cancellation_dates_dict = signup_dates_dict.copy()
+
+    # read through signup_dates and cancellation_dates and increment dictionary
+    for signup_date in signup_dates:
+        signup_dates_dict[signup_date.strftime("%Y-%m-%d")] = signup_dates_dict[signup_date.strftime("%Y-%m-%d")] + 1
+
+    for cancellation_date in cancellation_dates:
+        cancellation_dates_dict[cancellation_date.strftime("%Y-%m-%d")] = cancellation_dates_dict[cancellation_date.strftime("%Y-%m-%d")] + 1
+
+    # turns dictionary into list
+    signups_data = [list(item) for item in signup_dates_dict.items()]
+    cancellations_data = [list(item) for item in cancellation_dates_dict.items()]
+
+    # remove last 3 characters which are the dates so that we only deal with months
+    for row in signups_data:
+        row[0] = row[0][:-3]
+
+    for row in cancellations_data:
+        row[0] = row[0][:-3]
+
+    # combine together all the months 
+    counter = Counter()
+    for month, number in signups_data:
+        counter[month] += number
+
+    # list(counter.items()) is a list of tuples so we convert to a list of lists
+    signups_data = [list(t) for t in list(counter.items())]
+
+    counter = Counter()
+    for month, number in cancellations_data:
+        counter[month] += number
+
+    cancellations_data = [list(t) for t in list(counter.items())]
+
+    # signups_data = [
+    #     ["2025-01", 50],
+    #     ["2025-02", 75],
+    #     ["2025-03", 100],
+    #     ["2025-04", 80],
+    #     ["2025-05", 120],
+    #     ["2025-06", 90],
+    #     ["2025-07", 110],
+    # ]
+
+    # cancellations_data = [
+    #     ["2025-01", 5],
+    #     ["2025-02", 7],
+    #     ["2025-03", 10],
+    #     ["2025-04", 8],
+    #     ["2025-05", 12],
+    #     ["2025-06", 9],
+    #     ["2025-07", 11],
+    # ]
 
     return [signups_data, cancellations_data]
 
@@ -218,8 +253,6 @@ def getHourlyUsageData():
         row[0] = row[0].replace("Saturday", "2025-11-08")
 
     total = sum(row[1] for row in converted_hourly_usage_data)
-
-
 
     # Convert number of people in gym to percentages
     final_hourly_usage_data = [[row[0], round(row[1] / total * 100, 2)] for row in converted_hourly_usage_data]

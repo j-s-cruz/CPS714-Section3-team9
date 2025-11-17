@@ -33,38 +33,6 @@ export const getMembershipData = async () => {
     }
 }
 
-export const getSignupsData = async () => {
-    try {
-        const apiData = await axios.get<any[]>(api + '/data/signups_data');
-        return apiData.data;
-    }
-    catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.log(error.message);
-            return error.message;
-        } 
-        else {
-            console.log("Unexpected Error");
-        }
-    }
-}
-
-export const getCancellationsData = async () => {
-    try {
-        const apiData = await axios.get<any[]>(api + '/data/cancellations_data');
-        return apiData.data;
-    }
-    catch (error) {
-        if (axios.isAxiosError(error)) {
-            console.log(error.message);
-            return error.message;
-        } 
-        else {
-            console.log("Unexpected Error");
-        }
-    }
-}
-
 export const getSignupsAndCancellationsData = async () => {
     try {
         const apiData = await axios.get<any[]>(api + '/data/signups_cancellations_data');

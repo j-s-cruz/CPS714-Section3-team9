@@ -25,19 +25,6 @@ async def membership_data_get():
     
     return membership_data
 
-@data_router.get("/data/signups_data", tags=["data"])
-async def signups_data_get():
-
-    signups_data = getSignupsData()
-    return signups_data
-
-@data_router.get("/data/cancellations_data", tags=["data"])
-async def cancellations_data_get():
-
-    cancellations_data = getCancellationsData()
-
-    return cancellations_data
-
 @data_router.get("/data/signups_cancellations_data", tags=["data"])
 async def signups_cancellations_data_get():
 

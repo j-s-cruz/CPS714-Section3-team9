@@ -108,17 +108,10 @@ export const StaffDashboard = () => {
 //COMPONENT: REPORTS & ANALYTICS
 
 const Report = () => {
-  const [charts, setCharts] = useState<any[]>([]);
-
-  useEffect(() => {
-    //fetchReports();//to be included by team 8, these are just placeholders
-  }, []);
-
-  //const fetchReports = async () => {}
 
   return(
     <div>
-    <Analytics />
+      <Analytics />
     </div>
   );
 };
