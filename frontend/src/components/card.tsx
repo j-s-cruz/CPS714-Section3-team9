@@ -80,6 +80,29 @@ export const Card: React.FC<CardProps> = ({
   }
 
   // Determines the color based on the number of seats left
+  const difficultyColors = (difficulty: string) => {
+    if (difficulty === "beginner") {
+      return {
+        backgroundColor: "#FFFDE0",
+        color: "#545415",
+        border: "1px solid #545415"
+      };
+    } else if (difficulty === "intermediate") {
+      return {
+        backgroundColor: "#FFEBDE",
+        color: "#692B03",
+        border: "1px solid #692B03"
+      };
+    } else {
+      return {
+        backgroundColor: "#FFEDED",
+        color: "#5C0000",
+        border: "1px solid #5C0000"
+      };    
+    }
+  };
+
+  // Determines the color based on the number of seats left
   const seatsLeftColor = (seatsLeft: number) => {
     if (seatsLeft === 0) {
       return "text-dark";
@@ -141,11 +164,18 @@ export const Card: React.FC<CardProps> = ({
       {/* Class Image & Level Section */}
       <section className="position-relative">
         <img src={classImages[type]} alt={type} className="img-fluid mb-4" />
+        
         <p
-          className="bg-secondary text-white position-absolute top-0 end-0 px-1 mb-2"
-          style={{ fontSize: "10px" }}
+          className="position-absolute rounded-4 top-0 end-0 px-2 py-1 mb-2"
+          style={{
+            fontSize: "10px",
+            ...difficultyColors(difficulty),
+            transform: "translateY(-20%) translateX(10%)"
+          }}        
         >
-          {difficulty}
+          <b>
+            {difficulty}
+          </b>
         </p>
       </section>
 
