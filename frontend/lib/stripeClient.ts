@@ -5,7 +5,7 @@ const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 let stripePromise: Promise<Stripe | null>;
 
-\
+
 export const getStripe = (): Promise<Stripe | null> => {
   if (!stripePublishableKey) {
     console.error("Stripe Publishable Key is missing. Please check your .env.local file.");
