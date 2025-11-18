@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-// --- Types (Must match the structure used in page.tsx) ---
+
 interface Invoice {
   id: string;
   date: string;
