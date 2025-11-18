@@ -18,6 +18,6 @@ export const apiClient = {
   },
 
   // Placeholder for updateSubscription
-  updateSubscription: async (data: any) => {\
+  updateSubscription: async (data: any) => {
   }
 };
