@@ -25,7 +25,7 @@ def getMembershipData():
     # generate list of dates starting from earliest day to today
     start = signup_dates[0]
     end = today
-    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 1)).days)]
+    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 2)).days)]
 
     signup_dates_dict = {}
 
@@ -103,7 +103,7 @@ def getSignupsAndCancellationsData():
     # generate list of dates starting from earliest day to today
     start = signup_dates[0]
     end = today
-    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 1)).days)]
+    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 2)).days)]
 
     signup_dates_dict = {}
 
