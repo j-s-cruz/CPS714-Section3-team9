@@ -21,7 +21,7 @@ export interface CardProps {
   className: string;
   scheduledDate?: Date;
   time: string;
-  duration: number;
+  duration: string;
   trainer: string;
   difficulty: string;
   seatsLeft: number;
@@ -47,6 +47,37 @@ export const Card: React.FC<CardProps> = ({
     month: "short",
     day: "numeric",
   });
+
+  // Formats time from "HH:MM:SS" format to "HH:MM AM/PM" format
+  function formatedTime(time: string): string {
+    const [hour, minute] = time.split(":").map(Number);
+
+    // Select AM or PM
+    let timeOfDay: string;
+
+    if (hour < 12) {
+      timeOfDay = "AM";
+    } else {
+      timeOfDay = "PM";
+    }
+
+    // Covert 24 hour clock to 12 hour clock
+    let formatted12HourClock: number;
+
+    if (hour % 12 === 0) {
+      formatted12HourClock = 12;
+    } else {
+      formatted12HourClock = hour % 12;
+    }
+
+    return `${formatted12HourClock}:${minute.toString().padStart(2, "0")} ${timeOfDay}`;
+  } 
+
+  // Converts duration from "HH:MM:SS" format to total minutes
+  function formattedDuration(duration: string): number {
+      const [hours, minutes, _] = duration.split(":").map(Number);
+      return hours * 60 + minutes;
+  }
 
   // Determines the color based on the number of seats left
   const seatsLeftColor = (seatsLeft: number) => {
@@ -107,35 +138,35 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div className="card shadow-sm rounded-4 p-3">
-      {/* Class Image Section */}
-      <section>
+      {/* Class Image & Level Section */}
+      <section className="position-relative">
         <img src={classImages[type]} alt={type} className="img-fluid mb-4" />
-      </section>
-
-      {/* Class Details Section */}
-      <section className="d-flex justify-content-between align-items-center flex-wrap mb-2">
-        <h1 className="fs-4">{className}</h1>
         <p
-          className="bg-secondary text-white px-1 mb-2"
+          className="bg-secondary text-white position-absolute top-0 end-0 px-1 mb-2"
           style={{ fontSize: "10px" }}
         >
           {difficulty}
         </p>
       </section>
 
-      {/* Trainier and Class Decription Section */}
+      {/* Class Title Section */}
+      <section className="d-flex justify-content-between align-items-center flex-wrap mb-2">
+        <h1 className="fs-4">{className}</h1>
+      </section>
+
+      {/* Date, Time, and Duration Section */}
       <section>
         <hr className="mt-1 mb-1" />
         <span
           className="d-flex justify-content-center align-items-center flex-wrap"
-          style={{ fontSize: "14px" }}
+          style={{ fontSize: "12px" }}
         >
           <i className="bi-clock me-2"></i>
           <span className="me-2">{formattedDate}</span>
           <span className="me-2">|</span>
-          <span className="me-2">{time}</span>
+          <span className="me-2">{formatedTime(time)}</span>
           <span className="me-2">|</span>
-          <span>{duration} mins</span>
+          <span>{formattedDuration(duration)} mins</span>
         </span>
         <hr className="mt-1 mb-2" />
       </section>
