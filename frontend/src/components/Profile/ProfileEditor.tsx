@@ -294,7 +294,7 @@ export const ProfileEditor = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
-                disabled
+                disabled={!isEditingProfile}
                 required
               />
             </div>
