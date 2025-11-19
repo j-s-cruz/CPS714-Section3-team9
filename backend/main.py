@@ -27,6 +27,10 @@ class CancelRequest(BaseModel): #Pydantic model for the cancel request
     user_id: str
     booking_id: int
 
+class MemberName(BaseModel): #Pydantic model for member name
+    first_name: str
+    last_name: str
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -287,6 +291,64 @@ async def get_my_bookings(user_id: str):
             "success": False,
             "message": f"Error retrieving bookings: {str(e)}",
             "bookings": []
+        }
+
+@app.get("/members/{member_id}")
+async def get_member_by_id(member_id: str):
+    try:
+        db_query = supabase.table('member')\
+            .select('member_id, first_name, last_name, member_status')\
+            .eq('member_id', member_id)\
+            .single()\
+            .execute()
+        
+        member_data = db_query.data
+        
+        if not member_data:
+            return {
+                "success": False,
+                "message": f"Member with ID '{member_id}' not found"
+            }
+            
+        return {
+            "success": True,
+            "message": "Member retrieved successfully",
+            "member": member_data
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error retrieving member by ID: {str(e)}"
+        }
+
+@app.get("/members/name")
+async def get_member_by_name(first_name: str, last_name: str):
+    try:
+        db_query = supabase.table('member')\
+            .select('member_id, first_name, last_name, member_status')\
+            .eq('first_name', first_name)\
+            .eq('last_name', last_name)\
+            .execute()
+        
+        member_data = db_query.data
+        
+        if not member_data:
+            return {
+                "success": False,
+                "message": f"Member '{first_name} {last_name}' not found"
+            }
+            
+        return {
+            "success": True,
+            "message": "Member(s) retrieved successfully",
+            "members": member_data
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error retrieving member by name: {str(e)}"
         }
 
 app.include_router(data_router.data_router)
