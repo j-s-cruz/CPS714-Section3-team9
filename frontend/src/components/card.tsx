@@ -27,6 +27,7 @@ export interface CardProps {
   seatsLeft: number;
   type: string;
   buttonValue?: string;
+  premium_status?: string;
 }
 
 // Card component to display class information
@@ -40,6 +41,7 @@ export const Card: React.FC<CardProps> = ({
   seatsLeft,
   type,
   buttonValue = "BOOK",
+  premium_status = "basic",
 }) => {
   // Formats the date into a more readable format
   const formattedDate = scheduledDate.toLocaleDateString(undefined, {
@@ -88,6 +90,29 @@ export const Card: React.FC<CardProps> = ({
         border: "1px solid #545415"
       };
     } else if (difficulty === "intermediate") {
+      return {
+        backgroundColor: "#FFEBDE",
+        color: "#692B03",
+        border: "1px solid #692B03"
+      };
+    } else {
+      return {
+        backgroundColor: "#FFEDED",
+        color: "#5C0000",
+        border: "1px solid #5C0000"
+      };    
+    }
+  };
+
+  // Determines the color based on the membership tier
+  const memberColours = (premium_status: string) => {
+    if (premium_status === "basic") {
+      return {
+        backgroundColor: "#FFFDE0",
+        color: "#545415",
+        border: "1px solid #545415"
+      };
+    } else if (premium_status) {
       return {
         backgroundColor: "#FFEBDE",
         color: "#692B03",
@@ -177,6 +202,20 @@ export const Card: React.FC<CardProps> = ({
             {difficulty}
           </b>
         </p>
+
+       <p
+          className="position-absolute rounded-4 top-0 start-0 px-2 py-1 mb-2"
+          style={{
+            fontSize: "10px",
+            ...memberColours(premium_status),
+            transform: "translateY(-20%) translateX(10%)"
+          }}        
+        >
+          <b>
+            {premium_status}
+          </b>
+        </p>
+      
       </section>
 
       {/* Class Title Section */}

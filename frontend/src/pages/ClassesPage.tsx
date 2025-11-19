@@ -111,6 +111,7 @@ export default function ClassesPage() {
                 seatsLeft={total_spots - taken_spots}
                 type={classInfo.type}
                 buttonValue="BOOK"
+                premium_status={classInfo.premium_status}
               />
             );
           })}
