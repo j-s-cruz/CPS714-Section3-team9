@@ -143,7 +143,7 @@ async def book_class(request: BookingRequest):
         #return success booking response with details
         return {
             "success": True,
-            "message": "ClassBooking created successfully",
+            "message": "Class Booking created successfully",
             "booking": booking_result.data[0],
             "class_name": schedule['class']['class_name'],  # Include class name for UI
             "scheduled_date": schedule['scheduled_date'],
@@ -178,8 +178,8 @@ async def cancel_class(request: CancelRequest):
         
         booking = booking_query.data[0] #otherwise, get the booking data
 
-        #verify that the boojing is not already cancelled
-        if booking['cancelled_at'] is not None:
+        #verify that the booking is not already cancelled
+        if booking.get('booking_status') == 'cancelled' or booking['cancelled_at'] is not None:
             return {
                 "success": False,
                 "message": "Booking already cancelled"
@@ -190,7 +190,10 @@ async def cancel_class(request: CancelRequest):
 
         #Update booking status to cancelled with current timestamp
         supabase.table('class_bookings')\
-            .update({'cancelled_at': datetime.now().isoformat()})\
+            .update({
+                'cancelled_at': datetime.now().isoformat(),
+                'booking_status': 'cancelled'
+            })\
             .eq('id', request.booking_id)\
             .execute()
 
