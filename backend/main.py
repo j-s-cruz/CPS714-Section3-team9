@@ -23,7 +23,7 @@ class BookingRequest(BaseModel): #Pydantic model for the booking request
     user_id: str
     schedule_id: str
 
-class CancelRequest(BaseModel):
+class CancelRequest(BaseModel): #Pydantic model for the cancel request
     user_id: str
     booking_id: int
 
@@ -77,8 +77,87 @@ async def get_classes_schedules(
 
 #integration with team 1 and team 6 to help with this with membership tier validation and notification system
 @app.post("/classes/book")
-async def book_class():
-    return{"message": "not yet implemented"}
+async def book_class(request: BookingRequest):
+    try:
+
+        #supabase query to get the schedule and class details for the provided schedule_id
+        #schedule is feteched to verify and check avaliabity and check existance
+        schedule_query = supabase.table('class_schedules')\
+            .select('*, class(*)')\
+            .eq('id', request.schedule_id)\
+            .execute()
+        
+        if not schedule_query.data: #if the schedule is not found, return an error
+            return {
+                "success": False,
+                "message": "ClassSchedule not found"
+            }
+        
+        schedule = schedule_query.data[0] #get the schedule data from the first result
+
+        #check if the call if full or not by comparing taken and total spots
+        if schedule['taken_spots'] >= schedule['total_spots']:
+            return{
+                "success": False,
+                "message": "Class is full, No more spots available"
+            }
+        
+        #check if the user has already book the class schedule previously
+        #Query the class_bookings table to check if the user has already booked the class schedule
+        #Look at not null constraint on the schedule_id and user_id columns
+        existing_booking_query = supabase.table('class_bookings')\
+            .select('*')\
+            .eq('schedule_id', request.schedule_id)\
+            .eq('user_id', request.user_id)\
+            .is_('cancelled_at', 'null')\
+            .execute()
+        
+        if existing_booking_query.data: #if the user has already booked the class schedule, return an error
+            return {
+                "success": False,
+                "message": "You have already booked this class schedule"
+            }
+
+        #past the checks, we are created the booking record for the user
+        #automatic time stamp set by the database
+        booking_result = supabase.table('class_bookings')\
+            .insert({
+                'schedule_id': int(request.schedule_id),
+                'user_id': request.user_id,
+
+            }).execute()
+        
+        if not booking_result.data: #if the booking is not created, return an error
+            return {
+                "success": False,
+                "message": "Error creating booking record"
+            }
+        
+        #increment the taken spots in the schedule and update the table
+        new_taken_spots = schedule['taken_spots'] + 1
+        supabase.table('class_schedules')\
+            .update({'taken_spots': new_taken_spots})\
+            .eq('id', request.schedule_id)\
+            .execute()
+        
+        #return success booking response with details
+        return {
+            "success": True,
+            "message": "ClassBooking created successfully",
+            "booking": booking_result.data[0],
+            "class_name": schedule['class']['class_name'],  # Include class name for UI
+            "scheduled_date": schedule['scheduled_date'],
+            "time_from": schedule['time_from']
+        }
+        
+    except Exception as e: 
+        #if an error occurs in booking the class, return an error response
+        #log the error for debugging purposes
+        print(f"Error booking class: {str(e)}")
+        return {
+            "success": False,
+            "message": f"Error booking class: {str(e)}"
+        }
 
 @app.post("/classes/cancel")
 async def cancel_class(request: CancelRequest):
