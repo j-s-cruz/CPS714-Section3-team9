@@ -37,7 +37,7 @@ export default function SubscriptionPanel({ currentPlan, formatValue, formatDate
       <div className="flex justify-between items-end mb-6 border-b border-gray-200 dark:border-zinc-700 pb-4">
         <div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-            {isDataLoaded ? currentPlan.plan_name : 'Loading Plan...'}
+            {isDataLoaded ? currentPlan.plan_name.toUpperCase() : 'Loading Plan...'}
           </h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
             Billed {isDataLoaded ? currentPlan.billing_cycle : 'N/A'}
