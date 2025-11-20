@@ -336,7 +336,12 @@ export const MemberDashboard = () => {
                                   {scheduledDate}{startTime ? ` at ${startTime}` : ''}
                                 </p>
                               </div>
-                              <span className="badge-status text-xs">Confirmed</span>
+                              <button className="badge-gold test-xs"
+                                onClick={() => {
+                                  const scheduleElement = document.getElementById('class-calendar');
+                                  {/* Scroll down to the calendar view for upcoming classes */ }
+                                  scheduleElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }}>View</button>
                             </div>
                           );
                         })}
