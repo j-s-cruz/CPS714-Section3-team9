@@ -17,7 +17,7 @@ def getMembershipData():
 
         if row['current_period_end'] != None:
             # only count memberships that have ended, not ones that will end
-            if (datetime.fromisoformat(row['current_period_end']) < (today + timedelta(days = 1))):
+            if (datetime.fromisoformat(row['current_period_end']).date() < (today + timedelta(days = 1))):
                 cancellation_dates.append(datetime.fromisoformat(row['current_period_end']).date())
 
     # sort to get the earliest date
@@ -95,7 +95,7 @@ def getSignupsAndCancellationsData():
 
         if row['current_period_end'] != None:
             # only count memberships that have ended, not ones that will end
-            if (datetime.fromisoformat(row['current_period_end']) < (today + timedelta(days = 1))):
+            if (datetime.fromisoformat(row['current_period_end']).date() < (today + timedelta(days = 1))):
                 cancellation_dates.append(datetime.fromisoformat(row['current_period_end']).date())
 
     # sort to get the earliest date
