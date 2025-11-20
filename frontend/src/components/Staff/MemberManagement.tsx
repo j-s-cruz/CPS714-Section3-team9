@@ -27,7 +27,7 @@ const MemberManagement = () => {
         throw profilesError;
       }
       if (!profilesData){
-        console.log("DATA is NULL: ", {profilesData})
+        console.warn("DATA is NULL: ", {profilesData})
         return;
       }
 
@@ -49,7 +49,8 @@ const MemberManagement = () => {
       console.log(mergeData);
       setMembers(mergeData);
     }catch (error){
-      console.log("error happened while fetching members: ", error);
+      console.error("Error fetching members: ", error);
+      alert("Failed to load members. Please try again.")
     }
   };
 
