@@ -123,8 +123,6 @@ export const MembershipChartv2: React.FC = () => {
                 }
               },
             },
-          
-          
         };
 
     return (
