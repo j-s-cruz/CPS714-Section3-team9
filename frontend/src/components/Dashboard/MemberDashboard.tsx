@@ -318,7 +318,9 @@ export const MemberDashboard = () => {
                   <div className="text-right">
                     <p className="text-gray-100 text-lg font-semibold drop-shadow">
                       {subscription?.renewal_date
-                        ? `Renewal Date: ${subscription.renewal_date}`
+                        ? `Renewal Date: ${new Date(
+                            subscription.renewal_date
+                          ).toLocaleDateString()}`
                         : 'No renewal date'}
                     </p>
                   </div>
