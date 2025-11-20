@@ -58,11 +58,6 @@ export const MembershipChartv2: React.FC = () => {
               dataLabels: {
                 enabled: false
               },
-              //@ts-expect-error
-              stroke: {
-                width: [2,6],
-                curve: ['straight','monotoneCubic']
-              },
               fill: {
                 opacity: [1,0.75],
               },
@@ -127,10 +122,6 @@ export const MembershipChartv2: React.FC = () => {
                   enabled: false
                 }
               },
-              yaxis: {
-                max: 100,
-                tickAmount: 2
-              }
             },
           
           

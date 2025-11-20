@@ -25,7 +25,7 @@ def getMembershipData():
     # generate list of dates starting from earliest day to today
     start = signup_dates[0]
     end = today
-    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 1)).days)]
+    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 2)).days)]
 
     signup_dates_dict = {}
 
@@ -103,7 +103,7 @@ def getSignupsAndCancellationsData():
     # generate list of dates starting from earliest day to today
     start = signup_dates[0]
     end = today
-    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 1)).days)]
+    date_generated = [start + timedelta(days=x) for x in range(0, (end - start + timedelta(days = 2)).days)]
 
     signup_dates_dict = {}
 
@@ -245,35 +245,9 @@ def getClassTimesPopularityData():
         top_class_counts.append(added_together_data[i][1])
 
     return [top_class_times[:10], top_class_counts[:10]]
+
 def getGymOccupancyData():
     occupancy_data = [
-        ["2024-01-01 10:00", 30],
-        ["2024-01-01 11:00", 45],
-        ["2024-01-01 12:00", 50],
-        ["2024-01-01 13:00", 40],
-        ["2024-01-01 14:00", 60],
-        ["2024-01-01 15:00", 55],
-        ["2024-01-01 16:00", 70],
-        ["2025-01-01 10:00", 30],
-        ["2025-01-01 11:00", 45],
-        ["2025-01-01 12:00", 50],
-        ["2025-01-01 13:00", 40],
-        ["2025-01-01 14:00", 60],
-        ["2025-01-01 15:00", 55],
-        ["2025-01-01 16:00", 70],
-    ]
-
-    return occupancy_data
-
-def getHourlyUsageData():
-    hourly_usage_data = [
-        ["2024-01-01 06:00", 20],
-        ["2024-01-01 07:00", 35],
-        ["2024-01-01 08:00", 50],
-        ["2024-01-01 09:00", 40],
-        ["2024-01-01 10:00", 60],
-        ["2024-01-01 11:00", 55],
-        ["2024-01-01 12:00", 70],
         ["2025-01-01 06:00", 20],
         ["2025-01-01 07:00", 35],
         ["2025-01-01 08:00", 50],
@@ -281,7 +255,47 @@ def getHourlyUsageData():
         ["2025-01-01 10:00", 60],
         ["2025-01-01 11:00", 55],
         ["2025-01-01 12:00", 70],
-        ["2025-01-08 12:00", 70],
+        ["2025-01-01 14:00", 60],
+        ["2025-01-01 15:00", 55],
+        ["2025-01-01 16:00", 70],
+        ["2025-01-02 06:00", 20],
+        ["2025-01-02 07:00", 35],
+        ["2025-01-02 08:00", 50],
+        ["2025-01-02 09:00", 40],
+        ["2025-01-02 10:00", 60],
+        ["2025-01-02 11:00", 55],
+        ["2025-01-02 12:00", 70],
+        ["2025-01-02 13:00", 70],
+        ["2025-01-02 14:00", 60],
+        ["2025-01-02 15:00", 55],
+        ["2025-01-02 16:00", 70],
+    ]
+
+    return occupancy_data
+
+def getHourlyUsageData():
+    hourly_usage_data = [
+        ["2025-01-01 06:00", 20],
+        ["2025-01-01 07:00", 35],
+        ["2025-01-01 08:00", 50],
+        ["2025-01-01 09:00", 40],
+        ["2025-01-01 10:00", 60],
+        ["2025-01-01 11:00", 55],
+        ["2025-01-01 12:00", 70],
+        ["2025-01-01 14:00", 60],
+        ["2025-01-01 15:00", 55],
+        ["2025-01-01 16:00", 70],
+        ["2025-01-02 06:00", 20],
+        ["2025-01-02 07:00", 35],
+        ["2025-01-02 08:00", 50],
+        ["2025-01-02 09:00", 40],
+        ["2025-01-02 10:00", 60],
+        ["2025-01-02 11:00", 55],
+        ["2025-01-02 12:00", 70],
+        ["2025-01-02 13:00", 70],
+        ["2025-01-02 14:00", 60],
+        ["2025-01-02 15:00", 55],
+        ["2025-01-02 16:00", 70]
     ]
 
     format_string = "%Y-%m-%d %H:%M"
