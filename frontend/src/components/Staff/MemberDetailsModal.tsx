@@ -40,7 +40,7 @@ const MemberDetailsModal = ({cls, onClose, refreshMembers}: {cls: any, onClose: 
 
             setShowAlert(true); //notee: checkmark popup to show updates have been made
             
-            setTimeout(() => {setShowAlert(false); setEditingField(null);},10000); //settimeout 2nd argument is in ms
+            setTimeout(() => {setShowAlert(false); setEditingField(null);},500); //settimeout 2nd argument is in ms
             setMemberData(prev => ({...prev, [editingField]: editValue}))
             refreshMembers()
             cls[editingField] = editValue;

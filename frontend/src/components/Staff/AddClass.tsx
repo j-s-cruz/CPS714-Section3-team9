@@ -153,11 +153,16 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-yellow-600 mb-2">Start Time</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Start Time (9 AM - 9 PM)</label>
             <input
               type="time"
               value={formData.time}
-              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+              onChange={(e) => {
+                const t = e.target.value;
+                if (t >= "09:00" && t <= "21:00"){
+                  setFormData({ ...formData, time: e.target.value })
+                }
+            }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               required
             />
