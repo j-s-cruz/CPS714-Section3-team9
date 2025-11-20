@@ -71,6 +71,7 @@ const ClassManagement = ({refreshFlag} : {refreshFlag: boolean}) => {
                     <p className="text-sm text-slate-600">Instructor: {cls.instructor_name}</p>
                     <p className="text-sm text-slate-600">Date: {cls.day}</p>
                     <p className="text-sm text-slate-600">Time: {cls.time.slice(0, -3)}</p> 
+                    <p className="text-sm text-slate-600">Class Duration: {cls.duration} minutes</p> 
                   </div>
                 </div>
 
