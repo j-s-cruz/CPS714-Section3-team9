@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase'; 
-// Import the new components
 import SubscriptionPanel from './SubscriptionPanel'; 
 import PaymentForm from './PaymentForm';
 
-// --- Type Definition for Fetched Data ---
 // Defining the shape of the data returned from the database
 interface FetchedData {
     tier: string;
@@ -29,7 +27,6 @@ type SubscriptionType = {
 };
 
 
-// --- Data Fetching Functions ---
 
 async function fetchTestValue(userId: string) {
     if (!userId) return 'User ID Missing';
@@ -71,7 +68,6 @@ async function fetchSubscriptionData(userId: string): Promise<SubscriptionType |
     if (membershipData) {
         
         // Safely extract price from the joined table data
-        // NOTE: The property name in the object is 'subscriptions' after the change
         const price = membershipData.plan_details?.Cost ?? null; 
         
         const { tier, status, created_at, current_period_start, current_period_end } = membershipData;
