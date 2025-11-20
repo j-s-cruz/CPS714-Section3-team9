@@ -2,6 +2,8 @@
 import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
 
+import PaymentForm from './PaymentForm';
+
 
 async function fetchTestValue(userId: string) {
     if (!userId) return null;
@@ -108,20 +110,19 @@ export default function PaymentsAndBilling() {
           
           {/*Current Subscription Panel */}
           <div className="flex-1 min-w-[320px] h-96 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-md border border-gray-100 dark:border-zinc-700">
-            <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-                 Supabase Connection Test
-             </p>
-             <p className={`text-sm font-medium ${testValue.includes('FAIL') || testValue.includes('No Profile') ? 'text-red-500' : 'text-green-500'}`}>
-                 Result: **{testValue}**
-             </p>
-             <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">
-                 (Checks 'profiles' table for mock user)
-             </p>
+            <div className="flex justify-between items-start mb-4">
+              <div className='flex flex-col'>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Current Subscription</h2>
+                <p className="text-sm text-gray-600 dark:text-zinc-400">Manage your membership plan and billing</p>
+              </div>
+            </div>
+
           </div>
+
 
           {/* Make a Payment Form */}
           <div className="flex-1 min-w-[320px] h-96 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-md border border-gray-100 dark:border-zinc-700">
-            
+            <PaymentForm />
           </div>
 
         </section>
