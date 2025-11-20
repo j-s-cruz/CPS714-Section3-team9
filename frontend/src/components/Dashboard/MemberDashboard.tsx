@@ -36,33 +36,10 @@ export const MemberDashboard = () => {
       .from('ph')
       .select('ph');
 
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    /* Grab the date 7 days from today and set the time to 11:59 PM */
-    const sevenDaysFromNow = new Date(today);
-    sevenDaysFromNow.setDate(today.getDate() + 7);
-    sevenDaysFromNow.setHours(23, 59, 59, 999);
-
     /* Limit the upcoming events to the next 7 days */
     const bookings = (dummyData as any).bookings as any[];
 
-    const upcomingEvents = bookings
-      .filter(event => {
-        /* Parse date string as local date (avoid timezone issues) */
-        const [year, month, day] = event.date.split('-').map(Number);
-        const eventDate = new Date(year, month - 1, day);
-
-        /* Keep event only if it's within the next 7 days (today through 7 days from now) */
-        return eventDate >= today && eventDate <= sevenDaysFromNow;
-      })
-      /* Basic sorting by date and time to show the upcoming classes in the correct order */
-      .sort((a, b) => {
-        const dateA = new Date(`${a.date} ${a.start_time}`);
-        const dateB = new Date(`${b.date} ${b.start_time}`);
-        return dateA.getTime() - dateB.getTime();
-      });
+    const upcomingEvents = filterUpcomingEvents(bookings);
 
     setUpcomingBookings(upcomingEvents);
   };
@@ -76,6 +53,36 @@ export const MemberDashboard = () => {
     const notifications = (dummyData as any).notifications || [];
     setNotifications(notifications);
   };
+
+  function convertUTCtoLocal(date: string): Date {
+    /* Parse date string as local date (avoid timezone issues) */
+    const [year, month, day] = date.split('-').map(Number);
+    const eventDate = new Date(year, month - 1, day);
+    return eventDate;
+  }
+
+  function filterUpcomingEvents(events: any[]) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    /* Grab the date 7 days from today and set the time to 11:59 PM */
+    const sevenDaysFromNow = new Date(today);
+    sevenDaysFromNow.setDate(today.getDate() + 7);
+    sevenDaysFromNow.setHours(23, 59, 59, 999);
+
+    return events.filter(event => {
+        const eventDate = convertUTCtoLocal(event.date);
+
+        /* Keep event only if it's within the next 7 days (today through 7 days from now) */
+        return eventDate >= today && eventDate <= sevenDaysFromNow;
+      })
+      /* Basic sorting by date and time to show the upcoming classes in the correct order */
+      .sort((a, b) => {
+        const dateA = new Date(`${a.date} ${a.start_time}`);
+        const dateB = new Date(`${b.date} ${b.start_time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
+  }
 
   /* User data */
   const dummyProfile = (dummyData as any).profiles?.[0] || null;
@@ -232,7 +239,7 @@ export const MemberDashboard = () => {
                   <div className="text-right">
                     <p className="text-gray-100 text-lg font-semibold drop-shadow">
                       {subscription?.renewal_date
-                        ? `Renewal Date: ${new Date(subscription.renewal_date).toLocaleDateString()}`
+                        ? `Renewal Date: ${subscription.renewal_date}`
                         : 'No renewal date'}
                     </p>
                   </div>
@@ -267,11 +274,17 @@ export const MemberDashboard = () => {
                               </p>
                               <p className="text-sm text-gray-300 flex items-center gap-1 mt-2">
                                 <Clock className="w-4 h-4 text-gold-400" />
-                                {new Date(booking.date).toLocaleDateString()} at{' '}
+                                {booking.date} at{' '}
                                 {booking.start_time}
                               </p>
                             </div>
-                            <span className="badge-status text-xs">Confirmed</span>
+                            <button className="badge-gold text-xs" onClick={() => {
+                                const scheduleElement = document.getElementById('class-calendar');
+                                {/* Scroll down to the calendar view for upcoming classes */ }
+                                scheduleElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }}>
+                              View
+                            </button>
                           </div>
                         ))}
                       </div>
