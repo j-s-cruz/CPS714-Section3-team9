@@ -14,6 +14,12 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
 
   //Editing Window
   const openEditor = (field: string, currentValue: string) => {
+    
+    //edge case: don't open the editor for null/undefined values
+    if (currentValue == null){
+      console.warn(`Cannot edit ${field}. Value is Null or Undefined`);
+      return;
+    }
     setEditingField(field); //the column value for the class we are updating in the db
     setEditValue(currentValue);
   }
@@ -21,7 +27,12 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
   //Update the supabase backend when an admin makes changes to certain fields
   const saveEdit = async() => {
     if (!editingField) return;
-    
+
+    //if the value didn't change green checkmark popup shouldn't happen. (avoids confusion for user)
+    if (editValue.trim() === ""){
+       alert("Value cannot be empty.");
+        return; 
+    }
     //if the value didn't change green checkmark popup shouldn't happen. (avoids confusion for user)
     if (editValue == cls[editingField]){
         setEditingField(null);
@@ -46,9 +57,11 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
             },
             1000 
         ); //settimeout 2nd argument is in ms
-
-        refreshClasses();
-        cls[editingField] = editValue;
+        try{
+          refreshClasses();
+        }catch (error){
+          console.error("Failed to refresh classes. Please try again", error);
+        }
         setEditValue("");
     } catch (err: any){
       console.log(err)
