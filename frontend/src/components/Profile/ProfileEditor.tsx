@@ -28,7 +28,7 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
   const [profilePicture, setProfilePicture] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string>('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingGoals, setIsEditingGoals] = useState(false);
 
@@ -100,8 +100,7 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
 
     // Guard Clause: Ensure we have a user ID before proceeding.
     if (!userId) {
-      console.error("Cannot update profile: User ID is missing.");
-      setError(true);
+      setError("Cannot update profile: User ID is missing.");
       return;
     }
 
@@ -109,15 +108,21 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
 
     /* Reset from previous submit if somehow not done so already */
     setSuccess(false);
-    setError(false);
+    setError("");
 
     try {
+      /* check format of phone number and email before submitting */
+      if (invalidEmailFormat(email)) throw new Error('Invalid email format');
+
+      if (invalidPhoneNumberFormat(phoneNumber)) throw new Error('Invalid phone number format');
+
       /* Assuming name is one DB field */
       const fullName = `${firstName} ${lastName}`.trim();
 
       const updates = {
         full_name: fullName,
-        phone_number: phoneNumber,
+        phone_number: forcePhoneNumberFormat(phoneNumber),
+        email: email,
         profile_picture_url: profilePicture,
         fitness_goals: fitnessGoals,
       };
@@ -150,13 +155,31 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
       setIsEditingGoals(false);
       setTimeout(() => setSuccess(false), 2000);
     } catch (err: any) {
-      console.error("Error updating profile:", err.message);
-      setError(true);
-      setTimeout(() => setError(false), 2000);
+      setError("Error Updating Profile: " + err.message);
+      setTimeout(() => setError(''), 2000);
     } finally {
       setLoading(false);
     }
   };
+
+  function forcePhoneNumberFormat(number: string): string {
+    /* Remove all non-digit characters */
+    const digits = number.replace(/\D/g, '');
+    return `(${digits.slice(0, 3)})-${digits.slice(3, 6)}-${digits.slice(6)}`;
+
+  }
+
+  /* Returns true if the email is invalid */
+  function invalidEmailFormat(email: string): boolean {
+    if (email.length === 0) return true;
+    else if (!email.includes('@') || !email.includes('.') || email.indexOf('@') > email.lastIndexOf('.') || email.startsWith('@') || email.endsWith('.') || email.endsWith('@') || email.endsWith('.')) return true;
+    else return false;
+  }
+
+  function invalidPhoneNumberFormat(number: string): boolean {
+    const digits = number.replace(/\D/g, '');
+    return digits.length !== 10;
+  }
 
   const subscription = profile?.membership_subscriptions?.[0];
   const tier = subscription?.membership_tiers;
@@ -167,7 +190,7 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
       {error && (
         <div className="bg-red-500/20 border border-red-500 text-red-400 px-6 py-4 rounded-xl flex items-center gap-3 shadow-lg animate-scale-in">
           <X className="w-6 h-6" />
-          <span className="font-medium">Error updating profile. Please try again.</span>
+          <span className="font-medium">{error}</span>
         </div>
       )}
       {success && (
@@ -298,8 +321,9 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
               <input
                 type="email"
                 value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
-                disabled={true}
+                disabled={!isEditingProfile}
                 required
               />
             </div>
