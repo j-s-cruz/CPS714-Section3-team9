@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { admin_supabase } from './supabaseClient';
+import { CheckCircleIcon } from "lucide-react";
 //COMPONENT: ADD CLASS FEAUTURE
 
 const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refreshClasses: () => void }) => {
@@ -13,7 +14,9 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
     date: '',
     time: '',
     class_type: '',
+    duration: '',
   });
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,13 +29,19 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
         capacity: formData.capacity,
         day: formData.date,
         time: formData.time,
+        duration: formData.duration,
 
         
       });
 
       if (error) throw error;
-      refreshClasses();
-      onClose();
+      setShowAlert(true);
+
+      setTimeout(()=> {
+        setShowAlert(false)
+        refreshClasses();
+        onClose();
+        }, 500);
     } catch (error: any) {
       alert(error.message);
     }
@@ -49,9 +58,9 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
               type="text"
               value={formData.classId}
               onChange={(e) => {
-                if (!/^[a-zA-Z0-9\s]*$/.test(e.target.value))  // /regex/.test(string) --> for client-side input validation
+                if (!/^[a-zA-Z0-9\s\-]*$/.test(e.target.value))  // only allowing the following: a-z, A-Z, numbers, single whitespace and hyphen
                 {
-                  console.error("Input for the 'Class' field is invalid or you entered an empty string.")
+                  alert("Input for the 'Class' field is invalid." + "\nOnly Letters, Numbers, hypen and single white space is permitted")
                   return; 
                 }
                 setFormData({ ...formData, classId: e.target.value })            
@@ -66,8 +75,15 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
             <label className="block text-sm font-medium text-yellow-600 mb-2">Class Type</label>
             <input
               type="text"
-              value={formData.class_type}
-              onChange={(e) => setFormData({ ...formData, class_type: e.target.value })}
+              value={formData.class_type} 
+              onChange={(e) => {
+                if (!/^[a-zA-Z]*$/.test(e.target.value)) //validate input
+                {
+                  alert("Only enter string characters");
+                  return; 
+                }
+                setFormData({ ...formData, class_type: e.target.value })
+              }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 italic"
               required
               placeholder="ex: BASIC, PREMIUM, VIP"
@@ -79,7 +95,14 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
             <input
               type="text"
               value={formData.first_name}
-              onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+              onChange={(e) => {
+                if (!/^[a-zA-Z]*$/.test(e.target.value)) //validate input
+                {
+                  alert("Only enter string characters");
+                  return; 
+                }
+                setFormData({ ...formData, first_name: e.target.value })
+              }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 italic"
               required
               placeholder="ex: Nico"
@@ -91,7 +114,14 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
             <input
               type="text"
               value={formData.last_name}
-              onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+              onChange={(e) => {
+                if (!/^[a-zA-Z]*$/.test(e.target.value)) //validate input
+                {
+                  alert("Only enter string characters");
+                  return; 
+                }
+                setFormData({ ...formData, last_name: e.target.value })
+              }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 italic"
               required
               placeholder="ex: Ali Walsh"
@@ -132,6 +162,20 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
               required
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-yellow-600 mb-2">Class Duration (minutes)</label>
+            <input
+              type="number"
+              min="0"
+              max="121"
+              value={formData.duration}
+              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              required
+              placeholder="Duration (minutes, max 120)"
+            />
+          </div>
+          
 
           <div className="flex gap-2">
             <button
@@ -150,6 +194,13 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
           </div>
         </form>
       </div>
+      {showAlert && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-[9999]">
+          <CheckCircleIcon
+            className="text-green-600 w-20 h-20"
+          />
+        </div>
+      )}
     </div>
   );
 };
