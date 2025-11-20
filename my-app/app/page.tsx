@@ -1,32 +1,30 @@
 "use client";
 
+import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase'; 
-import SubscriptionPanel from './SubscriptionPanel'; 
-import PaymentForm from './PaymentForm';
 
-// Defining the shape of the data returned from the database
-interface FetchedData {
-    tier: string;
-    status: string;
-    current_period_start: string | null;
-    current_period_end: string | null;
-    created_at: string | null;
-    // The joined data is a single object { Cost: number } or null if no match found
-    plan_details: { Cost: number } | null; 
+
+import PaymentForm from './PaymentForm';
+import SubscriptionPanel from './SubscriptionPanel';
+import BillingHistory from './BillingHistory';
+
+interface SubscriptionType {
+  plan_name: string | null;
+  price: number | null;
+  billing_cycle: string;
+  is_active: boolean;
+  member_since: string | null;
+  next_renewal: string | null;
 }
 
-// Defining the final shape of the subscription object passed to the component
-type SubscriptionType = {
-    plan_name: string | null;
-    price: number | null;
-    billing_cycle: string;
-    is_active: boolean;
-    member_since: string | null;
-    next_renewal: string | null;
-};
-
-
+interface FetchedData {
+  tier: string | null;
+  status: string | null;
+  created_at: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  plan_details?: { Cost: number | null };
+}
 
 async function fetchTestValue(userId: string) {
     if (!userId) return 'User ID Missing';
@@ -50,7 +48,7 @@ async function fetchTestValue(userId: string) {
 async function fetchSubscriptionData(userId: string): Promise<SubscriptionType | null> {
     if (!userId) return null;
     
-    // ACTION: FIXING PARSING ERROR BY REMOVING COMMENTS AND NEWLINES
+    //obtain data from memberships table with joined plan details
     const { data, error } = await supabase
       .from('memberships') 
       .select(`tier, status, current_period_start, current_period_end, created_at, subscriptions ( Cost )`)
@@ -74,7 +72,7 @@ async function fetchSubscriptionData(userId: string): Promise<SubscriptionType |
 
         return {
             plan_name: tier,
-            price: price, // PRICE IS NOW FETCHED!
+            price: price, 
             billing_cycle: 'monthly', // Setting a standard billing cycle
             is_active: status === 'active',
             member_since: created_at || current_period_start,
@@ -168,17 +166,9 @@ export default function PaymentsAndBilling() {
           
           {/*SUPABASE CONNECTION TEST*/}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700">
-             <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-                 Membership Tier Test
-             </p>
-             <p className={`text-sm font-medium ${testValue.includes('FAIL') || testValue.includes('No Membership') ? 'text-red-500' : 'text-green-500'}`}>
-                 Result: **{testValue}**
-             </p>
-             <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">
-                 (Checks 'memberships' table for tier)
-             </p>
+             
           </div>
-          {/* Empty Box Placeholders 2, 3, 4 */}
+          {/* Empty Box Placeholders */}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
@@ -201,6 +191,11 @@ export default function PaymentsAndBilling() {
           <PaymentForm
           />
 
+        </section>
+
+        {/* Billing History Section */}
+        <section className="w-full mt-8">
+          <BillingHistory userId={mockUserId} />
         </section>
 
       </div>
