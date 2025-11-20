@@ -1,5 +1,6 @@
 "use client";
 
+// Icons removed: import { Calendar, Zap } from 'lucide-react'; 
 
 // Props interface for clarity
 interface SubscriptionPanelProps {

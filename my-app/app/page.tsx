@@ -5,22 +5,10 @@ import { useState, useEffect } from 'react';
 import PaymentForm from './PaymentForm';
 import SubscriptionPanel from './SubscriptionPanel'; 
 
-interface MembershipData {
-    tier: string;
-    status: string;
-    current_period_start: string;
-    current_period_end: string;
-    created_at: string;
-    // The joined field, explicitly typed as the expected structure or null
-    plan_details: { Cost: number } | null; 
-}
-
-
-// --- Final Data Fetching Functions ---
-
 async function fetchTestValue(userId: string) {
-    if (!userId) return null;
+    if (!userId) return 'User ID Missing';
     
+    // ACTION: Querying the 'memberships' table for the user's tier
     const { data, error } = await supabase
         .from('memberships') 
         .select('tier') 
@@ -39,7 +27,7 @@ async function fetchTestValue(userId: string) {
 async function fetchSubscriptionData(userId: string) {
     if (!userId) return null;
     
-    // Querying 'memberships' and joining with 'subscriptions' to get the Cost/Price.
+    // ACTION: Simplified Query - Only fetching fields directly from 'memberships'.
     const { data, error } = await supabase
       .from('memberships') 
       .select(`
@@ -47,10 +35,7 @@ async function fetchSubscriptionData(userId: string) {
         status, 
         current_period_start, 
         current_period_end, 
-        created_at,
-        
-        // Join: Fetch Cost from the 'subscriptions' table where tier matches
-        plan_details:subscriptions!tier ( Cost ) 
+        created_at
       `)
       .eq('user_id', userId)
       .maybeSingle(); 
@@ -60,24 +45,16 @@ async function fetchSubscriptionData(userId: string) {
       throw error;
     }
     
-    // ACTION: Apply Type Assertion to tell TypeScript the shape of the data object
-    const typedData = data as MembershipData | null;
-    
-    if (typedData) {
+    if (data) {
         
-        // 1. Safely handle the nested join structure. 
-        const planDetails = typedData.plan_details;
-        
-        // 2. Extract the cost with safe chaining (?? 0 provides a default).
-        const price = planDetails?.Cost ?? 0;
-        
-        // 3. Destructure primary fields for cleaner access.
-        const { tier, status, created_at, current_period_start, current_period_end } = typedData;
+        const { tier, status, created_at, current_period_start, current_period_end } = data;
 
         return {
+            // MAPPING: tier (DB) -> plan_name (Component Prop)
             plan_name: tier,
-            price: price, 
-            billing_cycle: 'monthly', 
+            // Price is temporarily NULL
+            price: null, 
+            billing_cycle: 'N/A', 
             is_active: status === 'active',
             member_since: created_at || current_period_start,
             next_renewal: current_period_end,
@@ -87,22 +64,6 @@ async function fetchSubscriptionData(userId: string) {
     return null;
 }
 
-async function fetchPaymentMethods(userId: string) {
-    if (!userId) return [];
-    
-    // NOTE: This assumes you have a 'payment_methods' table set up in Supabase
-    const { data, error } = await supabase
-        .from('payment_methods')
-        .select('id, card_type, last_four, is_default')
-        .eq('user_id', userId)
-        .order('is_default', { ascending: false });
-
-    if (error) {
-        console.error('Supabase payment methods fetch error:', error);
-        return [];
-    }
-    return data;
-}
 
 // Helper functions for formatting
 const formatValue = (value: any) => (typeof value === 'number' ? `$${value.toFixed(2)}` : value || 'N/A');
@@ -117,14 +78,23 @@ const formatDate = (dateString: string) => {
 
 export default function PaymentsAndBilling() {
 
-  const [subscription, setSubscription] = useState(null);
-  const [paymentMethods, setPaymentMethods] = useState([]);
+  type SubscriptionType = {
+    plan_name: string | null;
+    price: number | null;
+    billing_cycle: string;
+    is_active: boolean;
+    member_since: string | null;
+    next_renewal: string | null;
+  };
+
+  const [subscription, setSubscription] = useState<SubscriptionType | null>(null);
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [amount, setAmount] = useState(0.00);
+  const [amount, setAmount] = useState<number>(0.00);
   
   // NEW STATE FOR TEST
-  const [testValue, setTestValue] = useState('Checking Connection...');
+  const [testValue, setTestValue] = useState<string>('Checking Connection...');
 
   // I used my UserID
   const mockUserId = '49f7c14c-1c83-49fc-8701-38043efdb920'; 
@@ -138,6 +108,9 @@ export default function PaymentsAndBilling() {
        
         const testResult = await fetchTestValue(mockUserId);
         setTestValue(testResult ?? 'TEST: No Profile Found');
+
+        const subData = await fetchSubscriptionData(mockUserId);
+        setSubscription(subData);
         
       } catch (err) {
         setError("Failed to load dashboard data.");
@@ -173,7 +146,15 @@ export default function PaymentsAndBilling() {
           
           {/*  Box 1 */}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700">
-             
+             <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">
+                 Membership Tier Test
+             </p>
+             <p className={`text-sm font-medium ${testValue.includes('FAIL') || testValue.includes('No Membership') ? 'text-red-500' : 'text-green-500'}`}>
+                 Result: **{testValue}**
+             </p>
+             <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">
+                 (Checks 'memberships' table for tier)
+             </p>
           </div>
 
           {/* Box 2 */}
