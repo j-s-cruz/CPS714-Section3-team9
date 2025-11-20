@@ -79,9 +79,9 @@ const MemberManagement = () => {
                   {index+1}
                 </div>
                 <div>
-                  <p className="inline font-bold text-yellow-600">Name: {member.full_name}<br/></p>
-                  <p className="inline font-semibold text-slate-500">Tier: {member.memberships?.[0]?.tier || 'No subscription'}<br/></p>
-                  <p className="inline font-semibold text-slate-500">Account Created At: {member.created_at.slice(0, 10)}<br/></p>
+                  <p className="font-semibold text-yellow-600">Name: {member.full_name}<br/></p>
+                  <p className="text-sm text-slate-600">Tier: {member.memberships?.[0]?.tier || 'No subscription'}<br/></p>
+                  <p className="text-sm text-slate-600">Account Created At: {member.created_at.slice(0, 10)}<br/></p>
                 </div>
               </div>
             </button>
