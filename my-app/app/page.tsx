@@ -48,7 +48,7 @@ async function fetchTestValue(userId: string) {
 async function fetchSubscriptionData(userId: string): Promise<SubscriptionType | null> {
     if (!userId) return null;
     
-    // ACTION: FIXING PARSING ERROR BY REMOVING COMMENTS AND NEWLINES
+    //obtain data from memberships table with joined plan details
     const { data, error } = await supabase
       .from('memberships') 
       .select(`tier, status, current_period_start, current_period_end, created_at, subscriptions ( Cost )`)
@@ -72,7 +72,7 @@ async function fetchSubscriptionData(userId: string): Promise<SubscriptionType |
 
         return {
             plan_name: tier,
-            price: price, // PRICE IS NOW FETCHED!
+            price: price, 
             billing_cycle: 'monthly', // Setting a standard billing cycle
             is_active: status === 'active',
             member_since: created_at || current_period_start,
@@ -166,17 +166,9 @@ export default function PaymentsAndBilling() {
           
           {/*SUPABASE CONNECTION TEST*/}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700">
-             <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-                 Membership Tier Test
-             </p>
-             <p className={`text-sm font-medium ${testValue.includes('FAIL') || testValue.includes('No Membership') ? 'text-red-500' : 'text-green-500'}`}>
-                 Result: **{testValue}**
-             </p>
-             <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">
-                 (Checks 'memberships' table for tier)
-             </p>
+             
           </div>
-          {/* Empty Box Placeholders 2, 3, 4 */}
+          {/* Empty Box Placeholders */}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
