@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe, GiBiceps, GiBoxingGlove, GiStrongMan } from 'react-icons/gi';
 import { FaDumbbell, FaHeartbeat } from 'react-icons/fa';
-import dummyData from '../../data/data.json';
+import { supabase } from '../../lib/supabase';
 
 interface classInSchedule {
   id: string;
@@ -31,8 +31,9 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
   function startOfWeek(date: Date): Date {
     const d = new Date(date);
     const day = d.getDay();
-    /* Funky thing where 0 is Sunday so 1 is Monday thus we must add 1 to get the corresponding Monday*/
-    const diff = d.getDate() - day + 1;
+    /* Convert JS weekday (0=Sun..6=Sat) to an offset that makes Monday the start (0 = Monday)
+       ((day + 6) % 7) gives 0 for Monday and 6 for Sunday. */
+    const diff = d.getDate() - ((day + 6) % 7);
     return new Date(d.setDate(diff));
   }
 
@@ -102,17 +103,40 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
       const startDate = dateString(weekDays[0]);
       const endDate = dateString(weekDays[6]);
 
-      /* Fetch the data from team 3 (placeholder). Keep the call so it's easy to swap in later. */
-      // TODO: Replace with actual supabase call when available
-      // await supabase.from('ph').select('ph');
+      const { data, error } = await supabase
+        .from('class_schedules')
+        .select(`
+          id,
+          scheduled_date,
+          start_time,
+          end_time,
+          fitness_classes (
+            name,
+            instructor_name
+          )
+        `)
+        .gte('scheduled_date', startDate)
+        .lte('scheduled_date', endDate);
 
-      /* Use shared dummy data (frontend/src/data/data.json) while backend isn't available. */
-      const bookings = (dummyData as any).bookings as classInSchedule[];
+      if (error) throw error;
 
-      /* Filter bookings to the current week (startDate and endDate are YYYY-MM-DD strings) */
-      const weekBookings = bookings.filter(b => b.date >= startDate && b.date <= endDate);
+      if (!data) {
+        updateEvents([]);
+        return;
+      }
 
-      updateEvents(weekBookings);
+      const formattedEvents = data
+        .filter(event => event.scheduled_date && event.start_time && event.end_time) // Filter out events with missing crucial data
+        .map((event: any) => ({
+          id: event.id,
+          title: event.fitness_classes?.name || 'Unknown Class',
+          start_time: event.start_time,
+          end_time: event.end_time,
+          date: event.scheduled_date,
+          instructor: event.fitness_classes?.instructor_name || 'N/A',
+        }));
+
+      updateEvents(formattedEvents);
     } catch (error) {
       console.error('Error fetching schedule:', error);
     }
@@ -132,15 +156,23 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
   };
 
   /* Helper function that calculates the minutes difference from 9am */
-  function eventPosition(startTime : string): number {
-    /* if the assuming that the time in data is like "10:00 AM" */
-    const [time, time_of_day] = startTime.split(" ")
-    let [hours, minutes] = time.split(":").map(Number);
+  function eventPosition(startTime: string): number {
+    // Accept both 12-hour strings like "9:00 AM" and 24-hour SQL times like "09:00:00" or "09:00"
+    let hours = 0;
+    let minutes = 0;
 
-    if ((time_of_day === "PM" || time_of_day === "pm") && hours !== 12) hours += 12;
-    if ((time_of_day === "AM" || time_of_day === "am") && hours === 12) hours = 0;
+    if (/AM|PM/i.test(startTime)) {
+      const [time, period] = startTime.split(' ');
+      [hours, minutes] = time.split(':').map(Number);
+      if (/PM/i.test(period) && hours !== 12) hours += 12;
+      if (/AM/i.test(period) && hours === 12) hours = 0;
+    } else {
+      // Handle "HH:MM:SS" or "HH:MM"
+      const parts = startTime.split(':').map(Number);
+      hours = parts[0] || 0;
+      minutes = parts[1] || 0;
+    }
 
-    /* The start of the calendar day is 9 AM thus the positon is relative to it */
     const startHour = 9;
     const position = (hours - startHour) * 60 + minutes;
     return position;
@@ -251,7 +283,7 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
 
               {/* Time slots and events */}
               {timeSlots.map((time, timeIndex) => (
-                <>
+                <React.Fragment key={`time-row-${timeIndex}`}>
                   {/* Time */}
                   <div key={`time-${timeIndex}`} className="bg-gray-800/50 p-3 text-right border-t border-gray-700/30">
                     <div className="text-s text-gray-400 font-medium">{time}</div>
@@ -294,7 +326,7 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
                       </div>
                     );
                   })}
-                </>
+                </React.Fragment>
               ))}
             </div>
           </div>
