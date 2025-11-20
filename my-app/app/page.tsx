@@ -5,14 +5,25 @@ import { useState, useEffect } from 'react';
 import PaymentForm from './PaymentForm';
 import SubscriptionPanel from './SubscriptionPanel'; 
 
+interface MembershipData {
+    tier: string;
+    status: string;
+    current_period_start: string;
+    current_period_end: string;
+    created_at: string;
+    // The joined field, explicitly typed as the expected structure or null
+    plan_details: { Cost: number } | null; 
+}
+
+
+// --- Final Data Fetching Functions ---
+
 async function fetchTestValue(userId: string) {
     if (!userId) return null;
     
-    // Using a simple query on the 'profiles' table for a single value.
-    //Gets Tier from memberships table
     const { data, error } = await supabase
-        .from('memberships')
-        .select('tier')
+        .from('memberships') 
+        .select('tier') 
         .eq('user_id', userId) 
         .maybeSingle(); 
 
@@ -21,8 +32,76 @@ async function fetchTestValue(userId: string) {
         return 'FETCH FAILED';
     }
     
-    // Return the value found, or a default message
-    return data ? `Data Found: ${data.tier}` : 'TEST: No Profile Found';
+    return data ? `Tier Found: ${data.tier || 'No Tier Value'}` : 'TEST: No Membership Found';
+}
+
+
+async function fetchSubscriptionData(userId: string) {
+    if (!userId) return null;
+    
+    // Querying 'memberships' and joining with 'subscriptions' to get the Cost/Price.
+    const { data, error } = await supabase
+      .from('memberships') 
+      .select(`
+        tier, 
+        status, 
+        current_period_start, 
+        current_period_end, 
+        created_at,
+        
+        // Join: Fetch Cost from the 'subscriptions' table where tier matches
+        plan_details:subscriptions!tier ( Cost ) 
+      `)
+      .eq('user_id', userId)
+      .maybeSingle(); 
+
+    if (error) {
+      console.error('Supabase subscription fetch error:', error);
+      throw error;
+    }
+    
+    // ACTION: Apply Type Assertion to tell TypeScript the shape of the data object
+    const typedData = data as MembershipData | null;
+    
+    if (typedData) {
+        
+        // 1. Safely handle the nested join structure. 
+        const planDetails = typedData.plan_details;
+        
+        // 2. Extract the cost with safe chaining (?? 0 provides a default).
+        const price = planDetails?.Cost ?? 0;
+        
+        // 3. Destructure primary fields for cleaner access.
+        const { tier, status, created_at, current_period_start, current_period_end } = typedData;
+
+        return {
+            plan_name: tier,
+            price: price, 
+            billing_cycle: 'monthly', 
+            is_active: status === 'active',
+            member_since: created_at || current_period_start,
+            next_renewal: current_period_end,
+        };
+    }
+
+    return null;
+}
+
+async function fetchPaymentMethods(userId: string) {
+    if (!userId) return [];
+    
+    // NOTE: This assumes you have a 'payment_methods' table set up in Supabase
+    const { data, error } = await supabase
+        .from('payment_methods')
+        .select('id, card_type, last_four, is_default')
+        .eq('user_id', userId)
+        .order('is_default', { ascending: false });
+
+    if (error) {
+        console.error('Supabase payment methods fetch error:', error);
+        return [];
+    }
+    return data;
 }
 
 // Helper functions for formatting
