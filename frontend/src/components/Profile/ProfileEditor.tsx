@@ -389,6 +389,12 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
 
       {/* Fitness Goals Widget */}
       <div className="relative bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-2">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-10"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1728486145245-d4cb0c9c3470?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          }}
+        />
         <div className="flex items-center justify-between mb-6 relative z-10">
           <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
             <GiMuscleUp className="w-6 h-6 text-gold-400" />

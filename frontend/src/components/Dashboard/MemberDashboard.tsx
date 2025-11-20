@@ -14,7 +14,7 @@ import { Database } from '../../lib/supabase';
 import { ProfileEditor } from '../Profile/ProfileEditor';
 import { ClassCalendar } from './ClassCalendar';
 
-type TabType = 'dashboard' | 'profile' | 'staff';
+type TabType = 'dashboard' | 'profile';
 
 // Define a specific type for the profile object, including the nested subscription data.
 type ProfileWithSubscription = Database['public']['Tables']['profiles']['Row'] & {
