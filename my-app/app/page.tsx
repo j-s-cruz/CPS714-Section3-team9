@@ -1,32 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase'; 
-import SubscriptionPanel from './SubscriptionPanel'; 
 import PaymentForm from './PaymentForm';
-
-// Defining the shape of the data returned from the database
-interface FetchedData {
-    tier: string;
-    status: string;
-    current_period_start: string | null;
-    current_period_end: string | null;
-    created_at: string | null;
-    // The joined data is a single object { Cost: number } or null if no match found
-    plan_details: { Cost: number } | null; 
-}
-
-// Defining the final shape of the subscription object passed to the component
-type SubscriptionType = {
-    plan_name: string | null;
-    price: number | null;
-    billing_cycle: string;
-    is_active: boolean;
-    member_since: string | null;
-    next_renewal: string | null;
-};
-
-
+import SubscriptionPanel from './SubscriptionPanel';
+import BillingHistory from './BillingHistory'; 
 
 async function fetchTestValue(userId: string) {
     if (!userId) return 'User ID Missing';
@@ -201,6 +177,11 @@ export default function PaymentsAndBilling() {
           <PaymentForm
           />
 
+        </section>
+
+        {/* Billing History Section */}
+        <section className="w-full mt-8">
+          <BillingHistory userId={mockUserId} />
         </section>
 
       </div>
