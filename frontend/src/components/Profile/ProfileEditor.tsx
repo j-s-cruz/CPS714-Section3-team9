@@ -113,7 +113,7 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
 
     try {
       /* Assuming name is one DB field */
-      // const fullName = `${firstName} ${lastName}`.trim();
+      const fullName = `${firstName} ${lastName}`.trim();
 
       const updates = {
         full_name: fullName,
