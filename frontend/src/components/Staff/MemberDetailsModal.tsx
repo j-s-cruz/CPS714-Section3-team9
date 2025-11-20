@@ -14,6 +14,10 @@ const MemberDetailsModal = ({cls, onClose, refreshMembers}: {cls: any, onClose: 
 
 
     const openEditor = (field: string) => {
+        if (!(field in memberData)){
+            console.error("Invalid field", {field}); //check if editing field is not a valid field then output error
+            return;
+        }
         setEditingField(field); //the column value for the member we are updating in the db
         setEditValue(memberData[field]);
     }
@@ -22,8 +26,14 @@ const MemberDetailsModal = ({cls, onClose, refreshMembers}: {cls: any, onClose: 
     //Update the supabase backend when an admin makes changes to certain fields
     const saveEdit = async() => {
         if (!editingField) return;
+
+         
+        if (editValue.trim() == ""){  
+            alert("Please enter a non-empty value.");
+            return; 
+        }
         
-        //don't show alert if the admin doesn't change the value
+        //skip save if the value wasn't changed
         if (editValue == memberData[editingField]){  
             setEditingField(null);
             setEditValue("");
@@ -43,12 +53,11 @@ const MemberDetailsModal = ({cls, onClose, refreshMembers}: {cls: any, onClose: 
             setTimeout(() => {setShowAlert(false); setEditingField(null);},500); //settimeout 2nd argument is in ms
             setMemberData(prev => ({...prev, [editingField]: editValue}))
             refreshMembers()
-            cls[editingField] = editValue;
             setEditValue("");
 
         } catch (err: any){
-            console.log(err)
-            alert("failed to update");
+            console.error(err);
+            alert("failed to update please try again");
         }
   }
 
