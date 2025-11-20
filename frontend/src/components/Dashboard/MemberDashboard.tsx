@@ -3,7 +3,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import {
   User,
-  Settings,
   Bell,
   Clock,
   LogOut,
@@ -13,10 +12,9 @@ import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe, GiBiceps } from 'react-ic
 import { FaDumbbell } from 'react-icons/fa';
 import dummyData from '../../data/data.json';
 import { ProfileEditor } from '../Profile/ProfileEditor';
-import { StaffDashboard } from '../Staff/StaffDashboard';
 import { ClassCalendar } from './ClassCalendar';
 
-type TabType = 'dashboard' | 'profile' | 'staff';
+type TabType = 'dashboard' | 'profile';
 
 export const MemberDashboard = () => {
   const { user, profile, signOut } = useAuth();
@@ -134,19 +132,6 @@ export const MemberDashboard = () => {
                   <User className="w-4 h-4 inline mr-1" />
                   Profile
                 </button>
-                {/* TODO: I haven't touched this, not sure if you guys want to. */}
-                {myProfile?.is_staff && (
-                  <button
-                    onClick={() => setActiveTab('staff')}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'staff'
-                      ? 'bg-gold-500/90 text-gray-900 shadow-lg'
-                      : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
-                      }`}
-                  >
-                    <Settings className="w-4 h-4 inline mr-1" />
-                    Staff Panel
-                  </button>
-                )}
               </div>
 
               {/* Notifications (Again haven't touched this at all) */}
@@ -338,7 +323,6 @@ export const MemberDashboard = () => {
           )}
 
           {activeTab === 'profile' && <ProfileEditor />}
-          {activeTab === 'staff' && myProfile?.is_staff && <StaffDashboard />}
         </div>
       </main>
     </div>
