@@ -23,8 +23,14 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.time || formData.time < "9:00" || formData.time > "21:00"){
-      alert("Class start times are between 9:00 AM and 21:00");
+    //destructure the hour and mins from time and extract to check class start times fall in range 9 am and 9 pm
+    const [hours, mins] = formData.time.split(":").map(Number);
+    if (!formData.time || hours < 9 || hours > 21){
+      alert("Class start times are between 9:00 and 21:00");
+      return;
+    }
+    if (!formData.classId.trim()){
+      alert("Class name cannot be empty");
       return;
     }
     try {
