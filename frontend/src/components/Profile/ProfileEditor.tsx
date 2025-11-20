@@ -148,11 +148,11 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
       setSuccess(true);
       setIsEditingProfile(false);
       setIsEditingGoals(false);
-      setTimeout(() => setSuccess(false), 1000);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err: any) {
       console.error("Error updating profile:", err.message);
       setError(true);
-      setTimeout(() => setError(false), 1000);
+      setTimeout(() => setError(false), 2000);
     } finally {
       setLoading(false);
     }

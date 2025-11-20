@@ -185,6 +185,7 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     return end - start;
   }
 
+  /* Basic helper function to provide you the number of pixels needed if the event does not start on the hour */
   function minutesPastHour(position: number): number {
     return position % 60
   }

@@ -99,43 +99,17 @@ export const MemberDashboard = () => {
     else {
       const all = data || [];
       // Filter out bookings that somehow don't have the joined schedule relation
-      const valid = all.filter((b: any) => b?.class_schedules != null);
+      const valid = all.filter((b: any) => b?.class_schedules != null).sort((a, b) => {
+        const dateA = new Date(`${a.class_schedules.scheduled_date}T${a.class_schedules.start_time}`);
+        const dateB = new Date(`${b.class_schedules.scheduled_date}T${b.class_schedules.start_time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
       if (valid.length !== all.length) {
         console.warn('Some bookings were missing class_schedules and were filtered out:', all.filter((b: any) => b?.class_schedules == null));
       }
       setUpcomingBookings(valid);
     }
   };
-
-  function convertUTCtoLocal(date: string): Date {
-    /* Parse date string as local date (avoid timezone issues) */
-    const [year, month, day] = date.split('-').map(Number);
-    const eventDate = new Date(year, month - 1, day);
-    return eventDate;
-  }
-
-  function filterUpcomingEvents(events: any[]) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    /* Grab the date 7 days from today and set the time to 11:59 PM */
-    const sevenDaysFromNow = new Date(today);
-    sevenDaysFromNow.setDate(today.getDate() + 7);
-    sevenDaysFromNow.setHours(23, 59, 59, 999);
-
-    return events.filter(event => {
-        const eventDate = convertUTCtoLocal(event.date);
-
-        /* Keep event only if it's within the next 7 days (today through 7 days from now) */
-        return eventDate >= today && eventDate <= sevenDaysFromNow;
-      })
-      /* Basic sorting by date and time to show the upcoming classes in the correct order */
-      .sort((a, b) => {
-        const dateA = new Date(`${a.date} ${a.start_time}`);
-        const dateB = new Date(`${b.date} ${b.start_time}`);
-        return dateA.getTime() - dateB.getTime();
-      });
-  }
 
   /* User data */
   const subscription = myProfile?.membership_subscriptions?.[0];
@@ -156,7 +130,7 @@ export const MemberDashboard = () => {
   if (!myProfile) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-900 text-red-400">
-        Error: Could not load user profile. Please check the console and ensure the user ID is correct.
+        Error: Could not load user profile. Please ensure that the database is linked properly.
       </div>
     );
   }
@@ -318,9 +292,7 @@ export const MemberDashboard = () => {
                   <div className="text-right">
                     <p className="text-gray-100 text-lg font-semibold drop-shadow">
                       {subscription?.renewal_date
-                        ? `Renewal Date: ${new Date(
-                            subscription.renewal_date
-                          ).toLocaleDateString()}`
+                        ? `Renewal Date: ${subscription.renewal_date.split('T')[0]}`
                         : 'No renewal date'}
                     </p>
                   </div>
@@ -348,7 +320,7 @@ export const MemberDashboard = () => {
                           const schedule = booking.class_schedules || booking.class_schedules;
                           const className = schedule?.fitness_classes?.name || 'Unknown class';
                           const scheduledDate = schedule?.scheduled_date
-                            ? new Date(schedule.scheduled_date + 'T00:00:00').toLocaleDateString()
+                            ? schedule.scheduled_date.split('T')[0]
                             : 'TBD';
                           const startTime = schedule?.start_time || '';
 
@@ -419,7 +391,6 @@ export const MemberDashboard = () => {
           )}
 
           {activeTab === 'profile' && <ProfileEditor profile={myProfile} setProfile={setMyProfile} />}
-          {activeTab === 'staff' && myProfile?.is_staff && <StaffDashboard />}
         </div>
       </main>
     </div>
