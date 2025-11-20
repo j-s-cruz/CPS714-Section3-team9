@@ -163,12 +163,10 @@ export default function PaymentsAndBilling() {
           </p>
         </header>
 
-        {/* ========================================================= */}
         {/* SECTION 1: SUMMARY CARDS (Top Row) */}
-        {/* ========================================================= */}
         <section className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-12">
           
-          {/* 🟢 Box 1 - SUPABASE CONNECTION TEST (Now using membership tier) */}
+          {/*SUPABASE CONNECTION TEST*/}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700">
              <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">
                  Membership Tier Test
@@ -189,9 +187,7 @@ export default function PaymentsAndBilling() {
 
         <hr className="my-10 border-gray-200 dark:border-zinc-700" />
 
-        {/* ========================================================= */}
         {/* SECTION 2: DETAIL PANELS (Bottom Row) */}
-        {/* ========================================================= */}
         <section className="w-full flex flex-col md:flex-row gap-6">
           
           {/* LEFT BOX: Current Subscription Panel */}
