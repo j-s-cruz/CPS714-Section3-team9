@@ -17,15 +17,22 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
     duration: '',
   });
   const [showAlert, setShowAlert] = useState(false);
+  
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.time || formData.time < "9:00" || formData.time > "21:00"){
+      alert("Class start times are between 9:00 AM and 21:00");
+      return;
+    }
     try {
       const { error } = await admin_supabase.from('class').insert({
-        class_name: formData.classId,
-        class_type: formData.class_type.toUpperCase(),
-        instructor_fname: formData.first_name, 
-        instructor_lname: formData.last_name,
+        class_name: formData.classId.trim(),
+        class_type: formData.class_type.trim().toUpperCase(),
+        instructor_fname: formData.first_name.trim(), 
+        instructor_lname: formData.last_name.trim(),
         capacity: formData.capacity,
         day: formData.date,
         time: formData.time,
@@ -159,9 +166,7 @@ const AddClassModal = ({ onClose, refreshClasses }: { onClose: () => void, refre
               value={formData.time}
               onChange={(e) => {
                 const t = e.target.value;
-                if (t >= "09:00" && t <= "21:00"){
-                  setFormData({ ...formData, time: e.target.value })
-                }
+                setFormData({ ...formData, time: e.target.value })
             }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               required
