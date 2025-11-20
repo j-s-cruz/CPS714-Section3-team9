@@ -41,6 +41,22 @@ export default function PaymentsAndBilling() {
 
         </section>
 
+        
+        {/* The TWO Payment Boxes Sabesen & Daniel */}
+        <section className="w-full flex flex-col md:flex-row gap-6">
+          
+          {/*Current Subscription Panel */}
+          <div className="flex-1 min-w-[320px] h-96 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-md border border-gray-100 dark:border-zinc-700">
+            
+          </div>
+
+          {/* Make a Payment Form */}
+          <div className="flex-1 min-w-[320px] h-96 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-md border border-gray-100 dark:border-zinc-700">
+            
+          </div>
+
+        </section>
+
       </div>
     </div>
   );
