@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import ReactApexChart from "react-apexcharts";
 import { getSignupsAndCancellationsData } from '../analytics_service';
 
-// https://apexcharts.com/react-chart-demos/line-charts/syncing-charts/
-
 export const SignupsCancellationsChart: React.FC = () => {
 
     const [signupsData, setSignupsData] = useState<(string | number)[][]>([]);

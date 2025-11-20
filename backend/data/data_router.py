@@ -13,11 +13,6 @@ async def data_get():
     return [{"test": "test"}]
 
 
-class MembershipData:
-    def __init__(self, date: str, member_count: int):
-        self.date = date
-        self.member_count = member_count
-
 @data_router.get("/data/membership_data", tags=["data"])
 async def membership_data_get():
 
