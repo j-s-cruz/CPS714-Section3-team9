@@ -3,7 +3,8 @@ import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
 
 import PaymentForm from './PaymentForm';
-import SubscriptionPanel from './SubscriptionPanel'; 
+import SubscriptionPanel from './SubscriptionPanel';
+import BillingHistory from './BillingHistory'; 
 
 async function fetchTestValue(userId: string) {
     if (!userId) return 'User ID Missing';
@@ -176,7 +177,7 @@ export default function PaymentsAndBilling() {
 
         
         {/* The TWO Payment Boxes Sabesen & Daniel */}
-        <section className="w-full flex flex-col md:flex-row gap-6">
+        <section className="w-full flex flex-col md:flex-row gap-6 mt-8">
           
           {/*Current Subscription Panel */}
           <div className="flex-1 min-w-[320px] h-96 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-md border border-gray-100 dark:border-zinc-700">
@@ -194,6 +195,11 @@ export default function PaymentsAndBilling() {
             <PaymentForm />
           </div>
 
+        </section>
+
+        {/* Billing History Section */}
+        <section className="w-full mt-8">
+          <BillingHistory userId={mockUserId} />
         </section>
 
       </div>
