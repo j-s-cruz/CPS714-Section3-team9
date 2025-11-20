@@ -343,7 +343,7 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-gray-400 uppercase tracking-wider">Next Renewal</span>
                   <span className="font-medium text-gray-100">
-                    {new Date(subscription.renewal_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    {subscription.renewal_date.split('T')[0]}
                   </span>
                 </div>
               )}
@@ -355,6 +355,11 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
           )}
 
           {/* Button that should send you to billing details */}
+          <button
+            className="mt-6 px-4 py-2 bg-gold-500/90 hover:bg-gold-500 text-gray-900 rounded-lg font-medium transition-all duration-300 text-sm w-full"
+          >
+            Upgrade Membership & View Billing Details
+          </button>
         </div>
       </div>
 

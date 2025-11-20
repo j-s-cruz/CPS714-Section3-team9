@@ -178,6 +178,26 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     return position;
   }
 
+  function formatTime(start_time: string): string {
+    let hours = 0;
+    let minutes = 0;
+    let period = "";
+
+    const parts_of_time = start_time.split(':').map(Number);
+
+    if (parts_of_time[0] > 12) {
+      hours = parts_of_time[0] - 12;
+      period = "PM";
+    }
+    else {
+      hours = parts_of_time[0];
+      period = "AM";
+    }
+    minutes = parts_of_time[1]; 
+
+    return `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  }
+
   /* Gets the events duration which allows you to calculate the height of the block in the calendar */
   function eventblockHeight(startTime: string, endTime: string): number {
     const start = eventPosition(startTime);
@@ -320,7 +340,7 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
                                 <IconComponent className="w-4 h-4 flex-shrink-0" />
                                 <div className="font-bold truncate">{event.title}</div>
                               </div>
-                              <div className="text-xs opacity-90 truncate ml-2">{event.start_time} {event.end_time}</div>
+                              <div className="text-xs opacity-90 truncate ml-1">{formatTime(event.start_time)}-{formatTime(event.end_time)}</div>
                             </div>
                           );
                         })}

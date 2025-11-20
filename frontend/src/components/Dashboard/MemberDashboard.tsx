@@ -111,6 +111,27 @@ export const MemberDashboard = () => {
     }
   };
 
+  function formatTime(start_time: string): string {
+    let hours = 0;
+    let minutes = 0;
+    let period = "";
+
+    const parts_of_time = start_time.split(':').map(Number);
+
+    if (parts_of_time[0] > 12) {
+      hours = parts_of_time[0] - 12;
+      period = "PM";
+    }
+    else {
+      hours = parts_of_time[0];
+      period = "AM";
+    }
+    minutes = parts_of_time[1]; 
+
+    return `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  }
+
+
   /* User data */
   const subscription = myProfile?.membership_subscriptions?.[0];
   const tier = subscription?.membership_tiers;
@@ -322,7 +343,7 @@ export const MemberDashboard = () => {
                           const scheduledDate = schedule?.scheduled_date
                             ? schedule.scheduled_date.split('T')[0]
                             : 'TBD';
-                          const startTime = schedule?.start_time || '';
+                          const startTime = formatTime(schedule?.start_time || '');
 
                           return (
                             <div
