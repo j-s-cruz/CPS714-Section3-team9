@@ -1,8 +1,30 @@
 "use client";
 
+import { supabase } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+
+
 import PaymentForm from './PaymentForm';
 import SubscriptionPanel from './SubscriptionPanel';
-import BillingHistory from './BillingHistory'; 
+import BillingHistory from './BillingHistory';
+
+interface SubscriptionType {
+  plan_name: string | null;
+  price: number | null;
+  billing_cycle: string;
+  is_active: boolean;
+  member_since: string | null;
+  next_renewal: string | null;
+}
+
+interface FetchedData {
+  tier: string | null;
+  status: string | null;
+  created_at: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  plan_details?: { Cost: number | null };
+}
 
 async function fetchTestValue(userId: string) {
     if (!userId) return 'User ID Missing';
