@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase';
+
 export default function PaymentsAndBilling() {
   return (
     // Main container to center content on the page
