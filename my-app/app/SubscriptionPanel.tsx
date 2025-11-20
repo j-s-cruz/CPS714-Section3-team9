@@ -48,7 +48,7 @@ export default function SubscriptionPanel({ currentPlan, formatValue, formatDate
             {isDataLoaded ? `${formatValue(currentPlan.price)}/month` : 'N/A'}
           </p>
           <p className="text-xs text-gray-400 dark:text-zinc-500">
-            USD
+            CAD
           </p>
         </div>
       </div>
