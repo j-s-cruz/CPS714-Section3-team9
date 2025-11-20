@@ -142,16 +142,17 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
     }
   };
 
-  /* Navigation functions for prev, next and return to "today" */
-  const navigateWeek = (direction: 'prev' | 'next') => {
-    const newDate = new Date(currentWeekStart);
-    newDate.setDate(currentWeekStart.getDate() + (direction === 'next' ? 7 : -7));
-    setCurrentWeekStart(newDate);
-  };
-
-  /* Go back to the current week (specifically back to the week that holds today) */
-  const goToToday = () => {
-    setCurrentWeekStart(startOfWeek(new Date()));
+  /* Update Schedule View depending on which arrow button is pressed */
+  const updateWeek = (direction : 0 | 1 | 2, goToCurrentWeek: 0 | 1) => {
+    if (goToCurrentWeek === 1) { 
+      setCurrentWeekStart(startOfWeek(new Date()));
+    }
+    else {
+      const updatedDate = new Date(currentWeekStart);
+      const addDate = direction === 1 ? -7 : 7
+      updatedDate.setDate(currentWeekStart.getDate() + addDate)
+      setCurrentWeekStart(updatedDate);
+    }
   };
 
   /* Helper function that calculates the minutes difference from 9am */
@@ -178,16 +179,19 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
   }
 
   /* Gets the events duration which allows you to calculate the height of the block in the calendar */
-  function blockHeight(startTime: string, endTime: string): number {
+  function eventblockHeight(startTime: string, endTime: string): number {
     const start = eventPosition(startTime);
     const end = eventPosition(endTime);
     return end - start;
   }
 
+  function minutesPastHour(position: number): number {
+    return position % 60
+  }
+
   /* Helper function to get events for a specific day */
   function todaysEvents(date: Date): classInSchedule[] {
-    const dateStr = dateString(date);
-    return events.filter(event => event.date === dateStr);
+    return events.filter(event => event.date === dateString(date));
   }
 
   /* Add icons to events for fun and extra personalization */
@@ -235,19 +239,19 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={goToToday}
+              onClick={() => updateWeek(0, 1)}
               className="px-4 py-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg font-medium transition-all duration-200 text-sm"
             >
               Today
             </button>
             <button
-              onClick={() => navigateWeek('prev')}
+              onClick={() => updateWeek(1, 0)}
               className="p-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg transition-all duration-200"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={() => navigateWeek('next')}
+              onClick={() => updateWeek(2, 0)}
               className="p-2 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg transition-all duration-200"
             >
               <ChevronRight className="w-5 h-5" />
@@ -282,23 +286,23 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
                 <React.Fragment key={`time-row-${timeIndex}`}>
                   {/* Time */}
                   <div key={`time-${timeIndex}`} className="bg-gray-800/50 p-3 text-right border-t border-gray-700/30">
-                    <div className="text-xs text-gray-400 font-medium">{time}</div>
+                    <div className="text-s text-gray-400 font-medium">{time}</div>
                   </div>
 
-                  {/* Cells */}
+                  {/* Fill Cells With Events If Any */}
                   {weekDays.map((day, dayIndex) => {
+                    /* filter events to only the ones that fall in the 60 minutes between the start time and next time */
                     const dayEvents = todaysEvents(day);
                     const cellEvents = dayEvents.filter(event => {
                       const eventStartMinutes = eventPosition(event.start_time);
-                      const cellStartMinutes = timeIndex * 60;
-                      return eventStartMinutes >= cellStartMinutes && eventStartMinutes < cellStartMinutes + 60;
+                      const timeFromStart = timeIndex * 60;
+                      return eventStartMinutes >= timeFromStart && eventStartMinutes < timeFromStart + 60;
                     });
 
                     return (
                       <div
                         key={`cell-${timeIndex}-${dayIndex}`}
-                        className={`bg-gray-900/30 p-1 min-h-[60px] border-t border-gray-700/30 relative overflow-visible ${isToday(day) ? 'bg-gold-500/5' : ''
-                          }`}
+                        className={"bg-gray-900/30 p-1 min-h-[60px] border-t border-gray-700/30 relative overflow-visible"}
                       >
                         {cellEvents.map((event, eventIndex) => {
                           const IconComponent = getRandomIcon(event.id);
@@ -307,15 +311,15 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
                               key={`event-${event.id}-${eventIndex}`}
                               className="absolute left-1 right-1 rounded-lg p-2 text-xs cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-gold-500/90 text-gray-900 border border-gold-400 z-10"
                               style={{
-                                top: `${eventPosition(event.start_time) % 60}px`,
-                                height: `${blockHeight(event.start_time, event.end_time)}px`
+                                top: `${minutesPastHour(eventPosition(event.start_time))}px`,
+                                height: `${eventblockHeight(event.start_time, event.end_time)}px`
                               }}
                             >
                               <div className="flex items-center gap-2">
                                 <IconComponent className="w-4 h-4 flex-shrink-0" />
                                 <div className="font-bold truncate">{event.title}</div>
                               </div>
-                              <div className="text-xs opacity-90 truncate ml-6">{event.instructor}</div>
+                              <div className="text-xs opacity-90 truncate ml-2">{event.start_time} {event.end_time}</div>
                             </div>
                           );
                         })}

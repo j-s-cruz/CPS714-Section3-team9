@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   User,
-  Settings,
   Bell,
   Clock,
   LogOut,
@@ -13,7 +12,6 @@ import { FaDumbbell } from 'react-icons/fa';
 import { supabase } from '../../lib/supabase';
 import { Database } from '../../lib/supabase';
 import { ProfileEditor } from '../Profile/ProfileEditor';
-import { StaffDashboard } from '../Staff/StaffDashboard';
 import { ClassCalendar } from './ClassCalendar';
 
 type TabType = 'dashboard' | 'profile' | 'staff';
@@ -109,6 +107,36 @@ export const MemberDashboard = () => {
     }
   };
 
+  function convertUTCtoLocal(date: string): Date {
+    /* Parse date string as local date (avoid timezone issues) */
+    const [year, month, day] = date.split('-').map(Number);
+    const eventDate = new Date(year, month - 1, day);
+    return eventDate;
+  }
+
+  function filterUpcomingEvents(events: any[]) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    /* Grab the date 7 days from today and set the time to 11:59 PM */
+    const sevenDaysFromNow = new Date(today);
+    sevenDaysFromNow.setDate(today.getDate() + 7);
+    sevenDaysFromNow.setHours(23, 59, 59, 999);
+
+    return events.filter(event => {
+        const eventDate = convertUTCtoLocal(event.date);
+
+        /* Keep event only if it's within the next 7 days (today through 7 days from now) */
+        return eventDate >= today && eventDate <= sevenDaysFromNow;
+      })
+      /* Basic sorting by date and time to show the upcoming classes in the correct order */
+      .sort((a, b) => {
+        const dateA = new Date(`${a.date} ${a.start_time}`);
+        const dateB = new Date(`${b.date} ${b.start_time}`);
+        return dateA.getTime() - dateB.getTime();
+      });
+  }
+
   /* User data */
   const subscription = myProfile?.membership_subscriptions?.[0];
   const tier = subscription?.membership_tiers;
@@ -174,19 +202,6 @@ export const MemberDashboard = () => {
                   <User className="w-4 h-4 inline mr-1" />
                   Profile
                 </button>
-                {/* TODO: I haven't touched this, not sure if you guys want to. */}
-                {myProfile?.is_staff && (
-                  <button
-                    onClick={() => setActiveTab('staff')}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${activeTab === 'staff'
-                      ? 'bg-gold-500/90 text-gray-900 shadow-lg'
-                      : 'text-gray-300 hover:bg-gray-700/50 hover:text-gold-400'
-                      }`}
-                  >
-                    <Settings className="w-4 h-4 inline mr-1" />
-                    Staff Panel
-                  </button>
-                )}
               </div>
 
               {/* Notifications (Again haven't touched this at all) */}
@@ -303,7 +318,7 @@ export const MemberDashboard = () => {
                   <div className="text-right">
                     <p className="text-gray-100 text-lg font-semibold drop-shadow">
                       {subscription?.renewal_date
-                        ? `Renewal Date: ${new Date(subscription.renewal_date).toLocaleDateString()}`
+                        ? `Renewal Date: ${subscription.renewal_date}`
                         : 'No renewal date'}
                     </p>
                   </div>
