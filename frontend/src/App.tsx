@@ -39,7 +39,8 @@ function AppContent() {
     return <ResetPassword />;
   }
 
-  return user ? <MemberDashboard /> : <AuthForm />;
+  // Bypass login - always show dashboard
+  return <MemberDashboard />;
 }
 
 function App() {
