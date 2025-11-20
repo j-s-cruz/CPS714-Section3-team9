@@ -49,15 +49,15 @@ export const MemberDashboard = () => {
 
     const fetchProfileData = async () => {
       try {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*, membership_subscriptions(*, membership_tiers(*))')
-            .eq('id', HARDCODED_USER_ID)
-            .single();
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*, membership_subscriptions(*, membership_tiers(*))')
+          .eq('id', HARDCODED_USER_ID)
+          .single();
 
-          if (error) throw error;
+        if (error) throw error;
 
-          setMyProfile(data);
+        setMyProfile(data);
       } catch (error: any) {
         console.error('Error fetching profile:', error.message);
       }
@@ -126,7 +126,7 @@ export const MemberDashboard = () => {
       hours = parts_of_time[0];
       period = "AM";
     }
-    minutes = parts_of_time[1]; 
+    minutes = parts_of_time[1];
 
     return `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
   }
@@ -156,7 +156,7 @@ export const MemberDashboard = () => {
     );
   }
 
-  /* Use initials if profile picture not found */ 
+  /* Use initials if profile picture not found */
   const initials = (myProfile?.full_name || 'U').split(' ').map((p: string) => p[0]).slice(0, 2).join('');
 
   return (
@@ -201,7 +201,7 @@ export const MemberDashboard = () => {
 
               {/* Notifications (Again haven't touched this at all) */}
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setShowNotificationMenu(!showNotificationMenu)}
                   onBlur={() => setShowNotificationMenu(false)} // This will close the notifcication menu when clicking outside of it, but it also closes it when clicking inside, needs a better solution later
                   className="relative p-2 text-gray-400 hover:text-gold-400 transition-all duration-200 hover:bg-gray-700/50 rounded-lg">
@@ -210,7 +210,7 @@ export const MemberDashboard = () => {
                     <span className="absolute top-1 right-1 w-2 h-2 bg-gold-500 rounded-full animate-pulse-gold shadow-lg shadow-gold-500/50"></span>
                   )}
                 </button>
-                
+
                 {/* Notification drop down menu */}
                 {showNotificationMenu && (
                   <div className="absolute right-0 w-56 h-60 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
@@ -362,7 +362,7 @@ export const MemberDashboard = () => {
                                   const scheduleElement = document.getElementById('class-calendar');
                                   {/* Scroll down to the calendar view for upcoming classes */ }
                                   scheduleElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                  }}>View</button>
+                                }}>View</button>
                             </div>
                           );
                         })}

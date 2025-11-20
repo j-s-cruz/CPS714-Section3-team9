@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Save, User, Phone, Upload, Edit2, X, Crown} from 'lucide-react';
+import { Save, User, Phone, Upload, Edit2, X, Crown } from 'lucide-react';
 import { GiMuscleUp } from 'react-icons/gi';
 import { Database } from '../../lib/supabase';
 
@@ -46,14 +46,14 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
   /* if the user hits the edit button enable the fields in the form */
   const handleEditProfile = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingProfile(true);
   };
 
   /* if the user hits the cancel button it should reset the form*/
   const handleCancelProfile = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingProfile(false);
 
     /* If the user hits cancel we reset the form to the original data */
@@ -67,13 +67,13 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
   /* same logic as above but for fitness goals */
   const handleEditGoals = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingGoals(true);
   };
 
   const handleCancelGoals = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingGoals(false);
     setFitnessGoals(profile?.fitness_goals || '');
   };
