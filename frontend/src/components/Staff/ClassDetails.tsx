@@ -56,27 +56,44 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
     }
   }
 
-
   const deleteClass = async (classId : string) => {
     try{
 
-    if(!confirm("Are you sure you want to delete this class?")) return;
+      //don't delete if class id is invalid/undefined
+      if (!classId) {
+        alert("Invalid Class ID");
+        return;
+      }
+      //ask user confirmation before delete
+      if(!confirm("Are you sure you want to delete this class?")) return;
+
+      const {error, count} = await admin_supabase
+        .from("class")
+        .delete({count: "exact"}) //(counting rows)
+        .eq("id", classId)
+        .select("*"); //(need select for count)
+        
+      if (error) throw error;
+
+      //edge case handlinng:
+      if (count == 0){
+        alert("Class Does not Exist or was already deleted");
+        return;
+      }
+
+      alert("Class was succesfully deleted");
+      onClose();// close the modal
       
-    const {error} = await admin_supabase
-    .from('class')
-    .delete()
-    .eq('id', classId);
+      try{
+        refreshClasses(); //trigger parent refresh
+      }catch (e){
+        console.error("Failed to refresh classes");
+      }
       
-      
-    if (error) throw error;
-    alert("Class was succesfully deleted");
-    onClose();// close the modal
-    refreshClasses(); //trigger parent refresh
-    
-    }catch (err: any){
-      console.error("Delete error", err.message)
-      alert("Error deleting class");
-    }
+      }catch (err: any){
+        console.error("Delete error", err)
+        alert(err.message || "Error deleting class");
+      }
   };
 
     return (
