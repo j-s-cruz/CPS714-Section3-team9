@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { GiWeightLiftingUp, GiMuscleUp, GiRunningShoe, GiBiceps, GiBoxingGlove, GiStrongMan } from 'react-icons/gi';
 import { FaDumbbell, FaHeartbeat } from 'react-icons/fa';
 import dummyData from '../../data/data.json';
-import { supabase } from '../../lib/supabase';
 
 interface classInSchedule {
   id: string;
@@ -104,9 +103,8 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
       const endDate = dateString(weekDays[6]);
 
       /* Fetch the data from team 3 (placeholder). Keep the call so it's easy to swap in later. */
-      await supabase
-        .from('ph')
-        .select('ph');
+      // TODO: Replace with actual supabase call when available
+      // await supabase.from('ph').select('ph');
 
       /* Use shared dummy data (frontend/src/data/data.json) while backend isn't available. */
       const bookings = (dummyData as any).bookings as classInSchedule[];

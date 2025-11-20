@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
 import {
   User,
   Bell,
@@ -17,7 +15,11 @@ import { ClassCalendar } from './ClassCalendar';
 type TabType = 'dashboard' | 'profile';
 
 export const MemberDashboard = () => {
-  const { user, profile, signOut } = useAuth();
+  // TODO: Replace with actual auth when available
+  const user = { email: 'user@example.com' };
+  const profile = null;
+  const signOut = async () => console.log('Sign out');
+  
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [upcomingBookings, setUpcomingBookings] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -30,9 +32,8 @@ export const MemberDashboard = () => {
 
   const fetchUpcomingBookings = async () => {
     /* Place holder for fetching upcoming bookings from team 3 */
-    await supabase
-      .from('ph')
-      .select('ph');
+    // TODO: Replace with actual supabase call when available
+    // await supabase.from('ph').select('ph');
 
     /* Limit the upcoming events to the next 7 days */
     const bookings = (dummyData as any).bookings as any[];
@@ -44,9 +45,8 @@ export const MemberDashboard = () => {
 
   const fetchNotifications = async () => {
     /* Placeholder for notifications database. Use shared dummy data while backend isn't available. */
-    await supabase
-      .from('ph')
-      .select('ph');
+    // TODO: Replace with actual supabase call when available
+    // await supabase.from('ph').select('ph');
 
     const notifications = (dummyData as any).notifications || [];
     setNotifications(notifications);

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
 import { Save, User, Phone, Upload, Edit2, X, Crown } from 'lucide-react';
 import { GiBiceps, GiMuscleUp, GiTrophy } from 'react-icons/gi';
 import dummyData from '../../data/data.json';
 
 export const ProfileEditor = () => {
-  const { user, profile, refreshProfile } = useAuth();
+  // TODO: Replace with actual auth when available
+  const user = { email: 'user@example.com', id: '123' };
+  const profile: any = null;
+  const refreshProfile = async () => console.log('Refresh profile');
+  
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -122,19 +124,21 @@ export const ProfileEditor = () => {
 
     try {
       /* Assuming name is one DB field */
-      const fullName = `${firstName} ${lastName}`.trim();
+      // const fullName = `${firstName} ${lastName}`.trim();
 
       /* Update the database entry related to user ID */
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          full_name: fullName,
-          phone_number: phoneNumber,
-          profile_picture: profilePicture,
-          email: email,
-          fitness_goals: fitnessGoals,
-        })
-        .eq('id', user?.id);
+      // TODO: Replace with actual supabase call when available
+      // const { error: updateError } = await supabase
+      //   .from('profiles')
+      //   .update({
+      //     full_name: fullName,
+      //     phone_number: phoneNumber,
+      //     profile_picture: profilePicture,
+      //     email: email,
+      //     fitness_goals: fitnessGoals,
+      //   })
+      //   .eq('id', user?.id);
+      const updateError = null; // Mock for now
 
       if (updateError) throw updateError;
 
