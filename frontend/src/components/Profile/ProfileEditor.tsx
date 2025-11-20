@@ -1,15 +1,28 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { Save, User, Phone, Upload, Edit2, X, Crown } from 'lucide-react';
-import { GiBiceps, GiMuscleUp, GiTrophy } from 'react-icons/gi';
-import dummyData from '../../data/data.json';
+import { Save, User, Phone, Upload, Edit2, X, Crown} from 'lucide-react';
+import { GiMuscleUp } from 'react-icons/gi';
+import { Database } from '../../lib/supabase';
 
-export const ProfileEditor = () => {
-  const { user, profile, refreshProfile } = useAuth();
+// Re-using the same type definition from MemberDashboard for consistency
+type ProfileWithSubscription = Database['public']['Tables']['profiles']['Row'] & {
+  // membership_subscriptions comes back as an array when using a relation select
+  membership_subscriptions: (Database['public']['Tables']['membership_subscriptions']['Row'] & {
+    membership_tiers: Database['public']['Tables']['membership_tiers']['Row'] | null;
+  })[] | null;
+};
+
+interface ProfileEditorProps {
+  profile: ProfileWithSubscription | null;
+  setProfile: (profile: ProfileWithSubscription | null) => void;
+}
+
+export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
+  const userId = profile?.id;
+
   const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [fitnessGoals, setFitnessGoals] = useState('');
   const [profilePicture, setProfilePicture] = useState<string>('');
@@ -20,29 +33,15 @@ export const ProfileEditor = () => {
   const [isEditingGoals, setIsEditingGoals] = useState(false);
 
   useEffect(() => {
-    /* TODO: Need to change this. profile comes from an old section related to the auth form. This should be handled by team 1s stuff*/
-    if (profile) {
-      /* This assumes the databse only contains full name. Should probably change this otherwise */
-      const fullname = (profile.full_name || '').split(' ');
-      setFirstName(fullname[0] || '');
-      setLastName(fullname[1] || '');
-      setEmail(user?.email || '');
-      /* Again assuming we even have phone number as a field */
-      setPhoneNumber(profile.phone_number || '');
-      setFitnessGoals(profile.fitness_goals || '');
-      setProfilePicture(profile.profile_picture || '');
-    } else {
-      /* Dummy data to be used if profile does not return anything */
-      const dummyProfile = (dummyData as any).profiles?.[0] || {};
-      const nameParts = (dummyProfile.full_name || '').split(' ');
-      setFirstName(nameParts[0] || '');
-      setLastName(nameParts.slice(1).join(' ') || '');
-      setEmail(dummyProfile.email || '');
-      setPhoneNumber(dummyProfile.phone_number || '(123) 456-7890');
-      setFitnessGoals(dummyProfile.fitness_goals || '-Finish CPS714 Project\n-Exercise regularly\n-Eat healthy');
-      setProfilePicture(dummyProfile.profile_picture || '');
-    }
-  }, [profile, user]);
+    // Load initial data from the profile
+    const nameParts = (profile?.full_name || '').split(' ');
+    setFirstName(nameParts[0] || '');
+    setLastName(nameParts.slice(1).join(' ') || '');
+    setEmail(profile?.email || '');
+    setPhoneNumber(profile?.phone_number || '');
+    setFitnessGoals(profile?.fitness_goals || '');
+    setProfilePicture(profile?.profile_picture_url || '');
+  }, [profile]);
 
   /* if the user hits the edit button enable the fields in the form */
   const handleEditProfile = () => {
@@ -58,22 +57,11 @@ export const ProfileEditor = () => {
     setIsEditingProfile(false);
 
     /* If the user hits cancel we reset the form to the original data */
-    if (profile) {
-      const nameParts = (profile.full_name || '').split(' ');
-      setFirstName(nameParts[0] || '');
-      setLastName(nameParts.slice(1).join(' ') || '');
-      setEmail(user?.email || '');
-      setPhoneNumber(profile.phone_number || '');
-      setProfilePicture(profile.profile_picture || '');
-    } else {
-      const dummyProfile = (dummyData as any).profiles?.[0] || {};
-      const nameParts = (dummyProfile.full_name || '').split(' ');
-      setFirstName(nameParts[0] || '');
-      setLastName(nameParts.slice(1).join(' ') || '');
-      setEmail(dummyProfile.email || '');
-      setPhoneNumber(dummyProfile.phone_number || '(123) 456-7890');
-      setProfilePicture(dummyProfile.profile_picture || '');
-    }
+    const nameParts = (profile?.full_name || '').split(' ');
+    setFirstName(nameParts[0] || '');
+    setLastName(nameParts.slice(1).join(' ') || '');
+    setPhoneNumber(profile?.phone_number || '');
+    setProfilePicture(profile?.profile_picture_url || '');
   };
 
   /* same logic as above but for fitness goals */
@@ -87,12 +75,7 @@ export const ProfileEditor = () => {
     setSuccess(false);
     setError(false);
     setIsEditingGoals(false);
-    if (profile) {
-      setFitnessGoals(profile.fitness_goals || '');
-    } else {
-      const dummyProfile = (dummyData as any).profiles?.[0] || {};
-      setFitnessGoals(dummyProfile.fitness_goals || '-Finish CPS714 Project\n-Exercise regularly\n-Eat healthy');
-    }
+    setFitnessGoals(profile?.fitness_goals || '');
   };
 
   const handlePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +97,14 @@ export const ProfileEditor = () => {
   /* This function submits changes to the database (for both profile and goals) */
   const handleSubmitButton = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Guard Clause: Ensure we have a user ID before proceeding.
+    if (!userId) {
+      console.error("Cannot update profile: User ID is missing.");
+      setError(true);
+      return;
+    }
+
     setLoading(true);
 
     /* Reset from previous submit if somehow not done so already */
@@ -124,38 +115,51 @@ export const ProfileEditor = () => {
       /* Assuming name is one DB field */
       const fullName = `${firstName} ${lastName}`.trim();
 
-      /* Update the database entry related to user ID */
-      const { error: updateError } = await supabase
+      const updates = {
+        full_name: fullName,
+        phone_number: phoneNumber,
+        profile_picture_url: profilePicture,
+        fitness_goals: fitnessGoals,
+      };
+
+      // Type helpers for the generated supabase types can be strict in this workspace; ignore type-checking for the runtime call
+      // @ts-ignore
+      const { data, error } = await supabase
         .from('profiles')
-        .update({
-          full_name: fullName,
-          phone_number: phoneNumber,
-          profile_picture: profilePicture,
-          email: email,
-          fitness_goals: fitnessGoals,
-        })
-        .eq('id', user?.id);
+        .update(updates)
+        .eq('id', userId)
+        .select(`
+          *,
+          membership_subscriptions!left (
+            *,
+            membership_tiers (*)
+          )
+        `)
+        .single();
 
-      if (updateError) throw updateError;
+      if (error) throw error;
 
-      await refreshProfile();
+      // Update the state in the parent MemberDashboard component with the returned data
+      if (profile) {
+        // @ts-ignore - merge runtime row data into the profile state
+        setProfile({ ...profile, ...data });
+      }
+
       setSuccess(true);
       setIsEditingProfile(false);
       setIsEditingGoals(false);
       setTimeout(() => setSuccess(false), 1000);
-    } catch (error: any) {
-      /* PURELY FOR TESTING. SINCE AN UPDATE ALWAYS RETURNS ERROR. COMMENT THIS LINE OUT IF NOT DONE SO */
-      // setSuccess(true);
-      // setTimeout(() => setSuccess(false), 1000);
-
-      /* Actual code that should show fail */
+    } catch (err: any) {
+      console.error("Error updating profile:", err.message);
       setError(true);
       setTimeout(() => setError(false), 1000);
-
     } finally {
       setLoading(false);
     }
   };
+
+  const subscription = profile?.membership_subscriptions?.[0];
+  const tier = subscription?.membership_tiers;
 
   return (
     <div className="space-y-6">
@@ -168,7 +172,7 @@ export const ProfileEditor = () => {
       )}
       {success && (
         <div className="bg-gold-500/20 border border-gold-500 text-gold-400 px-6 py-4 rounded-xl flex items-center gap-3 shadow-lg animate-scale-in">
-          <GiBiceps className="w-6 h-6" />
+          <Save className="w-6 h-6" />
           <span className="font-medium">Profile updated successfully!</span>
         </div>
       )}
@@ -183,7 +187,7 @@ export const ProfileEditor = () => {
           }}
         />
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gold-500/60 to-gold-600/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-gold-500/60 to-gold-600/60 z-0" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -241,20 +245,22 @@ export const ProfileEditor = () => {
               </div>
             </div>
 
-            <div className="flex-1">
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePictureUpload}
-                  className="hidden"
-                />
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg font-medium transition-all duration-300 border border-gray-600/50 hover:border-gold-500/50 text-xs">
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload Photo</span>
-                </div>
-              </label>
-            </div>
+            {isEditingProfile && (
+              <div className="flex-1">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePictureUpload}
+                    className="hidden"
+                  />
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-gold-400 rounded-lg font-medium transition-all duration-300 border border-gray-600/50 hover:border-gold-500/50 text-xs">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload Photo</span>
+                  </div>
+                </label>
+              </div>
+            )}
           </div>
 
           {/* Form for profile information */}
@@ -292,9 +298,8 @@ export const ProfileEditor = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
-                disabled={!isEditingProfile}
+                disabled={true}
                 required
               />
             </div>
@@ -302,10 +307,7 @@ export const ProfileEditor = () => {
             <div>
               {/* Update phone number (not actually sure if phone number is needed but added anyways) */}
               <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wide">
-                <span className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Phone Number
-                </span>
+                Phone Number
               </label>
               <input
                 type="tel"
@@ -322,35 +324,42 @@ export const ProfileEditor = () => {
         {/* Combined Membership Details & Upgrade Section */}
         <div className="bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-1 h-full flex flex-col">
           <div
-            className="bg-gold-500/90 p-3 rounded-xl shadow-lg hover:bg-gold-500 transition-all cursor-pointer h-14 w-auto flex items-center gap-8"
+            className="bg-gold-500/90 p-3 rounded-xl shadow-lg hover:bg-gold-500 transition-all cursor-pointer h-14 w-auto flex items-center gap-3"
             title="Membership Details">
-            <Crown className="w-8 h-8 text-gray-900" />
+            <Crown className="w-6 h-6 text-gray-900" />
             <span className="text-xl font-bold text-gray-900">Membership Details</span>
-
           </div>
-          <div className="space-y-4">
-            <h3 className="text-lg text-gray-200">
-              Need to figure out what goes here
-            </h3>
-          </div>
+          {tier && subscription ? (
+            <div className="space-y-4 mt-6 text-sm flex-grow">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-gray-400 uppercase tracking-wider">Tier</span>
+                <span className="font-bold text-gold-400 text-base">{tier.name}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-gray-400 uppercase tracking-wider">Status</span>
+                <span className="font-medium text-gray-100 capitalize bg-green-500/20 px-2 py-1 rounded-md">{subscription.status}</span>
+              </div>
+              {subscription.renewal_date && (
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-gray-400 uppercase tracking-wider">Next Renewal</span>
+                  <span className="font-medium text-gray-100">
+                    {new Date(subscription.renewal_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex-grow flex items-center justify-center">
+              <p className="text-gray-400">No active membership found.</p>
+            </div>
+          )}
 
           {/* Button that should send you to billing details */}
-          <button className="w-full mt-6 px-6 py-3 bg-gold-500/90 text-gray-900 rounded-xl font-semibold hover:bg-gold-500 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-gold-500/30 mt-auto">
-            <GiTrophy className="w-5 h-5" />
-            Upgrade Membership
-          </button>
         </div>
       </div>
 
       {/* Fitness Goals Widget */}
       <div className="relative bg-gray-800/60 border border-gray-700/50 hover:border-gold-500/30 transition-all duration-300 p-6 hover:shadow-xl hover:shadow-gold-500/5 stagger-2">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-10"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=1550&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-          }}
-        />
         <div className="flex items-center justify-between mb-6 relative z-10">
           <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
             <GiMuscleUp className="w-6 h-6 text-gold-400" />

@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Keep the client untyped here to avoid overly-strict generated type inference impacting simple UI calls.
+// The `Database` type is still exported for explicit typing elsewhere when useful.
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export type Database = {
