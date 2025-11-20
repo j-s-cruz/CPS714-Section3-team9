@@ -166,15 +166,7 @@ export default function PaymentsAndBilling() {
           
           {/*SUPABASE CONNECTION TEST*/}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700">
-             <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-                 Membership Tier Test
-             </p>
-             <p className={`text-sm font-medium ${testValue.includes('FAIL') || testValue.includes('No Membership') ? 'text-red-500' : 'text-green-500'}`}>
-                 Result: **{testValue}**
-             </p>
-             <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">
-                 (Checks 'memberships' table for tier)
-             </p>
+             
           </div>
           {/* Empty Box Placeholders */}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
