@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useState, useEffect } from 'react';
 
 import PaymentForm from './PaymentForm';
-
+import SubscriptionPanel from './SubscriptionPanel'; 
 
 async function fetchTestValue(userId: string) {
     if (!userId) return null;
@@ -25,6 +25,16 @@ async function fetchTestValue(userId: string) {
     return data ? `Data Found: ${data.tier}` : 'TEST: No Profile Found';
 }
 
+// Helper functions for formatting
+const formatValue = (value: any) => (typeof value === 'number' ? `$${value.toFixed(2)}` : value || 'N/A');
+const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+};
 
 export default function PaymentsAndBilling() {
 
@@ -37,7 +47,7 @@ export default function PaymentsAndBilling() {
   // NEW STATE FOR TEST
   const [testValue, setTestValue] = useState('Checking Connection...');
 
-  // NOTE: Replace this with actual user ID from your Auth context!
+  // I used my UserID
   const mockUserId = '49f7c14c-1c83-49fc-8701-38043efdb920'; 
   
   // Combined data fetching hook
@@ -110,12 +120,11 @@ export default function PaymentsAndBilling() {
           
           {/*Current Subscription Panel */}
           <div className="flex-1 min-w-[320px] h-96 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-md border border-gray-100 dark:border-zinc-700">
-            <div className="flex justify-between items-start mb-4">
-              <div className='flex flex-col'>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Current Subscription</h2>
-                <p className="text-sm text-gray-600 dark:text-zinc-400">Manage your membership plan and billing</p>
-              </div>
-            </div>
+            <SubscriptionPanel 
+            currentPlan={currentPlan}
+            formatValue={formatValue}
+            formatDate={formatDate}
+          />
 
           </div>
 
