@@ -118,7 +118,7 @@ async def book_class(request: BookingRequest):
         member_status = member_query.data[0]['member_status']  # Get the member's tier (basic, premium, vip)
         class_premium_status = schedule['class']['premium_status']  # Get the class's tier requirement
         
-        # SValidate membership tier against class premium status
+        # Validate membership tier against class premium status
         # Membership hierarchy: basic < premium < vip
         # Rules:
         # - basic members can only book basic classes

@@ -1,4 +1,6 @@
 import React from "react";
+import { useState } from "react";
+
 
 // Mapping of class types to their corresponding image paths
 const classImages: Record<string, string> = {
@@ -26,6 +28,7 @@ export interface CardProps {
   difficulty: string;
   seatsLeft: number;
   type: string;
+  description?: string;
   buttonValue?: string;
   premium_status?: string;
 }
@@ -38,11 +41,38 @@ export const Card: React.FC<CardProps> = ({
   duration,
   trainer,
   difficulty,
-  seatsLeft,
+  seatsLeft: initialSeatsLeft, 
   type,
+  description,
   buttonValue = "BOOK",
   premium_status = "basic",
 }) => {
+
+  const [isBooked, setIsBooked] = useState(buttonValue === "CANCEL");
+  const [seatsLeft, setSeatsLeft] = useState(initialSeatsLeft);
+
+
+  // Handle button click for booking/cancelling - dummy implementation
+  const handleButtonClick = () => {
+    if (premium_status !== "basic") {
+      alert(`This is a ${premium_status} class. Upgrade your membership to book!`);
+      return;
+    }
+    if (!isBooked) {
+      setIsBooked(true);
+      setSeatsLeft((prev) => prev - 1);
+      // setSidebarMessage("Successfully booked!");
+      // setShowSidebar(true);
+    } else {
+      setIsBooked(false);
+      setSeatsLeft((prev) => prev + 1);
+      // setSidebarMessage("Booking cancelled!");
+      // setShowSidebar(true);
+    }
+    // setTimeout(() => setShowSidebar(false), 3000);
+  };
+
+    
   // Formats the date into a more readable format
   const formattedDate = scheduledDate.toLocaleDateString(undefined, {
     weekday: "short",
@@ -81,51 +111,7 @@ export const Card: React.FC<CardProps> = ({
       return hours * 60 + minutes;
   }
 
-  // Determines the color based on the number of seats left
-  const difficultyColors = (difficulty: string) => {
-    if (difficulty === "beginner") {
-      return {
-        backgroundColor: "#FFFDE0",
-        color: "#545415",
-        border: "1px solid #545415"
-      };
-    } else if (difficulty === "intermediate") {
-      return {
-        backgroundColor: "#FFEBDE",
-        color: "#692B03",
-        border: "1px solid #692B03"
-      };
-    } else {
-      return {
-        backgroundColor: "#FFEDED",
-        color: "#5C0000",
-        border: "1px solid #5C0000"
-      };    
-    }
-  };
-
-  // Determines the color based on the membership tier
-  const memberColours = (premium_status: string) => {
-    if (premium_status === "basic") {
-      return {
-        backgroundColor: "#FFFDE0",
-        color: "#545415",
-        border: "1px solid #545415"
-      };
-    } else if (premium_status) {
-      return {
-        backgroundColor: "#FFEBDE",
-        color: "#692B03",
-        border: "1px solid #692B03"
-      };
-    } else {
-      return {
-        backgroundColor: "#FFEDED",
-        color: "#5C0000",
-        border: "1px solid #5C0000"
-      };    
-    }
-  };
+  
 
   // Determines the color based on the number of seats left
   const seatsLeftColor = (seatsLeft: number) => {
@@ -187,40 +173,78 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div className="card shadow-sm rounded-4 p-3">
       {/* Class Image & Level Section */}
-      <section className="position-relative">
-        <img src={classImages[type]} alt={type} className="img-fluid mb-4" />
-        
-        <p
-          className="position-absolute rounded-4 top-0 end-0 px-2 py-1 mb-2"
+      <section className="mb-3">
+        <div className="d-flex justify-content-between mb-2">
+          {/* Premium Status */}
+          <div
+            className="d-flex align-items-center bg-white rounded-4 px-3 py-1 shadow-sm"
+            style={{ gap: "6px" }}
+          >
+          <i
+          className={`bi ${
+            premium_status === "basic"
+              ? "bi-star"       // empty star
+              : premium_status === "premium"
+              ? "bi-star-half"  // half star
+              : "bi-star-fill"  // full star for VIP
+          }`}
           style={{
-            fontSize: "10px",
-            ...difficultyColors(difficulty),
-            transform: "translateY(-20%) translateX(10%)"
-          }}        
-        >
-          <b>
-            {difficulty}
-          </b>
-        </p>
+            color:
+              premium_status === "basic"
+                ? "#aaa"       // grey for basic
+                : premium_status === "premium"
+                ? "#ffc107"    // yellow for premium
+                : "#ff8c00",   // orange for VIP
+            fontSize: "16px",
+          }}
+          ></i>
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 500,
+                color: "#000",
+              }}
+            >
+              {premium_status}
+            </span>
+          </div>
 
-       <p
-          className="position-absolute rounded-4 top-0 start-0 px-2 py-1 mb-2"
-          style={{
-            fontSize: "10px",
-            ...memberColours(premium_status),
-            transform: "translateY(-20%) translateX(10%)"
-          }}        
-        >
-          <b>
-            {premium_status}
-          </b>
-        </p>
-      
+          {/* Difficulty */}
+          <div
+            className="d-flex align-items-center bg-white rounded-4 px-3 py-1 shadow-sm"
+            style={{ gap: "6px" }}
+          >
+            <i
+              className="bi bi-circle-fill"
+              style={{
+                color:
+                  difficulty === "beginner"
+                    ? "#28a745" // bright green
+                    : difficulty === "intermediate"
+                    ? "#ffc107" // bright yellow
+                    : "#dc3545", // bright red
+                fontSize: "14px",
+              }}
+            ></i>
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 500,
+                color: "#000",
+              }}
+            >
+              {difficulty}
+            </span>
+          </div>
+        </div>
+
+        {/* Class Image */}
+        <img src={classImages[type]} alt={type} className="img-fluid" />
       </section>
 
       {/* Class Title Section */}
       <section className="d-flex justify-content-between align-items-center flex-wrap mb-2">
-        <h1 className="fs-4">{className}</h1>
+        <h1 className="fs-6"><b>{className}</b></h1>
       </section>
 
       {/* Date, Time, and Duration Section */}
@@ -228,7 +252,7 @@ export const Card: React.FC<CardProps> = ({
         <hr className="mt-1 mb-1" />
         <span
           className="d-flex justify-content-center align-items-center flex-wrap"
-          style={{ fontSize: "12px" }}
+          style={{ fontSize: "11px" }}
         >
           <i className="bi-clock me-2"></i>
           <span className="me-2">{formattedDate}</span>
@@ -245,11 +269,9 @@ export const Card: React.FC<CardProps> = ({
         <p className="mb-0" style={{ fontSize: "13px" }}>
           <b>Trainer:</b> {trainer}
         </p>
-        {/* <p style={{ fontSize: "13px" }}>
-          <b>Details:</b> Lorem Ipsum has been the industry's standard dummy
-          text ever since the 1500s, when an unknown printer took a galley of
-          type and scrambled it to make a type specimen book.
-        </p> */}
+        <p style={{ fontSize: "13px" }}>
+          <b>Details:</b> {description}
+        </p>
       </section>
 
       {/* Seats Left and Action Button Section */}
@@ -263,7 +285,23 @@ export const Card: React.FC<CardProps> = ({
           </p>
           <hr className="my-1 mx-0" />
         </span>
-        {buttonStatus(buttonValue)}
+        {/* {buttonStatus(buttonValue)} */}
+        {/* <button
+          className={`btn btn-${isBooked ? "danger" : "success"} btn-sm rounded-5 px-3`}
+          style={{ fontSize: "13px" }}
+          onClick={handleButtonClick}
+        >
+          {isBooked ? "CANCEL" : "BOOK"}
+        </button> */}
+
+      <button
+        className={`btn btn-${isBooked ? "danger" : "success"} btn-sm rounded-5 px-3`}
+        style={{ fontSize: "13px" }}
+        onClick={handleButtonClick}
+        disabled={premium_status !== "basic" && !isBooked} >
+        {isBooked ? "CANCEL" : "BOOK"}
+      </button>
+
       </section>
     </div>
   );

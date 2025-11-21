@@ -8,9 +8,10 @@ export type ClassInfo = {
   premium_status: string;
   type: string;
 };
+
 export type ClassSchedule = {
   class: ClassInfo,
-  class_id: number,
+  class_id: number, // schedule_id 
   duration:number;
   scheduled_date: Date;
   taken_spots: number;
@@ -19,6 +20,7 @@ export type ClassSchedule = {
   total_spots: number;
   trainer: string;
 };
+
 export async function fetchClassSchedules(
   date?: string,
   time_from?: string,

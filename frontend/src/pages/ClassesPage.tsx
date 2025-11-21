@@ -110,6 +110,7 @@ export default function ClassesPage() {
                 difficulty={classInfo.difficulty}
                 seatsLeft={total_spots - taken_spots}
                 type={classInfo.type}
+                description={classInfo.description}
                 buttonValue="BOOK"
                 premium_status={classInfo.premium_status}
               />
@@ -117,6 +118,7 @@ export default function ClassesPage() {
           })}
         </div>
       </div>
+
     </div>
   );
 }
