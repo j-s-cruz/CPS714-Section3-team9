@@ -28,7 +28,7 @@ export const BaseDashboardView = ({ subscription, userId, sendToProfile }: BaseD
         <UpcomingClasses userId={userId} />
 
         {/* Gym Acheivement Feed (Maybe goals we've acheived idk) */}
-        <AchvFeed />
+        <AchvFeed userId={userId}/> {/* THIS WAS UPDATED */}
       </div>
       {/* Add a stock image of a gym for more asthetics and seperation */}
       <div className="relative rounded-2xl border border-gray-700/50 overflow-hidden h-56">
