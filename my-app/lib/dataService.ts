@@ -1,6 +1,6 @@
 // This file is responsible for all communication with Supabase and data formatting.
 
-import { supabase } from '../lib/supabase';
+import { supabase } from './supabase';
 
 // --- Type Definition for Fetched Data (from DB) ---
 interface FetchedData {
@@ -9,6 +9,7 @@ interface FetchedData {
     current_period_start: string | null;
     current_period_end: string | null;
     created_at: string | null;
+    balance: number;
     // The joined data is a single object { Cost: number } or null if no match found
     subscriptions: { Cost: number } | null; 
 }
@@ -21,6 +22,7 @@ export type SubscriptionType = {
     is_active: boolean;
     member_since: string | null;
     next_renewal: string | null;
+    balance: number;
 };
 
 
@@ -74,6 +76,7 @@ export async function fetchSubscriptionData(userId: string): Promise<Subscriptio
         current_period_start, 
         current_period_end, 
         created_at,
+        balance,
         subscriptions ( Cost ) 
       `)
       .eq('user_id', userId)
@@ -90,7 +93,7 @@ export async function fetchSubscriptionData(userId: string): Promise<Subscriptio
         
         const price = membershipData.subscriptions?.Cost ?? null; 
         
-        const { tier, status, created_at, current_period_start, current_period_end } = membershipData;
+        const { tier, status, created_at, current_period_start, current_period_end, balance } = membershipData;
 
         return {
             plan_name: tier,
@@ -99,8 +102,46 @@ export async function fetchSubscriptionData(userId: string): Promise<Subscriptio
             is_active: status === 'active',
             member_since: created_at || current_period_start,
             next_renewal: current_period_end,
+            balance: balance ?? 0,
         };
     }
 
     return null;
+}
+
+export async function updateUserBalance(userId: string, amount: number): Promise<boolean> {
+    
+    // NOTE: For simplicity, we are assuming 'balance' is stored as a positive number (credit)
+    // and we are simply SETTING the new balance. In a professional app, you would use 
+    // PostgreSQL's increment operator for safer transactions.
+    
+    // First, retrieve the current membership ID, as 'user_id' is not the PK for 'memberships'
+    const { data: membershipData, error: fetchError } = await supabase
+        .from('memberships')
+        .select('id, balance')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    if (fetchError || !membershipData) {
+        console.error("Failed to find user's membership row:", fetchError);
+        return false;
+    }
+    
+    // Calculate the new balance: Current balance (credit) + Payment amount
+    // Note: If balance is stored as debt (negative), the logic changes. Assuming balance is credit.
+    const currentBalance = membershipData.balance ?? 0;
+    const newBalance = currentBalance + amount; 
+    
+    // Update the balance in the database
+    const { error: updateError } = await supabase
+        .from('memberships')
+        .update({ balance: newBalance })
+        .eq('id', membershipData.id); // Update by membership primary key (id)
+
+    if (updateError) {
+        console.error('Supabase balance update failed:', updateError);
+        return false;
+    }
+    
+    return true;
 }

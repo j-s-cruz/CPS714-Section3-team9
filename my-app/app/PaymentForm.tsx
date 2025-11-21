@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { Lock, ChevronDown } from 'lucide-react'; 
 
 interface PaymentMethod {
     id: number;
@@ -12,15 +11,20 @@ interface PaymentMethod {
 
 interface PaymentFormProps {
     paymentMethods: PaymentMethod[];
-    // We will use this later to inform the parent component of a successful payment
-    // onPaymentSuccess: () => void;
+    userId: string; // Added user ID prop
+    updateBalanceService: (userId: string, amount: number) => Promise<boolean>; // Added service prop
+    onPaymentSuccess: () => void; // Added reload prop
 }
 
-export default function PaymentForm({ paymentMethods }: PaymentFormProps) {
+export default function PaymentForm({ 
+    paymentMethods, 
+    userId, 
+    updateBalanceService, 
+    onPaymentSuccess 
+}: PaymentFormProps) {
     
-    // NOTE: For now, amount is initialized to 0.00
     const [amount, setAmount] = useState<number>(0.00);
-    // Select the default method, or 0 if the array is empty
+    const [isProcessing, setIsProcessing] = useState(false);
     const [selectedMethod, setSelectedMethod] = useState<number>(
         paymentMethods.find(pm => pm.is_default)?.id || (paymentMethods[0]?.id || 0)
     );
@@ -29,23 +33,42 @@ export default function PaymentForm({ paymentMethods }: PaymentFormProps) {
         setAmount(quickAmount);
     };
 
-    const handleProcessPayment = () => {
-        if (amount <= 0 || selectedMethod === 0) {
-            alert("Please enter a valid amount and select a payment method.");
-            return;
-        }
-        
-        // This is where the secure payment logic (calling a Next.js API Route) will go.
-        alert(`Simulating secure payment of ${formatValue(amount)} using method ID ${selectedMethod}. (Next step: implement API call)`);
-        console.log(`SECURE PAYLOAD TO API: { amount: ${amount}, method: ${selectedMethod} }`);
-        
-        // if (onPaymentSuccess) onPaymentSuccess();
-    };
-    
-    // Simple local formatter for the form display
     const formatValue = (value: number) => {
         return `C$${value.toFixed(2)}`;
     }
+
+    const handleProcessPayment = async () => {
+        if (amount <= 0 || selectedMethod === 0) {
+            alert("Please enter an amount greater than zero and select a payment method.");
+            return;
+        }
+        
+        // Disable button and show loading state
+        setIsProcessing(true);
+        
+        try {
+            // 1. SIMULATE SECURE PAYMENT PROCESSING (This is where a Stripe API call would go)
+            console.log(`Simulating secure payment initiation for ${formatValue(amount)}...`);
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network latency
+            
+            // 2. UPDATE BALANCE IN SUPABASE (Called after simulated payment success)
+            // The service adds the amount paid to the existing balance (credit)
+            const success = await updateBalanceService(userId, amount);
+
+            if (success) {
+                alert(`Payment successful! ${formatValue(amount)} credited to your account.`);
+                setAmount(0.00); // Clear input
+                onPaymentSuccess(); // Trigger parent component to reload dashboard data
+            } else {
+                alert("Payment failed: Could not update user balance in the database.");
+            }
+        } catch (error) {
+            console.error("Payment transaction error:", error);
+            alert("An unexpected error occurred during payment processing.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <div className="flex-1 min-w-[320px] p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-md border border-gray-100 dark:border-zinc-700">
@@ -68,11 +91,12 @@ export default function PaymentForm({ paymentMethods }: PaymentFormProps) {
                   onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
                   className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white"
                   placeholder="0.00"
+                  disabled={isProcessing}
                 />
               </div>
             </div>
 
-            {/* Payment Method Dropdown (Currently empty/placeholder) */}
+            {/* Payment Method Dropdown (Placeholder) */}
             <div className="mb-6">
               <label htmlFor="payment-method" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Payment Method</label>
               <div className="relative">
@@ -81,6 +105,7 @@ export default function PaymentForm({ paymentMethods }: PaymentFormProps) {
                   className="appearance-none w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white cursor-pointer"
                   value={selectedMethod}
                   onChange={(e) => setSelectedMethod(parseInt(e.target.value))}
+                  disabled={isProcessing}
                 >
                   {paymentMethods.length > 0 ? (
                     paymentMethods.map(pm => (
@@ -92,17 +117,22 @@ export default function PaymentForm({ paymentMethods }: PaymentFormProps) {
                     <option value={0} disabled>-- No Saved Methods --</option>
                   )}
                 </select>
-                <ChevronDown className="absolute inset-y-0 right-0 w-5 h-5 my-auto mr-3 text-gray-500 dark:text-zinc-400 pointer-events-none" />
               </div>
             </div>
 
             {/* Process Payment Button */}
             <button 
                 onClick={handleProcessPayment}
-                className="flex justify-center items-center w-full py-3 mb-2 bg-black dark:bg-indigo-600 text-white font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-indigo-700 transition"
+                className="flex justify-center items-center w-full py-3 mb-2 bg-black dark:bg-indigo-600 text-white font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-indigo-700 transition disabled:bg-gray-400 dark:disabled:bg-gray-700"
+                disabled={isProcessing}
             >
-                <Lock className="w-4 h-4 mr-2" />
-                Process Payment
+                {isProcessing ? (
+                    'Processing...'
+                ) : (
+                    <>
+                        Process Payment
+                    </>
+                )}
             </button>
             
             {/* Security Message */}
@@ -116,7 +146,8 @@ export default function PaymentForm({ paymentMethods }: PaymentFormProps) {
                     <button 
                         key={val}
                         onClick={() => handleQuickPay(parseFloat(val))}
-                        className="flex-1 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg text-gray-800 dark:text-zinc-200 font-medium hover:bg-gray-50 dark:hover:bg-zinc-700 transition"
+                        className="flex-1 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg text-gray-800 dark:text-zinc-200 font-medium hover:bg-gray-50 dark:hover:bg-zinc-700 transition disabled:opacity-50"
+                        disabled={isProcessing}
                     >
                         {formatValue(parseFloat(val))}
                     </button>

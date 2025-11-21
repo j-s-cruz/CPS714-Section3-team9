@@ -1,14 +1,15 @@
 "use client";
 
 import { supabase } from '../lib/supabase';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { 
     fetchTestValue, 
     fetchSubscriptionData, 
     formatValue, 
     formatDate,
-    SubscriptionType
+    SubscriptionType,
+    updateUserBalance,
 } from '../lib/dataService'; 
 
 import PaymentForm from './PaymentForm';
@@ -28,36 +29,48 @@ export default function PaymentsAndBilling() {
 
   const mockUserId = '49f7c14c-1c83-49fc-8701-38043efdb920'; 
   
-  useEffect(() => {
-    const loadData = async () => {
-      if (!mockUserId) { 
+  const reloadDashboardData = useCallback(async () => {
+    if (!mockUserId) { 
         setLoading(false); 
         setTestValue('User ID Missing');
         return; 
-      }
-      
-      try {
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
         const testResult = await fetchTestValue(mockUserId);
         setTestValue(testResult);
         
         const subData = await fetchSubscriptionData(mockUserId);
         setSubscription(subData);
         
-      } catch (err: any) {
-        // ACTION: Catch block now specifically logs the full error object 
+    } catch (err: any) {
         console.error("Dashboard Load Error:", err);
         setError("Failed to load dashboard data: " + err.message);
-      } finally {
+    } finally {
         setLoading(false);
-      }
-    };
-    loadData();
+    }
   }, [mockUserId]);
+  
+  // Initial load hook (calls the reusable function)
+  useEffect(() => {
+    reloadDashboardData();
+  }, [reloadDashboardData]);
     
   if (loading) return <div className="flex justify-center w-full min-h-screen items-center text-gray-500">Loading payment and billing data...</div>;
   if (error) return <div className="flex justify-center w-full min-h-screen items-center text-red-500">Error: {error}</div>;
 
-  const currentPlan = subscription || {};
+  const currentPlan = subscription || {} as CurrentSubscriptionType;
+
+  // Now, TypeScript knows currentPlan either has the SubscriptionType properties (if loaded) 
+  // or it's the fallback object we created (which also satisfies the type).
+  // This line is now safe and correct:
+  const balance = currentPlan.balance ?? 0; 
+  const balanceStatus = balance >= 0 ? "Credit / Prepaid" : "Balance Due";
+  
+  // Format the balance for display
+  const formattedBalance = formatValue(Math.abs(balance));
 
   return (
     <div className="flex justify-center w-full min-h-screen bg-gray-50 dark:bg-black p-8 sm:p-12 font-sans">
@@ -79,7 +92,12 @@ export default function PaymentsAndBilling() {
           
           {/*SUPABASE CONNECTION TEST*/}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700">
-             
+            <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">Current Balance</p>
+             <p className={`text-2xl font-bold ${balance < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                 {balance < 0 ? "-" : ""}
+                 {formattedBalance}
+             </p>
+             <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">{balanceStatus}</p>
           </div>
           {/* Empty Box Placeholders */}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
@@ -103,7 +121,11 @@ export default function PaymentsAndBilling() {
           {/* RIGHT BOX: Make a Payment Form */}
           <PaymentForm
             paymentMethods={paymentMethods}
-          />
+            // MISSING PROPS: The PaymentForm requires userId, updateBalanceService, and onPaymentSuccess props to be functional.
+            userId={mockUserId}
+            updateBalanceService={updateUserBalance}
+            onPaymentSuccess={reloadDashboardData}
+            />
 
         </section>
 
