@@ -24,6 +24,7 @@ export default function PaymentsAndBilling() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [testValue, setTestValue] = useState<string>('Checking Connection...');
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
 
   const mockUserId = '49f7c14c-1c83-49fc-8701-38043efdb920'; 
   
@@ -101,6 +102,7 @@ export default function PaymentsAndBilling() {
 
           {/* RIGHT BOX: Make a Payment Form */}
           <PaymentForm
+            paymentMethods={paymentMethods}
           />
 
         </section>
