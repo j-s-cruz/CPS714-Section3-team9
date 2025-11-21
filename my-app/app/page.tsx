@@ -1,107 +1,20 @@
 "use client";
 
 import { supabase } from '../lib/supabase';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
+import { 
+    fetchTestValue, 
+    fetchSubscriptionData, 
+    formatValue, 
+    formatDate,
+    SubscriptionType,
+    updateUserBalance,
+} from '../lib/dataService'; 
 
 import PaymentForm from './PaymentForm';
 import SubscriptionPanel from './SubscriptionPanel';
 import BillingHistory from './BillingHistory';
-
-interface SubscriptionType {
-  plan_name: string | null;
-  price: number | null;
-  billing_cycle: string;
-  is_active: boolean;
-  member_since: string | null;
-  next_renewal: string | null;
-}
-
-interface FetchedData {
-  tier: string | null;
-  status: string | null;
-  created_at: string | null;
-  current_period_start: string | null;
-  current_period_end: string | null;
-  plan_details?: { Cost: number | null };
-}
-
-async function fetchTestValue(userId: string) {
-    if (!userId) return 'User ID Missing';
-    
-    // Querying the 'memberships' table for the user's tier
-    const { data, error } = await supabase
-        .from('memberships') 
-        .select('tier') 
-        .eq('user_id', userId) 
-        .maybeSingle(); 
-
-    if (error && error.code !== 'PGRST116') { 
-        console.error('Supabase Test Fetch Error:', error);
-        return 'FETCH FAILED';
-    }
-    
-    return data ? `Tier Found: ${data.tier || 'No Tier Value'}` : 'TEST: No Membership Found';
-}
-
-
-async function fetchSubscriptionData(userId: string): Promise<SubscriptionType | null> {
-    if (!userId) return null;
-    
-    //obtain data from memberships table with joined plan details
-    const { data, error } = await supabase
-      .from('memberships') 
-      .select(`tier, status, current_period_start, current_period_end, created_at, subscriptions ( Cost )`)
-      .eq('user_id', userId)
-      .maybeSingle(); 
-
-    if (error) {
-      console.error('Supabase subscription fetch error:', error);
-      throw error;
-    }
-    
-    // Cast the retrieved data to the FetchedData interface to resolve type issues with joined fields
-    const membershipData = data as FetchedData | null;
-
-    if (membershipData) {
-        
-        // Safely extract price from the joined table data
-        const price = membershipData.plan_details?.Cost ?? null; 
-        
-        const { tier, status, created_at, current_period_start, current_period_end } = membershipData;
-
-        return {
-            plan_name: tier,
-            price: price, 
-            billing_cycle: 'monthly', // Setting a standard billing cycle
-            is_active: status === 'active',
-            member_since: created_at || current_period_start,
-            next_renewal: current_period_end,
-        };
-    }
-
-    return null;
-}
-
-
-// Helper functions for formatting
-const formatValue = (value: any): string => {
-    // If value is null, return N/A instead of $0.00
-    if (value === null || value === undefined) return 'N/A'; 
-    return typeof value === 'number' ? `$${value.toFixed(2)}` : value || 'N/A';
-};
-  
-const formatDate = (dateString: string): string => {
-    if (!dateString) return 'N/A';
-    // Ensure input is a string or number recognized by Date constructor
-    if (typeof dateString !== 'string' && typeof dateString !== 'number') return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
-};
-
 
 export default function PaymentsAndBilling() {
 
@@ -112,39 +25,52 @@ export default function PaymentsAndBilling() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [testValue, setTestValue] = useState<string>('Checking Connection...');
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
 
   const mockUserId = '49f7c14c-1c83-49fc-8701-38043efdb920'; 
   
-  useEffect(() => {
-    const loadData = async () => {
-      if (!mockUserId) { 
+  const reloadDashboardData = useCallback(async () => {
+    if (!mockUserId) { 
         setLoading(false); 
         setTestValue('User ID Missing');
         return; 
-      }
-      
-      try {
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
         const testResult = await fetchTestValue(mockUserId);
         setTestValue(testResult);
         
         const subData = await fetchSubscriptionData(mockUserId);
         setSubscription(subData);
         
-      } catch (err: any) {
-        // ACTION: Catch block now specifically logs the full error object 
+    } catch (err: any) {
         console.error("Dashboard Load Error:", err);
         setError("Failed to load dashboard data: " + err.message);
-      } finally {
+    } finally {
         setLoading(false);
-      }
-    };
-    loadData();
+    }
   }, [mockUserId]);
+  
+  // Initial load hook (calls the reusable function)
+  useEffect(() => {
+    reloadDashboardData();
+  }, [reloadDashboardData]);
     
   if (loading) return <div className="flex justify-center w-full min-h-screen items-center text-gray-500">Loading payment and billing data...</div>;
   if (error) return <div className="flex justify-center w-full min-h-screen items-center text-red-500">Error: {error}</div>;
 
-  const currentPlan = subscription || {};
+  const currentPlan = subscription || {} as CurrentSubscriptionType;
+
+  // Now, TypeScript knows currentPlan either has the SubscriptionType properties (if loaded) 
+  // or it's the fallback object we created (which also satisfies the type).
+  // This line is now safe and correct:
+  const balance = currentPlan.balance ?? 0; 
+  const balanceStatus = balance >= 0 ? "Credit / Prepaid" : "Balance Due";
+  
+  // Format the balance for display
+  const formattedBalance = formatValue(Math.abs(balance));
 
   return (
     <div className="flex justify-center w-full min-h-screen bg-gray-50 dark:bg-black p-8 sm:p-12 font-sans">
@@ -166,7 +92,12 @@ export default function PaymentsAndBilling() {
           
           {/*SUPABASE CONNECTION TEST*/}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700">
-             
+            <p className="text-base font-semibold text-gray-700 dark:text-zinc-300 mb-2">Current Balance</p>
+             <p className={`text-2xl font-bold ${balance < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                 {balance < 0 ? "-" : ""}
+                 {formattedBalance}
+             </p>
+             <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1">{balanceStatus}</p>
           </div>
           {/* Empty Box Placeholders */}
           <div className="h-32 p-6 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-700"></div>
@@ -189,7 +120,12 @@ export default function PaymentsAndBilling() {
 
           {/* RIGHT BOX: Make a Payment Form */}
           <PaymentForm
-          />
+            paymentMethods={paymentMethods}
+            // MISSING PROPS: The PaymentForm requires userId, updateBalanceService, and onPaymentSuccess props to be functional.
+            userId={mockUserId}
+            updateBalanceService={updateUserBalance}
+            onPaymentSuccess={reloadDashboardData}
+            />
 
         </section>
 
