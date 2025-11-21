@@ -1,7 +1,5 @@
 "use client";
 
-// Icons removed: import { Calendar, Zap } from 'lucide-react'; 
-
 // Props interface for clarity
 interface SubscriptionPanelProps {
     currentPlan: any; // Using 'any' to match the state in payments.tsx
