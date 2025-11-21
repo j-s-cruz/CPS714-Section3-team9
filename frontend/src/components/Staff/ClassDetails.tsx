@@ -111,7 +111,7 @@ const ClassDetailsModal = ({ cls, onClose, refreshClasses }: { cls: any, onClose
 
     return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-yellow-500">
+       <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-yellow-500 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-lg font-bold tracking-wide text-white">{cls.class_name}</h3>
           <button onClick={onClose} className="text-white text-xl">x</button>
