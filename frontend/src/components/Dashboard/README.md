@@ -13,15 +13,25 @@ The overall structure is as follows:
 MemberDashboard
 
 -> BaseDashboardView
+
 ---> Acheivement Feed
+
 ---> Class Calendar
+
 ---> MembershipBanner
+
 ---> Upcoming Classes
 
+
+
 -> ProfileEditor
+
 ---> EditProfile
+
 ---> EditGoals
+
 ---> MembershipDetails
+
 ---> (submitProfile)
 
 
