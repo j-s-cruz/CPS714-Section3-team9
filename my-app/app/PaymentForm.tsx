@@ -134,25 +134,7 @@ export default function PaymentForm({
                     </>
                 )}
             </button>
-            
-            {/* Security Message */}
-            <p className="text-center text-xs text-gray-500 dark:text-zinc-400 mb-6">
-              Secure payment processing powered by **Stripe**
-            </p>
-
-            {/* Quick Payment Options */}
-            <div className="flex justify-between space-x-3">
-                {['25.00', '50.00', '100.00'].map(val => (
-                    <button 
-                        key={val}
-                        onClick={() => handleQuickPay(parseFloat(val))}
-                        className="flex-1 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg text-gray-800 dark:text-zinc-200 font-medium hover:bg-gray-50 dark:hover:bg-zinc-700 transition disabled:opacity-50"
-                        disabled={isProcessing}
-                    >
-                        {formatValue(parseFloat(val))}
-                    </button>
-                ))}
-            </div>
+        
         </div>
     );
 }
