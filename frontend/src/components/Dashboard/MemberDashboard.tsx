@@ -9,7 +9,7 @@ import { GiBiceps } from 'react-icons/gi';
 import { FaDumbbell } from 'react-icons/fa';
 import { supabase } from '../../lib/supabase';
 import { Database } from '../../lib/supabase';
-import { ProfileEditor } from '../Profile/ProfileEditor';
+import { ProfileEditor } from './ProfileEditor';
 import { BaseDashboardView } from './BaseDashboardView';
 
 type TabType = 'dashboard' | 'profile';
