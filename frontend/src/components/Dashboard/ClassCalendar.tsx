@@ -185,8 +185,12 @@ export const ClassCalendar: React.FC<ClassCalendarProps> = ({ userId }) => {
 
     const parts_of_time = start_time.split(':').map(Number);
 
-    if (parts_of_time[0] > 12) {
-      hours = parts_of_time[0] - 12;
+    if (parts_of_time[0] === 0) {
+      hours = parts_of_time[0] + 12;
+      period = "AM";
+    }
+    else if (parts_of_time[0] >= 12) {
+      hours = parts_of_time[0] > 12 ? parts_of_time[0] - 12 : parts_of_time[0];
       period = "PM";
     }
     else {

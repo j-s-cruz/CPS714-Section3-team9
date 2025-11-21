@@ -46,14 +46,14 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
   /* if the user hits the edit button enable the fields in the form */
   const handleEditProfile = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingProfile(true);
   };
 
   /* if the user hits the cancel button it should reset the form*/
   const handleCancelProfile = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingProfile(false);
 
     /* If the user hits cancel we reset the form to the original data */
@@ -67,13 +67,13 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
   /* same logic as above but for fitness goals */
   const handleEditGoals = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingGoals(true);
   };
 
   const handleCancelGoals = () => {
     setSuccess(false);
-    setError(false);
+    setError("");
     setIsEditingGoals(false);
     setFitnessGoals(profile?.fitness_goals || '');
   };
@@ -116,7 +116,6 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
 
       if (invalidPhoneNumberFormat(phoneNumber)) throw new Error('Invalid phone number format');
 
-      /* Assuming name is one DB field */
       const fullName = `${firstName} ${lastName}`.trim();
 
       const updates = {
@@ -380,7 +379,7 @@ export const ProfileEditor = ({ profile, setProfile }: ProfileEditorProps) => {
 
           {/* Button that should send you to billing details */}
           <button
-            className="mt-6 px-4 py-2 bg-gold-500/90 hover:bg-gold-500 text-gray-900 rounded-lg font-medium transition-all duration-300 text-sm w-full"
+            className="mt-6 px-4 py-4 bg-gold-500/90 hover:bg-gold-500 text-gray-900 rounded-lg font-medium transition-all duration-300 text-lg w-full"
           >
             Upgrade Membership & View Billing Details
           </button>
