@@ -17,17 +17,20 @@ interface PaymentFormProps {
 }
 
 export default function PaymentForm({ 
-    paymentMethods, 
+    paymentMethods, // Ignored
     userId, 
     updateBalanceService, 
     onPaymentSuccess 
 }: PaymentFormProps) {
     
+    // Form State
     const [amount, setAmount] = useState<number>(0.00);
+    const [cardName, setCardName] = useState('');
+    const [cardNumber, setCardNumber] = useState('');
+    const [expiry, setExpiry] = useState('');
+    const [cvc, setCvc] = useState('');
+    
     const [isProcessing, setIsProcessing] = useState(false);
-    const [selectedMethod, setSelectedMethod] = useState<number>(
-        paymentMethods.find(pm => pm.is_default)?.id || (paymentMethods[0]?.id || 0)
-    );
 
     const handleQuickPay = (quickAmount: number) => {
         setAmount(quickAmount);
@@ -38,8 +41,13 @@ export default function PaymentForm({
     }
 
     const handleProcessPayment = async () => {
-        if (amount <= 0 || selectedMethod === 0) {
-            alert("Please enter an amount greater than zero and select a payment method.");
+        // Simple form validation for simulation
+        if (amount <= 0) {
+            alert("Please enter an amount greater than zero.");
+            return;
+        }
+        if (cardName.length < 3 || cardNumber.length < 15 || expiry.length !== 5 || cvc.length < 3) {
+             alert("Please enter valid card details (Name, Number, Expiry, CVC).");
             return;
         }
         
@@ -47,17 +55,21 @@ export default function PaymentForm({
         setIsProcessing(true);
         
         try {
-            // 1. SIMULATE SECURE PAYMENT PROCESSING (This is where a Stripe API call would go)
-            console.log(`Simulating secure payment initiation for ${formatValue(amount)}...`);
+            // 1. SIMULATE SECURE PAYMENT PROCESSING (Stripe Element interaction simulation)
+            console.log(`Simulating payment initiation for ${formatValue(amount)} using card ending in ${cardNumber.slice(-4)}...`);
             await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network latency
             
             // 2. UPDATE BALANCE IN SUPABASE (Called after simulated payment success)
-            // The service adds the amount paid to the existing balance (credit)
             const success = await updateBalanceService(userId, amount);
 
             if (success) {
                 alert(`Payment successful! ${formatValue(amount)} credited to your account.`);
-                setAmount(0.00); // Clear input
+                setAmount(0.00); // Clear amount
+                setCardName(''); // Clear form
+                setCardNumber('');
+                setExpiry('');
+                setCvc('');
+
                 onPaymentSuccess(); // Trigger parent component to reload dashboard data
             } else {
                 alert("Payment failed: Could not update user balance in the database.");
@@ -77,8 +89,73 @@ export default function PaymentForm({
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Make a Payment</h2>
             <p className="text-sm text-gray-600 dark:text-zinc-400 mb-6">Process one-time payments or add credits to your account.</p>
 
-            {/* Amount Input */}
+            {/* --- CARD DETAILS INPUTS --- */}
+
+            {/* Card Holder Name */}
             <div className="mb-4">
+                <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Card Holder Name</label>
+                <input
+                    id="cardName"
+                    type="text"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white"
+                    placeholder="John Doe"
+                    disabled={isProcessing}
+                />
+            </div>
+
+            {/* Card Number */}
+            <div className="mb-4">
+                <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Card Number</label>
+                <input
+                    id="cardNumber"
+                    type="text"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim())} // Formats number with spaces
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white"
+                    placeholder="XXXX XXXX XXXX XXXX"
+                    maxLength={19} // 16 digits + 3 spaces
+                    disabled={isProcessing}
+                />
+            </div>
+
+            {/* Expiry and CVC */}
+            <div className="mb-6 flex space-x-4">
+                <div className="flex-1">
+                    <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Expiration (MM/YY)</label>
+                    <input
+                        id="expiry"
+                        type="text"
+                        value={expiry}
+                        onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                            setExpiry(value);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white"
+                        placeholder="MM/YY"
+                        maxLength={5}
+                        disabled={isProcessing}
+                    />
+                </div>
+                <div className="flex-1">
+                    <label htmlFor="cvc" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">CVC</label>
+                    <input
+                        id="cvc"
+                        type="text"
+                        value={cvc}
+                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))} // Max 4 digits
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white"
+                        placeholder="123"
+                        maxLength={4}
+                        disabled={isProcessing}
+                    />
+                </div>
+            </div>
+            
+            {/* Amount Input */}
+            <div className="mb-6">
               <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Amount (CAD)</label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-zinc-400">
@@ -96,30 +173,6 @@ export default function PaymentForm({
               </div>
             </div>
 
-            {/* Payment Method Dropdown (Placeholder) */}
-            <div className="mb-6">
-              <label htmlFor="payment-method" className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">Payment Method</label>
-              <div className="relative">
-                <select
-                  id="payment-method"
-                  className="appearance-none w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-zinc-700 text-gray-900 dark:text-white cursor-pointer"
-                  value={selectedMethod}
-                  onChange={(e) => setSelectedMethod(parseInt(e.target.value))}
-                  disabled={isProcessing}
-                >
-                  {paymentMethods.length > 0 ? (
-                    paymentMethods.map(pm => (
-                      <option key={pm.id} value={pm.id}>
-                        {pm.card_type} **** {pm.last_four} {pm.is_default ? '(Default)' : ''}
-                      </option>
-                    ))
-                  ) : (
-                    <option value={0} disabled>-- No Saved Methods --</option>
-                  )}
-                </select>
-              </div>
-            </div>
-
             {/* Process Payment Button */}
             <button 
                 onClick={handleProcessPayment}
@@ -130,11 +183,29 @@ export default function PaymentForm({
                     'Processing...'
                 ) : (
                     <>
-                        Process Payment
+                        Pay {formatValue(amount)}
                     </>
                 )}
             </button>
-        
+            
+            {/* Security Message */}
+            <p className="text-center text-xs text-gray-500 dark:text-zinc-400 mb-6">
+              **SECURITY NOTE:** Do not enter real card details. This form is for simulation only.
+            </p>
+
+            {/* Quick Payment Options */}
+            <div className="flex justify-between space-x-3">
+                {['25.00', '50.00', '100.00'].map(val => (
+                    <button 
+                        key={val}
+                        onClick={() => handleQuickPay(parseFloat(val))}
+                        className="flex-1 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg text-gray-800 dark:text-zinc-200 font-medium hover:bg-gray-50 dark:hover:bg-zinc-700 transition disabled:opacity-50"
+                        disabled={isProcessing}
+                    >
+                        {formatValue(parseFloat(val))}
+                    </button>
+                ))}
+            </div>
         </div>
     );
 }
